@@ -72,6 +72,11 @@ class Horaire
      */
     private $finPauseMidi;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Pointage::class, inversedBy="horaire")
+     */
+    private $pointage;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -205,6 +210,18 @@ class Horaire
     public function setFinPauseMidi(\DateTimeInterface $finPauseMidi): self
     {
         $this->finPauseMidi = $finPauseMidi;
+
+        return $this;
+    }
+
+    public function getPointage(): ?Pointage
+    {
+        return $this->pointage;
+    }
+
+    public function setPointage(?Pointage $pointage): self
+    {
+        $this->pointage = $pointage;
 
         return $this;
     }
