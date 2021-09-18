@@ -2,6 +2,8 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Horaire;
+use App\Entity\JourFerier;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -31,5 +33,8 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('File');
 
         yield MenuItem::section('Users');
+        yield MenuItem::section('Config');
+        yield MenuItem::linkToCrud('Jour Ferier', 'fas fa-list', JourFerier::class);
+        yield MenuItem::linkToCrud('Horaire', 'fas fa-list', Horaire::class);
     }
 }
