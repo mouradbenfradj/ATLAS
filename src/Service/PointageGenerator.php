@@ -34,6 +34,7 @@ class PointageGenerator
         while ($record = $table->nextRecord()) {
             $pointage = new Pointage();
             $pointage->setDate(DateTime::createFromFormat('d/m/Y', $record->attdate));
+
             if (!in_array($pointage->getDate()->format("Y-m-d"), $ignoreDay)) {
                 foreach ($horaires as $horaire) {
                     if ($pointage->getDate() >= $horaire->getDateDebut() and $pointage->getDate() <= $horaire->getDateFin())
