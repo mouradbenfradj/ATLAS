@@ -3,6 +3,10 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -10,6 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
@@ -46,6 +51,18 @@ class UserCrudController extends AbstractCrudController
             IntegerField::new('matricule'),
             DateField::new('debutTravaille'),
             DateField::new('demission'),
+            AssociationField::new('pointage'),
         ];
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        $dbfGenerator = Action::new('dbfGenerator', 'generate depui DbF File')
+            ->linkToRoute('dbf_upload', function (User $user): array {
+                return [
+                    'id' => $user->getId()
+                ];
+            });
+        return $actions->add(Crud::PAGE_INDEX, $dbfGenerator);
     }
 }

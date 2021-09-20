@@ -90,14 +90,14 @@ class Pointage
     private $diff;
 
     /**
-     * @ORM\OneToMany(targetEntity=User::class, mappedBy="pointage")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="pointages")
      */
-    private $Employer;
+    private $employer;
+
 
     public function __construct()
     {
         $this->horaire = new ArrayCollection();
-        $this->Employer = new ArrayCollection();
     }
 
     public function getDate(): ?\DateTimeInterface
@@ -286,32 +286,14 @@ class Pointage
         return $this;
     }
 
-    /**
-     * @return Collection|User[]
-     */
-    public function getEmployer(): Collection
+    public function getEmployer(): ?User
     {
-        return $this->Employer;
+        return $this->employer;
     }
 
-    public function addEmployer(User $employer): self
+    public function setEmployer(?User $employer): self
     {
-        if (!$this->Employer->contains($employer)) {
-            $this->Employer[] = $employer;
-            $employer->setPointage($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEmployer(User $employer): self
-    {
-        if ($this->Employer->removeElement($employer)) {
-            // set the owning side to null (unless already changed)
-            if ($employer->getPointage() === $this) {
-                $employer->setPointage(null);
-            }
-        }
+        $this->employer = $employer;
 
         return $this;
     }

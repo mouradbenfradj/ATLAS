@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2dae9f4f13af96cab4bc0e6a80b0ba36",
+    "content-hash": "599c4d53e9d33eaeb40b4f32ea4fec6e",
     "packages": [
         {
             "name": "composer/package-versions-deprecated",
@@ -1683,6 +1683,72 @@
                 }
             ],
             "time": "2021-05-22T16:11:15+00:00"
+        },
+        {
+            "name": "hisamu/php-xbase",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/luads/php-xbase.git",
+                "reference": "72e073693c594620ea6fc190b8d34a70e3ed4fc0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/luads/php-xbase/zipball/72e073693c594620ea6fc190b8d34a70e3ed4fc0",
+                "reference": "72e073693c594620ea6fc190b8d34a70e3ed4fc0",
+                "shasum": ""
+            },
+            "require": {
+                "ext-iconv": "*",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.0||^8.0||^9.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "XBase\\": "src"
+                },
+                "exclude-from-classmap": [
+                    "/tests"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Luã de Souza",
+                    "email": "lsouza@codeinc.com.br"
+                },
+                {
+                    "name": "Erwin Kooi",
+                    "email": "info@cyane.nl"
+                },
+                {
+                    "name": "Alexander Strizhak",
+                    "email": "gam6itko@gmail.com"
+                }
+            ],
+            "description": "A simple parser for *.dbf, *.fpt files using PHP",
+            "homepage": "https://github.com/luads/php-xbase",
+            "keywords": [
+                "dbase",
+                "dbf",
+                "foxpro"
+            ],
+            "support": {
+                "issues": "https://github.com/luads/php-xbase/issues",
+                "source": "https://github.com/luads/php-xbase/tree/2.0.1"
+            },
+            "time": "2021-03-21T20:49:38+00:00"
         },
         {
             "name": "laminas/laminas-code",

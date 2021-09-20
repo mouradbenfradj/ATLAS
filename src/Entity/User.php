@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -34,11 +36,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string")
      */
     private $password;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Pointage::class, inversedBy="Employer")
-     */
-    private $pointage;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
@@ -79,6 +76,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="date", nullable=true)
      */
     private $demission;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Pointage::class, mappedBy="employer")
+     */
+    private $pointages;
+
+    public function __construct()
+    {
+        $this->pointages = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -167,18 +174,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
-    }
-
-    public function getPointage(): ?Pointage
-    {
-        return $this->pointage;
-    }
-
-    public function setPointage(?Pointage $pointage): self
-    {
-        $this->pointage = $pointage;
-
-        return $this;
     }
 
     public function getUserID(): ?int
@@ -273,6 +268,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDemission(?\DateTimeInterface $demission): self
     {
         $this->demission = $demission;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Pointage[]
+     */
+    public function getPointages(): Collection
+    {
+        return $this->pointages;
+    }
+
+    public function addPointage(Pointage $pointage): self
+    {
+        if (!$this->pointages->contains($pointage)) {
+            $this->pointages[] = $pointage;
+            $pointage->setEmployer($this);
+        }
+
+        return $this;
+    }
+
+    public function removePointage(Pointage $pointage): self
+    {
+        if ($this->pointages->removeElement($pointage)) {
+            // set the owning side to null (unless already changed)
+            if ($pointage->getEmployer() === $this) {
+                $pointage->setEmployer(null);
+            }
+        }
 
         return $this;
     }
