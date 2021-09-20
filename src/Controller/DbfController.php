@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Pointage;
 use App\Form\UploadType;
+use App\Service\PointageGenerator;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -32,7 +33,7 @@ class DbfController extends AbstractController
     /**
      * @Route("/upload/{id}", name="dbf_upload", methods={"GET","POST"})
      */
-    public function upload(Request $request, $id): Response
+    public function upload(Request $request, PointageGenerator $pointageGenerator, $id): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
@@ -40,41 +41,7 @@ class DbfController extends AbstractController
             $dbf = $form->get('upload')->getData();
             if ($dbf) {
                 $table = new TableReader($dbf);
-                while ($record = $table->nextRecord()) {
-                    $pointage = new Pointage();
-                    $pointage->setDate(new DateTime($record->attdate));
-                    $pointage->setEntrer(new DateTime($record->starttime));
-                    $pointage->setSortie(new DateTime($record->endtime));
-                    dump($record->attdate);
-                    /*  $record->userid;
-                    $record->badgenumbe;
-                    $record->ssn;
-                    $record->username;
-                    $record->autosch;
-                    $record->attdate;
-                    $record->schid;
-                    $record->clockintim;
-                    $record->clockoutti;
-                    $record->;
-                    $record->;
-                    $record->workday;
-                    $record->realworkda;
-                    $record->late;
-                    $record->early;
-                    $record->absent;
-                    $record->overtime;
-                    $record->worktime;
-                    $record->exceptioni;
-                    $record->mustin;
-                    $record->mustout;
-                    $record->deptid;
-                    $record->sspedaynor;
-                    $record->sspedaywee;
-                    $record->sspedayhol;
-                    $record->atttime;
-                    $record->attchktime; */
-                }
-                dd('ff');
+                $pointageGenerator->fromDbfFile($table, $id);
             }
             return $this->redirectToRoute('dbf_index', [], Response::HTTP_SEE_OTHER);
         }

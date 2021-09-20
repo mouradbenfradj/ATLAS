@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\HoraireRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -10,6 +12,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Horaire
 {
+    public function __toString()
+    {
+        return $this->horaire;
+    }
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -73,9 +79,14 @@ class Horaire
     private $finPauseMidi;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Pointage::class, inversedBy="horaire")
+     * @ORM\OneToMany(targetEntity=Pointage::class, mappedBy="horaire")
      */
-    private $pointage;
+    private $pointages;
+
+    public function __construct()
+    {
+        $this->pointages = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -214,14 +225,32 @@ class Horaire
         return $this;
     }
 
-    public function getPointage(): ?Pointage
+    /**
+     * @return Collection|Pointage[]
+     */
+    public function getPointages(): Collection
     {
-        return $this->pointage;
+        return $this->pointages;
     }
 
-    public function setPointage(?Pointage $pointage): self
+    public function addPointage(Pointage $pointage): self
     {
-        $this->pointage = $pointage;
+        if (!$this->pointages->contains($pointage)) {
+            $this->pointages[] = $pointage;
+            $pointage->setHoraire($this);
+        }
+
+        return $this;
+    }
+
+    public function removePointage(Pointage $pointage): self
+    {
+        if ($this->pointages->removeElement($pointage)) {
+            // set the owning side to null (unless already changed)
+            if ($pointage->getHoraire() === $this) {
+                $pointage->setHoraire(null);
+            }
+        }
 
         return $this;
     }

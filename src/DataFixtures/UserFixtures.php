@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\User;
+use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -18,6 +19,10 @@ class UserFixtures extends Fixture
     {
         $user = new User();
         $user->setEmail("mourad.ben.fradj@gmail.com");
+        $user->setBadgenumbe(207);
+        $user->setFirstName("Mourad");
+        $user->setLastName("Ben Fradj");
+        $user->setDebutTravaille(new DateTime("2016/04/02"));
         $user->setRoles(['ROLE_ADMIN']);
         $user->setPassword($this->passwordHasher->hashPassword(
             $user,

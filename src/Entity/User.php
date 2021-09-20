@@ -14,6 +14,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    public function __toString()
+    {
+        return $this->getBadgenumbe() . " " . $this->getLastName() . " " . $this->getFirstName();
+    }
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -78,7 +82,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $demission;
 
     /**
-     * @ORM\OneToMany(targetEntity=Pointage::class, mappedBy="employer")
+     * @ORM\OneToMany(targetEntity=Pointage::class,cascade={"persist"}, mappedBy="employer")
      */
     private $pointages;
 

@@ -25,11 +25,6 @@ class Pointage
     private $date;
 
     /**
-     * @ORM\OneToMany(targetEntity=Horaire::class, mappedBy="pointage")
-     */
-    private $horaire;
-
-    /**
      * @ORM\Column(type="time", nullable=true)
      */
     private $entrer;
@@ -94,12 +89,15 @@ class Pointage
      */
     private $employer;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Horaire::class, inversedBy="pointages")
+     */
+    private $horaire;
 
-    public function __construct()
+    public function getId(): ?int
     {
-        $this->horaire = new ArrayCollection();
+        return $this->id;
     }
-
     public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
@@ -108,36 +106,6 @@ class Pointage
     public function setDate(\DateTimeInterface $date): self
     {
         $this->date = $date;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Horaire[]
-     */
-    public function getHoraire(): Collection
-    {
-        return $this->horaire;
-    }
-
-    public function addHoraire(Horaire $horaire): self
-    {
-        if (!$this->horaire->contains($horaire)) {
-            $this->horaire[] = $horaire;
-            $horaire->setPointage($this);
-        }
-
-        return $this;
-    }
-
-    public function removeHoraire(Horaire $horaire): self
-    {
-        if ($this->horaire->removeElement($horaire)) {
-            // set the owning side to null (unless already changed)
-            if ($horaire->getPointage() === $this) {
-                $horaire->setPointage(null);
-            }
-        }
 
         return $this;
     }
@@ -294,6 +262,18 @@ class Pointage
     public function setEmployer(?User $employer): self
     {
         $this->employer = $employer;
+
+        return $this;
+    }
+
+    public function getHoraire(): ?Horaire
+    {
+        return $this->horaire;
+    }
+
+    public function setHoraire(?Horaire $horaire): self
+    {
+        $this->horaire = $horaire;
 
         return $this;
     }
