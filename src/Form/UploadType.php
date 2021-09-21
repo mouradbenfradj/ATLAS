@@ -16,7 +16,7 @@ class UploadType extends AbstractType
             ->add('upload', FileType::class, [
                 'label_attr' => ['class' => 'custom-file-label'],
                 'attr' => ['class' => 'custom-file-input'],
-                'label' => 'Upload dbf (bdf file)',
+                'label' => 'Upload dbf/Xlsx',
 
                 // unmapped means that this field is not associated to any entity property
                 'mapped' => false,

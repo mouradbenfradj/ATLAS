@@ -58,6 +58,13 @@ class UserCrudController extends AbstractCrudController
                     'id' => $user->getId()
                 ];
             });
-        return $actions->add(Crud::PAGE_INDEX, $dbfGenerator);
+        $wlsxGenerator = Action::new('xlsxGenerator', 'generate depui Xlsx File')
+            ->linkToRoute('xlsx_upload', function (User $user): array {
+                return [
+                    'id' => $user->getId()
+                ];
+            });
+        $actions->add(Crud::PAGE_INDEX, $dbfGenerator);
+        return $actions->add(Crud::PAGE_INDEX, $wlsxGenerator);
     }
 }
