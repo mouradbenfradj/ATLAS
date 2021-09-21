@@ -3,6 +3,12 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Pointage;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
 class PointageCrudController extends AbstractCrudController
@@ -12,14 +18,46 @@ class PointageCrudController extends AbstractCrudController
         return Pointage::class;
     }
 
-    /*
+
     public function configureFields(string $pageName): iterable
     {
         return [
             IdField::new('id'),
-            TextField::new('title'),
-            TextEditorField::new('description'),
+            DateField::new('date'),
+            AssociationField::new('horaire'),
+            TimeField::new('entrer'),
+            TimeField::new('sortie'),
+            TimeField::new('nbrHeurTravailler'),
+            TimeField::new('retardEnMinute'),
+            TimeField::new('departAnticiper'),
+            TimeField::new('retardMidi'),
+            TimeField::new('totaleRetard'),
+            TimeField::new('autorisationSortie'),
+            NumberField::new('congerPayer'),
+            NumberField::new('abscence'),
+            TimeField::new('heurNormalementTravailler'),
+            TimeField::new('diff'),
+            AssociationField::new('employer'),
         ];
     }
-    */
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('id')
+            ->add('date')
+            ->add('horaire')
+            ->add('entrer')
+            ->add('sortie')
+            ->add('nbrHeurTravailler')
+            ->add('retardEnMinute')
+            ->add('departAnticiper')
+            ->add('retardMidi')
+            ->add('totaleRetard')
+            ->add('autorisationSortie')
+            ->add('congerPayer')
+            ->add('abscence')
+            ->add('heurNormalementTravailler')
+            ->add('diff')
+            ->add('employer');
+    }
 }
