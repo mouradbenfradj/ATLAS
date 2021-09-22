@@ -8,71 +8,117 @@ use App\Entity\User;
 use App\Entity\Horaire;
 use App\Entity\Pointage;
 use App\Entity\JourFerier;
+use App\Service\DateService;
+use App\Service\JourFerierService;
 use Doctrine\ORM\EntityManagerInterface;
 
-class PointageGenerator
+class PointageGeneratorService
 {
-    // @em EntityManagerInterface
+
+    /**
+     * jourFerierService
+     *
+     * @var JourFerierService
+     */
+    private $jourFerierService;
+
+    /**
+     * em
+     *
+     * @var EntityManagerInterface
+     */
     private $em;
-    public function __construct(EntityManagerInterface $em)
+
+    /**
+     * @var DateService
+     */
+    private $dateService;
+
+    /**
+     * @var TimeService
+     */
+    private $timeService;
+    /**
+     * @var HoraireService
+     */
+    private $horaireService;
+    /**
+     * @var PointageService
+     */
+    private $pointageService;
+
+    /**
+     * @param EntityManagerInterface $em
+     * @param JourFerierService $jourFerierService
+     * @param DateService $dateService
+     * @param TimeService $timeService
+     * @param HoraireService $horaireService
+     * @param PointageService $pointageService
+     */
+    public function __construct(EntityManagerInterface $em, PointageService $pointageService, JourFerierService $jourFerierService, DateService $dateService, TimeService $timeService, HoraireService $horaireService)
     {
         $this->em = $em;
+        $this->jourFerierService = $jourFerierService;
+        $this->dateService = $dateService;
+        $this->horaireService = $horaireService;
+        $this->timeService = $timeService;
+        $this->pointageService = $pointageService;
     }
 
-
-    public function fromDbfFile(object $table, int $userId): void
+    /**
+     * fromDbfFile
+     * 
+     * @param object $table
+     * @param User $user
+     * 
+     * @return void
+     */
+    public function fromDbfFile(object $dbfs, User $user): void
     {
-        $user = $this->em->getRepository(User::class)->find($userId);
-        $horaires = $this->em->getRepository(Horaire::class)->findAll();
-        $jourFerier = $this->em->getRepository(JourFerier::class)->findAll();
-        $ignoreDay = [];
-        foreach ($jourFerier as $jf) {
-            $dt = $jf->getDebut();
-            do {
-                array_push($ignoreDay, $dt->format("Y-m-d"));
-                $dt->add(new DateInterval('P1D'));
-            } while ($dt <= $jf->getFin());
-        }
-        while ($record = $table->nextRecord()) {
-            $pointage = new Pointage();
-            $pointage->setDate(DateTime::createFromFormat('d/m/Y', $record->attdate));
-
-            if (!in_array($pointage->getDate()->format("Y-m-d"), $ignoreDay)) {
-                foreach ($horaires as $horaire) {
-                    if ($pointage->getDate() >= $horaire->getDateDebut() and $pointage->getDate() <= $horaire->getDateFin()) {
-                        dump($horaire);
-                        $diff = date_diff($horaire->getHeurFinTravaille(), $horaire->getHeurDebutTravaille());
-                        dump($diff);
-                        $pointage->setHeurNormalementTravailler(new DateTime($diff->h . ":" . $diff->i . ":" . $diff->s));
-
+        while ($record = $dbfs->nextRecord()) {
+            $dateDbf = $this->dateService->dateDbfToStringY_m_d($record->attdate);
+            $isJourFerier = $this->jourFerierService->isJourFerier($dateDbf);
+            if (!$isJourFerier) {
+                $pointage = new Pointage();
+                $pointage->setDate($this->dateService->dateDbfToDateTime($record->attdate));
+                $pointage->setHoraire($this->horaireService->getHoraireForDate($pointage->getDate()));
+                $pointage->setEntrer($this->timeService->generateTime($record->starttime));
+                $pointage->setSortie($this->timeService->generateTime($record->endtime));
+                $this->pointageService->setPointage($pointage);
+                $pointage->setNbrHeurTravailler($this->pointageService->nbrHeurTravailler());
+                dd($pointage);
+                $pointage->setRetardEnMinute();
+                $pointage->setDepartAnticiper();
+                $pointage->setRetardMidi();
+                $pointage->setTotaleRetard();
+                $pointage->setAutorisationSortie();
+                $pointage->setCongerPayer();
+                $pointage->setAbscence();
+                $pointage->setHeurNormalementTravailler(new DateTime($diff->h . ":" . $diff->i . ":" . $diff->s));
+                $pointage->diff();
 
 
-
-
-
+                dump($horaire);
+                $diff = date_diff($horaire->getHeurFinTravaille(), $horaire->getHeurDebutTravaille());
+                dump($diff);
 
 
 
 
-                        $pointage->setHoraire($horaire);
 
-                        if ($record->starttime != "")
-                            $pointage->setEntrer(new DateTime($record->starttime));
-                        else
-                            $pointage->setEntrer(new DateTime("00:00:00"));
 
-                        if ($record->endtime != "")
-                            $pointage->setSortie(new DateTime($record->endtime));
-                        else
-                            $pointage->setSortie(new DateTime("23:59:00"));
 
-                        $diff = date_diff($pointage->getEntrer(), $pointage->getSortie());
-                        dump($diff);
-                        $pointage->setTotaleRetard(new DateTime($diff->h . ":" . $diff->i . ":" . $diff->s));
 
-                        dd($pointage);
-                    }
-                }
+
+
+
+                $diff = date_diff($pointage->getEntrer(), $pointage->getSortie());
+                dump($diff);
+                $pointage->setTotaleRetard(new DateTime($diff->h . ":" . $diff->i . ":" . $diff->s));
+
+                dd($pointage);
+
+
 
                 $pointage->setDiff(new DateTime("00:00:00"));
                 $user->addPointage($pointage);
@@ -128,7 +174,7 @@ class PointageGenerator
             $sheet = $spreadsheet->getSheet($i);
             $sheetData = $sheet->toArray(null, true, true, true);
             foreach ($sheetData as $ligne) {
-                $horaire = $this->em->getRepository(Horaire::class)->findOneByHoraire($ligne['B']);
+                $horaire = $this->em->getRepository(Horaire::class)->findOneBy(["horaire" => $ligne['B']]);
                 if (
                     DateTime::createFromFormat('d/m/Y', $ligne['A']) !== false
                     &&

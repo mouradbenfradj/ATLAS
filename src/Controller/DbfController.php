@@ -4,11 +4,12 @@ namespace App\Controller;
 
 use XBase\TableReader;
 use App\Form\UploadType;
-use App\Service\PointageGenerator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\Admin\PointageCrudController;
+use App\Entity\User;
+use App\Service\PointageGeneratorService;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -18,14 +19,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class DbfController extends AbstractController
 {
 
+    /**
+     * @var AdminUrlGenerator
+     */
     private $adminUrlGenerator;
 
+    /**
+     * @param AdminUrlGenerator $adminUrlGenerator
+     */
     public function __construct(AdminUrlGenerator $adminUrlGenerator)
     {
         $this->adminUrlGenerator = $adminUrlGenerator;
     }
     /**
      * @Route("/", name="dbf")
+     * @return Response
      */
     public function index(): Response
     {
@@ -37,16 +45,21 @@ class DbfController extends AbstractController
 
     /**
      * @Route("/upload/{id}", name="dbf_upload", methods={"GET","POST"})
+     * @param Request $request
+     * @param PointageGeneratorService $pointageGeneratorService
+     * @param User $id
+     * 
+     * @return Response
      */
-    public function upload(Request $request, PointageGenerator $pointageGenerator, $id): Response
+    public function upload(Request $request, PointageGeneratorService $pointageGeneratorService, User $id): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $dbf = $form->get('upload')->getData();
             if ($dbf) {
-                $table = new TableReader($dbf);
-                $pointageGenerator->fromDbfFile($table, $id);
+                $dbfs = new TableReader($dbf);
+                $pointageGeneratorService->fromDbfFile($dbfs, $id);
             }
             $url = $this->adminUrlGenerator
                 ->setController(PointageCrudController::class)

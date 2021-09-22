@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\Admin\PointageCrudController;
+use App\Service\PointageGeneratorService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -31,7 +32,7 @@ class XlsxController extends AbstractController
     /**
      * @Route("/upload/{id}", name="xlsx_upload", methods={"GET","POST"})
      */
-    public function upload(Request $request, PointageGenerator $pointageGenerator, $id): Response
+    public function upload(Request $request, PointageGeneratorService $pointageGenerator, $id): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
