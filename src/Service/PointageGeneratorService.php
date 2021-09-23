@@ -89,72 +89,55 @@ class PointageGeneratorService
                 $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());
                 $pointage->setDepartAnticiper(null);
                 $pointage->setRetardMidi(null);
-                $pointage->setTotaleRetard();
-                dd($pointage);
-                $pointage->setAutorisationSortie();
-                $pointage->setCongerPayer();
-                $pointage->setAbscence();
-                $pointage->setHeurNormalementTravailler(new DateTime($diff->h . ":" . $diff->i . ":" . $diff->s));
-                $pointage->diff();
-
-
-                dump($horaire);
-                $diff = date_diff($horaire->getHeurFinTravaille(), $horaire->getHeurDebutTravaille());
-                dump($diff);
-
-
-
-
-
-
-
-
-
-
-
-                $diff = date_diff($pointage->getEntrer(), $pointage->getSortie());
-                dump($diff);
-                $pointage->setTotaleRetard(new DateTime($diff->h . ":" . $diff->i . ":" . $diff->s));
-
-                dd($pointage);
-
-
-
-                $pointage->setDiff(new DateTime("00:00:00"));
+                $pointage->setTotaleRetard($this->pointageService->totalRetard());
+                $pointage->setAutorisationSortie(null);
+                $pointage->setCongerPayer(null);
+                $pointage->setAbscence(null);
+                $pointage->setHeurNormalementTravailler($this->pointageService->heurNormalementTravailler());
+                $pointage->setDiff($this->pointageService->diff());
                 $user->addPointage($pointage);
                 $this->em->persist($user);
                 /*  
-                $record->userid;
-            $record->badgenumbe;
-            $record->ssn;
-            $record->username;
-            $record->autosch;
-            $record->attdate;
-            $record->schid;
-            $record->clockintim;
-            $record->clockoutti;
-            $record->;
-            $record->;
-            $record->workday;
-            $record->realworkda;
-            $record->late;
-            $record->early;
-            $record->absent;
-            $record->overtime;
-            $record->worktime;
-            $record->exceptioni;
-            $record->mustin;
-            $record->mustout;
-            $record->deptid;
-            $record->sspedaynor;
-            $record->sspedaywee;
-            $record->sspedayhol;
-            $record->atttime;
-            $record->attchktime; */
+                    $record->userid;
+                    $record->badgenumbe;
+                    $record->ssn;
+                    $record->username;
+                    $record->autosch;
+                    $record->attdate;
+                    $record->schid;
+                    $record->clockintim;
+                    $record->clockoutti;
+                    $record->;
+                    $record->;
+                    $record->workday;
+                    $record->realworkda;
+                    $record->late;
+                    $record->early;
+                    $record->absent;
+                    $record->overtime;
+                    $record->worktime;
+                    $record->exceptioni;
+                    $record->mustin;
+                    $record->mustout;
+                    $record->deptid;
+                    $record->sspedaynor;
+                    $record->sspedaywee;
+                    $record->sspedayhol;
+                    $record->atttime;
+                    $record->attchktime; 
+                */
             }
         }
         $this->em->flush();
     }
+
+    /**
+     * fromXlsxFile
+     *
+     * @param [type] $spreadsheet
+     * @param integer $userId
+     * @return void
+     */
     public function fromXlsxFile($spreadsheet, int $userId): void
     {
         $user = $this->em->getRepository(User::class)->find($userId);
@@ -169,7 +152,7 @@ class PointageGeneratorService
             } while ($dt <= $jf->getFin());
         } */
         $sheetCount = $spreadsheet->getSheetCount();
-
+        dd($sheetCount);
         for ($i = 0; $i < $sheetCount; $i++) {
             $sheet = $spreadsheet->getSheet($i);
             $sheetData = $sheet->toArray(null, true, true, true);

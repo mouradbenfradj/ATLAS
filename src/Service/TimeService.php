@@ -4,24 +4,17 @@ namespace App\Service;
 
 use DateTime;
 use DateInterval;
-use App\Entity\Horaire;
-use App\Entity\Pointage;
 
 class TimeService
 {
     /**
-     * 
+     * margeDuRetard
      */
     private $margeDuRetard = 30;
 
     /**
-     * __construct
-     */
-    public function __construct()
-    {
-    }
-
-    /**
+     * generateTime
+     * 
      * @param string $time
      * 
      * @return DateTime
@@ -33,18 +26,32 @@ class TimeService
         else
             return new DateTime("00:00:00");
     }
+
     /**
-     * DateIntervalToDateTime
+     * dateTimeToDateInterval
+     *
+     * @param DateTime $dateTime
+     * @return DateInterval
+     */
+    public function dateTimeToDateInterval(DateTime $dateTime): DateInterval
+    {
+        return new DateInterval('PT' . $dateTime->format('H') . 'H' . $dateTime->format('i')  . 'M' . $dateTime->format('s') . 'S');
+    }
+
+    /**
+     * dateIntervalToDateTime
      *
      * @param DateInterval $dateInterval
      * @return DateTime
      */
-    public function DateIntervalToDateTime(DateInterval $dateInterval): DateTime
+    public function dateIntervalToDateTime(DateInterval $dateInterval): DateTime
     {
         return new DateTime($dateInterval->h . ":" . $dateInterval->i . ":" . $dateInterval->s);
     }
 
     /**
+     * diffTime
+     * 
      * @param DateTime $timeMax
      * @param DateTime $timeMix
      * 
@@ -55,7 +62,10 @@ class TimeService
         $diff =  date_diff($timeMax, $timeMix);
         return new DateInterval('PT' . $diff->h . 'H' . $diff->i . 'M' . $diff->s . 'S');
     }
+
     /**
+     * margeDuRetard
+     * 
      * @return DateInterval
      */
     public function margeDuRetard(): DateInterval

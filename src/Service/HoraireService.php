@@ -16,7 +16,10 @@ class HoraireService
      * @var EntityManagerInterface
      */
     private $em;
+
     /**
+     * horaires
+     * 
      * @var Horaire[]
      */
     private $horaires;
@@ -34,6 +37,7 @@ class HoraireService
      * @var TimeService
      */
     private $timeService;
+
     /**
      * __construct
      *
@@ -52,17 +56,16 @@ class HoraireService
      * 
      * @return Horaire
      */
-    public function getHoraireForDate(DateTime $dateTime)
+    public function getHoraireForDate(DateTime $dateTime): Horaire
     {
-
+        $this->horaires = $this->em->getRepository(Horaire::class)->findAll();
         $resultat = current($this->horaires);
         $trouve = false;
         while ($horaire = next($this->horaires) and !$trouve) {
+
             if ($dateTime >= $horaire->getDateDebut() and $dateTime <= $horaire->getDateFin()) {
                 $resultat = $horaire;
-                dump($resultat);
                 $trouve = true;
-                dd($trouve);
             }
         }
         $this->horaire = $resultat;
@@ -70,28 +73,48 @@ class HoraireService
     }
 
 
-
-    public function diffPauseMatinalTime()
+    /**
+     *diffPauseMatinalTime
+     *
+     * @return DateInterval
+     */
+    public function diffPauseMatinalTime(): DateInterval
     {
         return $this->timeService->diffTime($this->horaire->getFinPauseMatinal(), $this->horaire->getDebutPauseMatinal());
     }
-    public function diffPauseDejeunerTime()
+
+    /**
+     * diffPauseDejeunerTime
+     *
+     * @return DateInterval
+     */
+    public function diffPauseDejeunerTime(): DateInterval
     {
         return  $this->timeService->diffTime($this->horaire->getFinPauseDejeuner(), $this->horaire->getDebutPauseDejeuner());
     }
-    public function diffPauseMidiTime()
+    /**
+     * diffPauseMidiTime
+     *
+     * @return DateInterval
+     */
+    public function diffPauseMidiTime(): DateInterval
     {
         return  $this->timeService->diffTime($this->horaire->getFinPauseMidi(), $this->horaire->getDebutPauseMidi());
     }
-    public function sumPause()
+
+    /**
+     * sumPause
+     *
+     * @return DateInterval
+     */
+    public function sumPause(): DateInterval
     {
         $e = new DateTime('00:00:00');
         $e->add($this->diffPauseMatinalTime());
         $e->add($this->diffPauseDejeunerTime());
         $e->add($this->diffPauseMidiTime());
-        return new DateInterval('PT' . $e->format('H') . 'H' . $e->format('i') . 'M' . $e->format('s') . 'S');
+        return $this->timeService->dateTimeToDateInterval($e);
     }
-
 
 
     /**
