@@ -10,6 +10,11 @@ use App\Entity\Pointage;
 class TimeService
 {
     /**
+     * 
+     */
+    private $margeDuRetard = 30;
+
+    /**
      * __construct
      */
     public function __construct()
@@ -47,6 +52,14 @@ class TimeService
      */
     public function diffTime(DateTime $timeMax, DateTime $timeMix): DateInterval
     {
-        return date_diff($timeMax, $timeMix);
+        $diff =  date_diff($timeMax, $timeMix);
+        return new DateInterval('PT' . $diff->h . 'H' . $diff->i . 'M' . $diff->s . 'S');
+    }
+    /**
+     * @return DateInterval
+     */
+    public function margeDuRetard(): DateInterval
+    {
+        return new DateInterval('PT' . $this->margeDuRetard . 'M');
     }
 }

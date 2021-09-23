@@ -40,17 +40,20 @@ class PointageService
         $this->timeService = $timeService;
     }
 
-
-
-
     public function nbrHeurTravailler()
     {
-        $nbrHeurTravailler = $this->timeService->DateIntervalToDateTime($this->timeService->diffTime($this->pointage->getSortie(), $this->pointage->getEntrer()));
-        dd($this->horaireService->sumPause());
-        $nbrHeurTravailler->sub();
-        dd($nbrHeurTravailler);
-        $diff = date_diff($this->horaireService->getHoraire()->getHeurFinTravaille(), $this->horaireService->getHoraire()->getHeurDebutTravaille());
-        return new DateTime($this->pointage->getDate());
+        $time = new DateTime($this->pointage->getSortie()->format("H:i:s"));
+        $time->sub($this->horaireService->sumPause());
+        $time = $this->timeService->diffTime($time, $this->pointage->getEntrer());
+        return $this->timeService->DateIntervalToDateTime($time);
+    }
+
+    public function retardEnMinute()
+    {
+        $time = new DateTime($this->horaireService->getHoraire()->getHeurDebutTravaille()->format("H:i:s"));
+        $time->add($this->timeService->margeDuRetard());
+        $time = $this->timeService->diffTime($time, $this->pointage->getEntrer());
+        return $this->timeService->DateIntervalToDateTime($time);
     }
 
     /**

@@ -3,7 +3,9 @@
 namespace App\Service;
 
 use DateTime;
+use DateInterval;
 use App\Entity\Horaire;
+use App\Service\TimeService;
 use Doctrine\ORM\EntityManagerInterface;
 
 class HoraireService
@@ -75,22 +77,19 @@ class HoraireService
     }
     public function diffPauseDejeunerTime()
     {
-        return $this->timeService->diffTime($this->horaire->getFinPauseDejeuner(), $this->horaire->getDebutPauseDejeuner());
+        return  $this->timeService->diffTime($this->horaire->getFinPauseDejeuner(), $this->horaire->getDebutPauseDejeuner());
     }
     public function diffPauseMidiTime()
     {
-        return $this->timeService->diffTime($this->horaire->getFinPauseMidi(), $this->horaire->getDebutPauseMidi());
+        return  $this->timeService->diffTime($this->horaire->getFinPauseMidi(), $this->horaire->getDebutPauseMidi());
     }
     public function sumPause()
     {
         $e = new DateTime('00:00:00');
-        dump($this->diffPauseMatinalTime());
         $e->add($this->diffPauseMatinalTime());
-        dump($this->diffPauseDejeunerTime());
         $e->add($this->diffPauseDejeunerTime());
-        dump($this->diffPauseMidiTime());
         $e->add($this->diffPauseMidiTime());
-        dd($e);
+        return new DateInterval('PT' . $e->format('H') . 'H' . $e->format('i') . 'M' . $e->format('s') . 'S');
     }
 
 

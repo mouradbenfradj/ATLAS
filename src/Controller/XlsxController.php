@@ -2,9 +2,7 @@
 
 namespace App\Controller;
 
-use XBase\TableReader;
 use App\Form\UploadType;
-use App\Service\PointageGenerator;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

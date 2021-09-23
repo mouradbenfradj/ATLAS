@@ -86,11 +86,11 @@ class PointageGeneratorService
                 $pointage->setSortie($this->timeService->generateTime($record->endtime));
                 $this->pointageService->setPointage($pointage);
                 $pointage->setNbrHeurTravailler($this->pointageService->nbrHeurTravailler());
-                dd($pointage);
-                $pointage->setRetardEnMinute();
-                $pointage->setDepartAnticiper();
-                $pointage->setRetardMidi();
+                $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());
+                $pointage->setDepartAnticiper(null);
+                $pointage->setRetardMidi(null);
                 $pointage->setTotaleRetard();
+                dd($pointage);
                 $pointage->setAutorisationSortie();
                 $pointage->setCongerPayer();
                 $pointage->setAbscence();
@@ -175,11 +175,8 @@ class PointageGeneratorService
             $sheetData = $sheet->toArray(null, true, true, true);
             foreach ($sheetData as $ligne) {
                 $horaire = $this->em->getRepository(Horaire::class)->findOneBy(["horaire" => $ligne['B']]);
-                if (
-                    DateTime::createFromFormat('d/m/Y', $ligne['A']) !== false
-                    &&
-                    $horaire
-                ) {
+
+                if (DateTime::createFromFormat('d/m/Y', $ligne['A']) !== false && $horaire) {
                     $pointage = new Pointage();
                     foreach ($ligne as $char => $colomn) {
                         switch ($char) {
@@ -215,7 +212,15 @@ class PointageGeneratorService
                                     try {
                                         $pointage->setNbrHeurTravailler(new DateTime($colomn));
                                     } catch (\Exception $e) {
-                                        $pointage->setNbrHeurTravailler(new DateTime("00:00:00"));
+                                        $time = new DateTime($pointage->getSortie()->format("H:i:s"));
+                                        $diff = date_diff($horaire->getFinPauseMatinal(), $horaire->getDebutPauseMatinal());
+                                        $time->sub(new DateInterval('PT' . $diff->h . 'H' . $diff->i . 'M' . $diff->s . 'S'));
+                                        $diff = date_diff($horaire->getFinPauseDejeuner(), $horaire->getDebutPauseDejeuner());
+                                        $time->sub(new DateInterval('PT' . $diff->h . 'H' . $diff->i . 'M' . $diff->s . 'S'));
+                                        $diff = date_diff($horaire->getFinPauseMidi(), $horaire->getDebutPauseMidi());
+                                        $time->sub(new DateInterval('PT' . $diff->h . 'H' . $diff->i . 'M' . $diff->s . 'S'));
+                                        $diff = date_diff($time, $pointage->getEntrer());
+                                        $pointage->setNbrHeurTravailler(new DateTime($diff->h . ":" . $diff->i . ":" . $diff->s));
                                     }
                                 break;
                             case 'F':
@@ -223,25 +228,41 @@ class PointageGeneratorService
                                     try {
                                         $pointage->setRetardEnMinute(new DateTime($colomn));
                                     } catch (\Exception $e) {
-                                        dd($ligne);
-                                        $pointage->setRetardEnMinute(new DateTime("00:00:00"));
+                                        $time = new DateTime($horaire->getHeurDebutTravaille()->format("H:i:s"));
+                                        $time->add(new DateInterval('PT30M'));
+                                        $diff = date_diff($pointage->getEntrer(), $time);
+                                        $pointage->setRetardEnMinute(new DateTime($diff->h . ":" . $diff->i . ":" . $diff->s));
                                     }
                                 break;
                             case 'G':
                                 if ($colomn)
                                     $pointage->setDepartAnticiper(new DateTime($colomn));
+
                                 break;
                             case 'H':
                                 if ($colomn)
                                     $pointage->setRetardMidi(new DateTime($colomn));
                                 break;
                             case 'I':
-                                if ($colomn)
+                                try {
                                     $pointage->setTotaleRetard(new DateTime($colomn));
+                                } catch (\Exception $e) {
+                                    $pointage->setTotaleRetard(new DateTime("00:00:00"));
+                                    $time = new DateTime($pointage->getTotaleRetard()->format("H:i:s"));
+                                    if ($pointage->getRetardEnMinute())
+                                        $time->add(new DateInterval('PT' . $pointage->getRetardEnMinute()->format('H') . 'H' . $pointage->getRetardEnMinute()->format('i') . 'M' . $pointage->getRetardEnMinute()->format('s') . 'S'));
+                                    if ($pointage->getDepartAnticiper())
+                                        $time->add(new DateInterval('PT' . $pointage->getDepartAnticiper()->format('H') . 'H' . $pointage->getDepartAnticiper()->format('i') . 'M' . $pointage->getDepartAnticiper()->format('s') . 'S'));
+                                    if ($pointage->getRetardMidi())
+                                        $time->add(new DateInterval('PT' . $pointage->getRetardMidi()->format('H') . 'H' . $pointage->getRetardMidi()->format('i') . 'M' . $pointage->getRetardMidi()->format('s') . 'S'));
+                                    $pointage->setTotaleRetard($time);
+                                }
                             case 'J':
-
-                                if ($colomn)
+                                try {
                                     $pointage->setAutorisationSortie(new DateTime($colomn));
+                                } catch (\Exception $e) {
+                                    $pointage->setAutorisationSortie(new DateTime('00:00:00'));
+                                }
                                 break;
                             case 'K':
                                 if ($colomn)
@@ -252,8 +273,16 @@ class PointageGeneratorService
                                     $pointage->setAbscence($colomn);
                                 break;
                             case 'M':
-                                if ($colomn)
+                                try {
                                     $pointage->setHeurNormalementTravailler(new DateTime($colomn));
+                                } catch (\Exception $e) {
+                                    $time = new DateTime($horaire->getHeurFinTravaille()->format("H:i:s"));
+                                    if ($pointage->getAutorisationSortie())
+                                        $time->sub(new DateInterval('PT' . $pointage->getAutorisationSortie()->format('H') . 'H' . $pointage->getAutorisationSortie()->format('i') . 'M' . $pointage->getAutorisationSortie()->format('s') . 'S'));
+                                    $diff = date_diff($time, $horaire->getHeurDebutTravaille());
+                                    $pointage->setHeurNormalementTravailler(new DateTime($diff->h . ":" . $diff->i . ":" . $diff->s));
+                                    dd($pointage);
+                                }
                                 break;
                             case 'N':
                                 if ($colomn)
