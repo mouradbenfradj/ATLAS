@@ -29,6 +29,7 @@ class PointageService
      */
     private $pointage;
 
+    private $sumWeek;
     /**
      * __construct
      *
@@ -38,6 +39,19 @@ class PointageService
     {
         $this->horaireService = $horaireService;
         $this->timeService = $timeService;
+        $this->sumWeek = [
+            "semaine" => 1,
+            "nbrHeurTravailler" => new DateTime("00:00:00"),
+            "retardEnMinute" => new DateTime("00:00:00"),
+            "departAnticiper" => new DateTime("00:00:00"),
+            "retardMidi" => new DateTime("00:00:00"),
+            "totaleRetard" => new DateTime("00:00:00"),
+            "autorisationSortie" =>  new DateTime("00:00:00"),
+            "congerPayer" =>  0,
+            "abscence" =>  0,
+            "heurNormalementTravailler" =>  new DateTime("00:00:00"),
+            "diff" => new DateTime("00:00:00"),
+        ];
     }
 
     public function nbrHeurTravailler()
@@ -80,6 +94,67 @@ class PointageService
         return $this;
     }
 
+    public function nextIsWeek()
+    {
+        dump(new DateTime("first day of this week"));
+        dump(new DateTime("next day of this week"));
+        dd(new DateTime("next weekday"));
+
+        dump(new DateTime("weekdays"));
+        dump(new DateTime("weekdays"));
+        dump(new DateTime("weekday"));
+        dump(new DateTime('sunday'));
+        dump(new DateTime('monday'));
+        dump(new DateTime('tuesday'));
+        dump(new DateTime('wednesday'));
+        dump(new DateTime("weekdays sunday"));
+        dump(new DateTime("weekday sunday"));
+        dump(new DateTime("weekdays monday"));
+        dump(new DateTime("weekday monday"));
+        dump(new DateTime("weekdays tuesday"));
+        dump(new DateTime("weekday tuesday"));
+        dump(new DateTime("weekdays wednesday"));
+
+
+
+
+        dd(new DateTime("weekday wednesday"));
+        dd($this->pointage->getdate());
+        $nextWeekDate = new DateTime('1st January Next Week');
+        dd($nextWeekDate->format('Y-m-d'));
+    }
+    public function nextIsYear()
+    {
+        $nextYearDate = new DateTime('1st January Next Year');
+        dd($nextYearDate->format('Y-m-d'));
+        $checkDate = new DateTime($this->pointage->getDate()->format("Y-m-d"));
+    }
+    public function nextIsMonth()
+    {
+
+        $nextWeekDate = new DateTime('1st January Next Month');
+        dd($nextWeekDate->format('Y-m-d'));
+        $this->pointage->getDate()->format('N') >= 6;
+    }
+    public function sumWeek(array $sumpWeek)
+    {
+        dump($sumpWeek["semaine"]);
+        dump($sumpWeek["nbrHeurTravailler"]);
+        dump($sumpWeek["retardEnMinute"]);
+        dump($sumpWeek["departAnticiper"]);
+        dump($sumpWeek["retardMidi"]);
+        dump($sumpWeek["totaleRetard"]);
+        dump($sumpWeek["autorisationSortie"]);
+        dump($sumpWeek["congerPayer"]);
+        dump($sumpWeek["abscence"]);
+        dump($sumpWeek["heurNormalementTravailler"]);
+        dump($sumpWeek["diff"]);
+
+        dd($sumpWeek);
+        $sumpWeek = [];
+        return $sumpWeek;
+    }
+
     /**
      * totalRetard
      *
@@ -114,5 +189,25 @@ class PointageService
     public function diff(): DateTime
     {
         return $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($this->pointage->getNbrHeurTravailler(), $this->pointage->getHeurNormalementTravailler()));
+    }
+
+    /**
+     * Get the value of sumWeek
+     */
+    public function getSumWeek()
+    {
+        return $this->sumWeek;
+    }
+
+    /**
+     * Set the value of sumWeek
+     *
+     * @return  self
+     */
+    public function setSumWeek($sumWeek)
+    {
+        $this->sumWeek = $sumWeek;
+
+        return $this;
     }
 }
