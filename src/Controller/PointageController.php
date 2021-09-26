@@ -45,17 +45,43 @@ class PointageController extends AbstractController
         foreach ($pointages as $index => $pointage) {
             $pointageService->setPointage($pointage);
             if ($pointageService->nextIsWeek() and $index) {
-                array_push($collectSemaine, $pointageService->getSumWeek());
+                array_push($collectSemaine, $pointageService->getInitBilan());
                 dd($collectSemaine);
             }
-            dd($pointageService->getSumWeek());
+            dd($pointageService->getInitBilan());
         }
         return $this->render('pointage/bilanSemestiriel.html.twig', [
             'pointages' => $collectSemaine,
         ]);
     }
     /**
-     * @Route("/bilanSemestiriel", name="bilan_semestiriel", methods={"GET"})
+     * @Route("/bilanMensuel", name="bilan_mensuel", methods={"GET"})
+     * 
+     * @param PointageRepository $pointageRepository
+     * @param Security $security
+     * @param PointageService $pointageService
+     * @return Response
+     */
+    public function bilanMensuel(PointageRepository $pointageRepository, Security $security, PointageService $pointageService): Response
+    {
+        $user = $security->getUser();
+        $pointages = $pointageRepository->findBy(["employer" => $user], ["date" => "ASC"]);
+        $collectSemaine = [];
+
+        foreach ($pointages as $index => $pointage) {
+            $pointageService->setPointage($pointage);
+            if ($pointageService->nextIsWeek() and $index) {
+                array_push($collectSemaine, $pointageService->getInitBilan());
+                dd($collectSemaine);
+            }
+            dd($pointageService->getInitBilan());
+        }
+        return $this->render('pointage/bilanMensuel.html.twig', [
+            'pointages' => $collectSemaine,
+        ]);
+    }
+    /**
+     * @Route("/bilanAnnuel", name="bilan_annuel", methods={"GET"})
      * 
      * @param PointageRepository $pointageRepository
      * @param Security $security
@@ -66,18 +92,23 @@ class PointageController extends AbstractController
     {
         $user = $security->getUser();
         $pointages = $pointageRepository->findBy(["employer" => $user], ["date" => "ASC"]);
-        $collectSemaine = [];
+        $collect = [];
+        $bilan = $pointageService->getInitBilan();
 
         foreach ($pointages as $index => $pointage) {
+            $sumpBilan["interval"] = $pointage->getDate()->format('Y');
             $pointageService->setPointage($pointage);
-            if ($pointageService->nextIsWeek() and $index) {
-                array_push($collectSemaine, $pointageService->getSumWeek());
-                dd($collectSemaine);
-            }
-            dd($pointageService->getSumWeek());
+            $bilan = $pointageService->sumBilan($bilan);
+            /* $bilan = $pointageService->getInitBilan();
+            dump($pointageService->getNextYear());
+            array_push($collect, $bilan); */
+            /*  if (!$index or $pointage->getDate()->format('Y') == $pointageService->getNextYear()) {
+              
+            } */
         }
-        return $this->render('pointage/bilanSemestiriel.html.twig', [
-            'pointages' => $collectSemaine,
+        dd($collect);
+        return $this->render('pointage/bilanAnnuel.html.twig', [
+            'pointages' => $collect,
         ]);
     }
 

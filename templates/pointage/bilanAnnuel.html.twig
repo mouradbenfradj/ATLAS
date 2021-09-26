@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pointage bilanSemestiriel{% endblock %}
+
+{% block body %}
+    <h1>Pointage bilanSemestiriel</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>semaine</th>
+                <th>Nbr Heures Travaillées</th>
+                <th>Retard en MIN</th>
+                <th>Départ anticipé</th>
+                <th>Retard midi</th>
+                <th>Total Retard</th>
+                <th>AS</th>
+                <th>CP</th>
+                <th>ABS</th>
+                <th>HT Normalement travaillées</th>
+                <th>Diff</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for pointage in pointages %}
+            <tr>
+                <td>{{ pointage.semaine }}</td>
+                <td>{{ pointage.nbrHeurTravailler ? pointage.nbrHeurTravailler|date('H:i:s') : '' }}</td>
+                <td>{{ pointage.retardEnMinute ? pointage.retardEnMinute|date('H:i:s') : '' }}</td>
+                <td>{{ pointage.departAnticiper ? pointage.departAnticiper|date('H:i:s') : '' }}</td>
+                <td>{{ pointage.retardMidi ? pointage.retardMidi|date('H:i:s') : '' }}</td>
+                <td>{{ pointage.totaleRetard ? pointage.totaleRetard|date('H:i:s') : '' }}</td>
+                <td>{{ pointage.autorisationSortie ? pointage.autorisationSortie|date('H:i:s') : '' }}</td>
+                <td>{{ pointage.congerPayer }}</td>
+                <td>{{ pointage.abscence }}</td>
+                <td>{{ pointage.heurNormalementTravailler ? pointage.heurNormalementTravailler|date('H:i:s') : '' }}</td>
+                <td>{{ pointage.diff ? pointage.diff|date('H:i:s') : '' }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="15">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

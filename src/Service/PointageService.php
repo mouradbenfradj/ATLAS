@@ -6,6 +6,7 @@ use DateTime;
 use App\Entity\Pointage;
 use App\Service\TimeService;
 use App\Service\HoraireService;
+use DateTimeInterface;
 
 class PointageService
 {
@@ -29,7 +30,13 @@ class PointageService
      */
     private $pointage;
 
-    private $sumWeek;
+    private $initBilan;
+
+    /**
+     *      
+     * @var int
+     */
+    private $nextYear;
     /**
      * __construct
      *
@@ -39,19 +46,26 @@ class PointageService
     {
         $this->horaireService = $horaireService;
         $this->timeService = $timeService;
-        $this->sumWeek = [
-            "semaine" => 1,
-            "nbrHeurTravailler" => new DateTime("00:00:00"),
-            "retardEnMinute" => new DateTime("00:00:00"),
-            "departAnticiper" => new DateTime("00:00:00"),
-            "retardMidi" => new DateTime("00:00:00"),
-            "totaleRetard" => new DateTime("00:00:00"),
-            "autorisationSortie" =>  new DateTime("00:00:00"),
+        $this->initBilan = [
+            "interval" => 0,
+            "nbrHeurTravailler" => 0,
+            "retardEnMinute" => 0,
+            "departAnticiper" => 0,
+            "retardMidi" => 0,
+            "totaleRetard" => 0,
+            "autorisationSortie" => 0,
             "congerPayer" =>  0,
             "abscence" =>  0,
-            "heurNormalementTravailler" =>  new DateTime("00:00:00"),
-            "diff" => new DateTime("00:00:00"),
+            "heurNormalementTravailler" => 0,
+            "diff" => 0,
         ];
+    }
+    public function bilan(DateTimeInterface $time, int $total)
+    {
+        $total += $time->format('H') * 3600; // Convert the hours to seconds and add to our total
+        $total += $time->format('i') * 60;  // Convert the minutes to seconds and add to our total
+        $total += $time->format('s'); // Add the seconds to our total
+        return $total;
     }
 
     public function nbrHeurTravailler()
@@ -96,10 +110,6 @@ class PointageService
 
     public function nextIsWeek()
     {
-        dump(new DateTime("first day of this week"));
-        dump(new DateTime("next day of this week"));
-        dd(new DateTime("next weekday"));
-
         dump(new DateTime("weekdays"));
         dump(new DateTime("weekdays"));
         dump(new DateTime("weekday"));
@@ -155,6 +165,25 @@ class PointageService
         return $sumpWeek;
     }
 
+    public function sumBilan(array $sumpBilan)
+    {
+        dump($sumpBilan["interval"]);
+        dump($sumpBilan["nbrHeurTravailler"]);
+        dump($sumpBilan["retardEnMinute"]);
+        dump($sumpBilan["departAnticiper"]);
+        dump($sumpBilan["retardMidi"]);
+        dump($sumpBilan["totaleRetard"]);
+        dump($sumpBilan["autorisationSortie"]);
+        dump($sumpBilan["congerPayer"]);
+        dump($sumpBilan["abscence"]);
+        dump($sumpBilan["heurNormalementTravailler"]);
+        dump($sumpBilan["diff"]);
+
+        dd($sumpWeek);
+        $sumpWeek = [];
+        return $sumpWeek;
+    }
+
     /**
      * totalRetard
      *
@@ -191,23 +220,50 @@ class PointageService
         return $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($this->pointage->getNbrHeurTravailler(), $this->pointage->getHeurNormalementTravailler()));
     }
 
+
     /**
-     * Get the value of sumWeek
+     * Get the value of initBilan
      */
-    public function getSumWeek()
+    public function getInitBilan()
     {
-        return $this->sumWeek;
+        return $this->initBilan;
     }
 
     /**
-     * Set the value of sumWeek
+     * Set the value of initBilan
      *
      * @return  self
      */
-    public function setSumWeek($sumWeek)
+    public function setInitBilan($initBilan)
     {
-        $this->sumWeek = $sumWeek;
+        $this->initBilan = $initBilan;
 
+        return $this;
+    }
+
+    /**
+     * Get the value of nextYear
+     *
+     * @return  int
+     */
+    public function getNextYear()
+    {
+        $this->nextYear = new DateTime($this->pointage->getDate()->format("Y-m-d"));
+        $this->nextYear->modify('+1 year');
+        return $this->nextYear;
+    }
+
+    /**
+     * Set the value of nextYear
+     *
+     * @param  int  $nextYear
+     *
+     * @return  self
+     */
+    public function setNextYear(int $nextYear)
+    {
+
+        $this->nextYear = $nextYear + 1;
         return $this;
     }
 }

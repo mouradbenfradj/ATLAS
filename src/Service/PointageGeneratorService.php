@@ -7,7 +7,6 @@ use DateInterval;
 use App\Entity\User;
 use App\Entity\Horaire;
 use App\Entity\Pointage;
-use App\Entity\JourFerier;
 use App\Service\DateService;
 use App\Service\JourFerierService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -68,36 +67,30 @@ class PointageGeneratorService
     /**
      * fromDbfFile
      * 
-     * @param object $table
-     * @param User $user
+     * @param  $record
      * 
-     * @return void
+     * @return Pointage
      */
-    public function fromDbfFile(object $dbfs, User $user): void
+    public function fromDbfFile($record): Pointage
     {
-        while ($record = $dbfs->nextRecord()) {
-            $dateDbf = $this->dateService->dateDbfToStringY_m_d($record->attdate);
-            $isJourFerier = $this->jourFerierService->isJourFerier($dateDbf);
-            if (!$isJourFerier) {
-                $pointage = new Pointage();
-                $pointage->setDate($this->dateService->dateDbfToDateTime($record->attdate));
-                $pointage->setHoraire($this->horaireService->getHoraireForDate($pointage->getDate()));
-                $pointage->setEntrer($this->timeService->generateTime($record->starttime));
-                $pointage->setSortie($this->timeService->generateTime($record->endtime));
-                $this->pointageService->setPointage($pointage);
-                $pointage->setNbrHeurTravailler($this->pointageService->nbrHeurTravailler());
-                $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());
-                $pointage->setDepartAnticiper(null);
-                $pointage->setRetardMidi(null);
-                $pointage->setTotaleRetard($this->pointageService->totalRetard());
-                $pointage->setAutorisationSortie(null);
-                $pointage->setCongerPayer(null);
-                $pointage->setAbscence(null);
-                $pointage->setHeurNormalementTravailler($this->pointageService->heurNormalementTravailler());
-                $pointage->setDiff($this->pointageService->diff());
-                $user->addPointage($pointage);
-                $this->em->persist($user);
-                /*  
+        $pointage = new Pointage();
+        $pointage->setDate($this->dateService->dateDbfToDateTime($record->attdate));
+        $pointage->setHoraire($this->horaireService->getHoraireForDate($pointage->getDate()));
+        $pointage->setEntrer($this->timeService->generateTime($record->starttime));
+        $pointage->setSortie($this->timeService->generateTime($record->endtime));
+        $this->pointageService->setPointage($pointage);
+        $pointage->setNbrHeurTravailler($this->pointageService->nbrHeurTravailler());
+        $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());
+        $pointage->setDepartAnticiper(null);
+        $pointage->setRetardMidi(null);
+        $pointage->setTotaleRetard($this->pointageService->totalRetard());
+        $pointage->setAutorisationSortie(null);
+        $pointage->setCongerPayer(null);
+        $pointage->setAbscence(null);
+        $pointage->setHeurNormalementTravailler($this->pointageService->heurNormalementTravailler());
+        $pointage->setDiff($this->pointageService->diff());
+        return $pointage;
+        /*  
                     $record->userid;
                     $record->badgenumbe;
                     $record->ssn;
@@ -126,9 +119,6 @@ class PointageGeneratorService
                     $record->atttime;
                     $record->attchktime; 
                 */
-            }
-        }
-        $this->em->flush();
     }
 
     /**

@@ -1,59 +1,60 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Pointage index{% endblock %}
+{% block title %}Pointage index
+{% endblock %}
 
 {% block body %}
-    <h1>Pointage index</h1>
+	<h1>Pointage index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Date</th>
-                <th>Entrer</th>
-                <th>Sortie</th>
-                <th>NbrHeurTravailler</th>
-                <th>RetardEnMinute</th>
-                <th>DepartAnticiper</th>
-                <th>RetardMidi</th>
-                <th>TotaleRetard</th>
-                <th>AutorisationSortie</th>
-                <th>CongerPayer</th>
-                <th>Abscence</th>
-                <th>HeurNormalementTravailler</th>
-                <th>Diff</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for pointage in pointages %}
-            <tr>
-                <td>{{ pointage.id }}</td>
-                <td>{{ pointage.date ? pointage.date|date('Y-m-d') : '' }}</td>
-                <td>{{ pointage.entrer ? pointage.entrer|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.sortie ? pointage.sortie|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.nbrHeurTravailler ? pointage.nbrHeurTravailler|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.retardEnMinute ? pointage.retardEnMinute|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.departAnticiper ? pointage.departAnticiper|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.retardMidi ? pointage.retardMidi|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.totaleRetard ? pointage.totaleRetard|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.autorisationSortie ? pointage.autorisationSortie|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.congerPayer }}</td>
-                <td>{{ pointage.abscence }}</td>
-                <td>{{ pointage.heurNormalementTravailler ? pointage.heurNormalementTravailler|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.diff ? pointage.diff|date('H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('pointage_show', {'id': pointage.id}) }}">show</a>
-                    <a href="{{ path('pointage_edit', {'id': pointage.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="15">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Date</th>
+				<th>Entrer</th>
+				<th>Sortie</th>
+				<th>NbrHeurTravailler</th>
+				<th>RetardEnMinute</th>
+				<th>DepartAnticiper</th>
+				<th>RetardMidi</th>
+				<th>TotaleRetard</th>
+				<th>AutorisationSortie</th>
+				<th>CongerPayer</th>
+				<th>Abscence</th>
+				<th>HeurNormalementTravailler</th>
+				<th>Diff</th>
+				<th>actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for pointage in pointages %}
+				<tr>
+					<td>{{ pointage.id }}</td>
+					<td>{{ pointage.date ? pointage.date|date('Y-m-d') : '' }}</td>
+					<td>{{ pointage.entrer ? pointage.entrer|date('H:i:s') : '' }}</td>
+					<td>{{ pointage.sortie ? pointage.sortie|date('H:i:s') : '' }}</td>
+					<td>{{ pointage.nbrHeurTravailler ? pointage.nbrHeurTravailler|date('H:i:s') : '' }}</td>
+					<td>{{ pointage.retardEnMinute ? pointage.retardEnMinute|date('H:i:s') : '' }}</td>
+					<td>{{ pointage.departAnticiper ? pointage.departAnticiper|date('H:i:s') : '' }}</td>
+					<td>{{ pointage.retardMidi ? pointage.retardMidi|date('H:i:s') : '' }}</td>
+					<td>{{ pointage.totaleRetard ? pointage.totaleRetard|date('H:i:s') : '' }}</td>
+					<td>{{ pointage.autorisationSortie ? pointage.autorisationSortie|date('H:i:s') : '' }}</td>
+					<td>{{ pointage.congerPayer }}</td>
+					<td>{{ pointage.abscence }}</td>
+					<td>{{ pointage.heurNormalementTravailler ? pointage.heurNormalementTravailler|date('H:i:s') : '' }}</td>
+					<td>{{ pointage.diff ? pointage.diff|date('H:i:s') : '' }}</td>
+					<td>
+						<a href="{{ path('pointage_show', {'id': pointage.id}) }}">show</a>
+						<a href="{{ path('pointage_edit', {'id': pointage.id}) }}">edit</a>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="15">no records found</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 
-    <a href="{{ path('pointage_new') }}">Create new</a>
+	<a href="{{ path('pointage_new') }}">Create new</a>
 {% endblock %}

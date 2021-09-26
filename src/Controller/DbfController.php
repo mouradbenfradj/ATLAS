@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\Admin\PointageCrudController;
 use App\Entity\User;
+use App\Service\DateService;
+use App\Service\JourFerierService;
 use App\Service\PointageGeneratorService;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -51,7 +53,7 @@ class DbfController extends AbstractController
      * 
      * @return Response
      */
-    public function upload(Request $request, PointageGeneratorService $pointageGeneratorService, User $id): Response
+    public function upload(Request $request, DateService $dateService, JourFerierService $jourFerierService, PointageGeneratorService $pointageGeneratorService, User $id): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
@@ -59,7 +61,16 @@ class DbfController extends AbstractController
             $dbf = $form->get('upload')->getData();
             if ($dbf) {
                 $dbfs = new TableReader($dbf);
-                $pointageGeneratorService->fromDbfFile($dbfs, $id);
+                while ($record = $dbfs->nextRecord()) {
+                    $dateDbf = $dateService->dateDbfToStringY_m_d($record->attdate);
+                    $isJourFerier = $jourFerierService->isJourFerier($dateDbf);
+                    if (!$isJourFerier) {
+                        $id->addPointage($pointageGeneratorService->fromDbfFile($record));
+                    }
+                }
+                $this->getDoctrine()->getManager()->flush();
+
+                $this->addFlash('success', 'id.updated_successfully');
             }
             $url = $this->adminUrlGenerator
                 ->setController(PointageCrudController::class)
@@ -67,7 +78,7 @@ class DbfController extends AbstractController
                 ->generateUrl();
             return $this->redirect($url);
         }
-        dump($id);
+
         return $this->render('dbf/upload.html.twig', [
             'form' => $form->createView(),
         ]);

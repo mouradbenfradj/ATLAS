@@ -1,22 +1,71 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello DefaultController!{% endblock %}
+{% block title %}Pointage bilanAnnuel
+{% endblock %}
+{% macro secondsToMinutes(seconds) %}
+	{# set hours minus minutes/seconds #}
+	{% set hours = (seconds / 60)  // 60 %}
 
+	{% if hours  < 1 %}
+		{# set hours to nothing #}
+		{% set hours = null %}
+	{% else %}
+		{# output hours with a colon: #}
+		{% set hours = hours ~ ':' %}
+	{% endif %}
+
+	{# set minutes remain but no seconds and with a colon #}
+	{% set minutes = (seconds / 60)  % 60   ~ ':' %}
+
+	{# set seconds but no minutes or hours #}
+	{% set seconds = seconds % 60 %}
+	{% if seconds < 10 %}
+		{# add a leading zero if seconds are less than 10 #}
+		{% set seconds = '0' ~ seconds %}
+	{% endif %}
+
+	{{ hours }}{{ minutes}}{{ seconds }}
+
+{% endmacro %}
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+	<h1>Pointage bilanAnnuel</h1>
+	<table class="table" border="1">
+		<thead>
+			<tr>
+				<th>nombre année de travaille</th>
+				<th>Nbr Heures Travaillées</th>
+				<th>Retard en MIN</th>
+				<th>Départ anticipé</th>
+				<th>Retard midi</th>
+				<th>Total Retard</th>
+				<th>AS</th>
+				<th>CP</th>
+				<th>ABS</th>
+				<th>HT Normalement travaillées</th>
+				<th>Diff</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for pointage in bilan %}
+				<tr>
+					<td>{{ pointage.interval }}</td>
+					<td>{{ _self.secondsToMinutes( pointage.nbrHeurTravailler)  }}</td>
+					<td>{{ _self.secondsToMinutes(pointage.retardEnMinute)  }}</td>
+					<td>{{ _self.secondsToMinutes(pointage.departAnticiper) }}</td>
+					<td>{{ _self.secondsToMinutes( pointage.retardMidi)  }}</td>
+					<td>{{ _self.secondsToMinutes(pointage.totaleRetard)  }}</td>
+					<td>{{ _self.secondsToMinutes(pointage.autorisationSortie)  }}</td>
+					<td>{{ pointage.congerPayer }}</td>
+					<td>{{ pointage.abscence }}</td>
+					<td>{{ _self.secondsToMinutes(pointage.heurNormalementTravailler) }}</td>
+					<td>{{ _self.secondsToMinutes(pointage.diff)}}</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="15">no records found</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Administration <code><a href="{{ path('admin') }}">Administration</a></code></li>
-        <li>Pointage <code><a href="{{ path('pointage_index') }}">Pointage</a></code></li>
-        <li>bilan semestiriel <code><a href="{{ path('bilan_semestiriel') }}">bilan semestiriel</a></code></li>
-        
-    </ul>
-</div>
 {% endblock %}
