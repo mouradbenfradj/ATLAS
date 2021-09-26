@@ -1,7 +1,5 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Pointage bilanAnnuel
-{% endblock %}
 {% macro secondsToMinutes(seconds) %}
 	{# set hours minus minutes/seconds #}
 	{% set hours = (seconds / 60)  // 60 %}
@@ -27,6 +25,8 @@
 	{{ hours }}{{ minutes}}{{ seconds }}
 
 {% endmacro %}
+{% block body_title %}bilanAnnuel
+{% endblock %}
 {% block body %}
 	<h1>Pointage bilanAnnuel</h1>
 	<table class="table" border="1">

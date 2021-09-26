@@ -22,18 +22,6 @@ class DefaultController extends AbstractController
     public function index(PointageRepository $pointageRepository, Security $security, PointageService $pointageService): Response
     {
         $pointages = $pointageRepository->findBy(["employer" => $security->getUser()], ["date" => "ASC"]);
-
-
-        // Total to hold the amount of seconds
-        $total = 0;
-
-        /*   // Loop the data items
-        foreach ($data as $item) :
-            $temp = explode(":", $item); // Explode by the seperator :
-            $total += (int) $temp[0] * 3600; // Convert the hours to seconds and add to our total
-            $total += (int) $temp[1] * 60;  // Convert the minutes to seconds and add to our total
-            $total += (int) $temp[2]; // Add the seconds to our total
-        endforeach; */
         $bilan = $pointageService->getInitBilan();
         $thisYear = 0;
         foreach ($pointages as $index => $pointage) {

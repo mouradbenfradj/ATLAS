@@ -34,15 +34,19 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linktoDashboard('Dashboard', 'fa fa-home');
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
-        yield MenuItem::section('File');
-
-        yield MenuItem::section('Users');
-        yield MenuItem::linkToCrud('Pointage', 'fas fa-list', Pointage::class);
-        yield MenuItem::linkToCrud('Employer', 'fas fa-list', User::class);
-
-        yield MenuItem::section('Config');
-        yield MenuItem::linkToCrud('Jour Ferier', 'fas fa-list', JourFerier::class);
-        yield MenuItem::linkToCrud('Horaire', 'fas fa-list', Horaire::class);
+        yield MenuItem::subMenu('bilan', 'fa fa-article')->setSubItems([
+            MenuItem::linkToRoute('Bilan annuel', 'fas fa-list', 'default_index'),
+            MenuItem::linkToRoute('Bilan mensuel', 'fas fa-list', 'default_index'),
+            MenuItem::linkToRoute('Bilan semestiriel', 'fas fa-list', 'default_index'),
+        ]);
+        yield MenuItem::subMenu('Users', 'fa fa-article')->setSubItems([
+            MenuItem::linkToCrud('Pointage', 'fas fa-list', Pointage::class),
+            MenuItem::linkToCrud('Employer', 'fas fa-list', User::class),
+        ]);
+        yield MenuItem::subMenu('Config', 'fa fa-article')->setSubItems([
+            MenuItem::linkToCrud('Jour Ferier', 'fas fa-list', JourFerier::class),
+            MenuItem::linkToCrud('Horaire', 'fas fa-list', Horaire::class),
+        ]);
     }
 
 
