@@ -86,9 +86,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $pointages;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Conger::class, mappedBy="employer")
+     */
+    private $congers;
+
     public function __construct()
     {
         $this->pointages = new ArrayCollection();
+        $this->congers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -300,6 +306,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($pointage->getEmployer() === $this) {
                 $pointage->setEmployer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Conger[]
+     */
+    public function getCongers(): Collection
+    {
+        return $this->congers;
+    }
+
+    public function addConger(Conger $conger): self
+    {
+        if (!$this->congers->contains($conger)) {
+            $this->congers[] = $conger;
+            $conger->setEmployer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConger(Conger $conger): self
+    {
+        if ($this->congers->removeElement($conger)) {
+            // set the owning side to null (unless already changed)
+            if ($conger->getEmployer() === $this) {
+                $conger->setEmployer(null);
             }
         }
 
