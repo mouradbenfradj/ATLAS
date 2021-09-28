@@ -22,7 +22,7 @@ class PointageCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id'),
+            IdField::new('id')->onlyOnIndex(),
             DateField::new('date'),
             AssociationField::new('horaire'),
             TimeField::new('entrer'),
@@ -32,8 +32,8 @@ class PointageCrudController extends AbstractCrudController
             TimeField::new('departAnticiper'),
             TimeField::new('retardMidi'),
             TimeField::new('totaleRetard'),
-            TimeField::new('autorisationSortie'),
-            NumberField::new('congerPayer'),
+            AssociationField::new('autorisationSortie'),
+            AssociationField::new('congerPayer'),
             NumberField::new('abscence'),
             TimeField::new('heurNormalementTravailler'),
             TimeField::new('diff'),

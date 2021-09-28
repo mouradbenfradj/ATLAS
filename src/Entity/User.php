@@ -91,10 +91,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $congers;
 
+    /**
+     * @ORM\OneToMany(targetEntity=AutorisationSortie::class, mappedBy="employer")
+     */
+    private $autorisationSorties;
+
     public function __construct()
     {
         $this->pointages = new ArrayCollection();
         $this->congers = new ArrayCollection();
+        $this->autorisationSorties = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -336,6 +342,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($conger->getEmployer() === $this) {
                 $conger->setEmployer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|AutorisationSortie[]
+     */
+    public function getAutorisationSorties(): Collection
+    {
+        return $this->autorisationSorties;
+    }
+
+    public function addAutorisationSorty(AutorisationSortie $autorisationSorty): self
+    {
+        if (!$this->autorisationSorties->contains($autorisationSorty)) {
+            $this->autorisationSorties[] = $autorisationSorty;
+            $autorisationSorty->setEmployer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAutorisationSorty(AutorisationSortie $autorisationSorty): self
+    {
+        if ($this->autorisationSorties->removeElement($autorisationSorty)) {
+            // set the owning side to null (unless already changed)
+            if ($autorisationSorty->getEmployer() === $this) {
+                $autorisationSorty->setEmployer(null);
             }
         }
 

@@ -80,6 +80,8 @@ class PointageService
     {
         $time = new DateTime($this->horaireService->getHoraire()->getHeurDebutTravaille()->format("H:i:s"));
         $time->add($this->timeService->margeDuRetard());
+        if ($time >= $this->pointage->getEntrer())
+            return null;
         $time = $this->timeService->diffTime($time, $this->pointage->getEntrer());
         return $this->timeService->dateIntervalToDateTime($time);
     }
@@ -211,7 +213,7 @@ class PointageService
         $time = new DateTime($this->horaireService->getHoraire()->getHeurFinTravaille()->format("H:i:s"));
         $time->sub($this->horaireService->sumPause());
         if ($this->pointage->getAutorisationSortie())
-            $time->sub($this->timeService->dateTimeToDateInterval($this->pointage->getAutorisationSortie()));
+            $time->sub($this->timeService->dateTimeToDateInterval($this->pointage->getAutorisationSortie()->getTime()));
         $time = $this->timeService->diffTime($time, $this->horaireService->getHoraire()->getHeurDebutTravaille());
         return $this->timeService->dateIntervalToDateTime($time);
     }

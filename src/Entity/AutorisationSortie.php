@@ -2,15 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\CongerRepository;
+use App\Repository\AutorisationSortieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=CongerRepository::class)
+ * @ORM\Entity(repositoryClass=AutorisationSortieRepository::class)
  */
-class Conger
+class AutorisationSortie
 {
     /**
      * @ORM\Id
@@ -20,27 +20,22 @@ class Conger
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="congers")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="autorisationSorties")
      */
     private $employer;
 
     /**
      * @ORM\Column(type="date")
      */
-    private $debut;
+    private $dateAutorisation;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="time")
      */
-    private $fin;
+    private $time;
 
     /**
-     * @ORM\Column(type="boolean")
-     */
-    private $demiJourner;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Pointage::class, mappedBy="congerPayer")
+     * @ORM\OneToMany(targetEntity=Pointage::class, mappedBy="autorisationSortie")
      */
     private $pointages;
 
@@ -48,7 +43,6 @@ class Conger
     {
         $this->pointages = new ArrayCollection();
     }
-
 
     public function getId(): ?int
     {
@@ -67,38 +61,26 @@ class Conger
         return $this;
     }
 
-    public function getDebut(): ?\DateTimeInterface
+    public function getDateAutorisation(): ?\DateTimeInterface
     {
-        return $this->debut;
+        return $this->dateAutorisation;
     }
 
-    public function setDebut(\DateTimeInterface $debut): self
+    public function setDateAutorisation(\DateTimeInterface $dateAutorisation): self
     {
-        $this->debut = $debut;
+        $this->dateAutorisation = $dateAutorisation;
 
         return $this;
     }
 
-    public function getFin(): ?\DateTimeInterface
+    public function getTime(): ?\DateTimeInterface
     {
-        return $this->fin;
+        return $this->time;
     }
 
-    public function setFin(\DateTimeInterface $fin): self
+    public function setTime(\DateTimeInterface $time): self
     {
-        $this->fin = $fin;
-
-        return $this;
-    }
-
-    public function getDemiJourner(): ?bool
-    {
-        return $this->demiJourner;
-    }
-
-    public function setDemiJourner(bool $demiJourner): self
-    {
-        $this->demiJourner = $demiJourner;
+        $this->time = $time;
 
         return $this;
     }
@@ -115,7 +97,7 @@ class Conger
     {
         if (!$this->pointages->contains($pointage)) {
             $this->pointages[] = $pointage;
-            $pointage->setCongerPayer($this);
+            $pointage->setAutorisationSortie($this);
         }
 
         return $this;
@@ -125,8 +107,8 @@ class Conger
     {
         if ($this->pointages->removeElement($pointage)) {
             // set the owning side to null (unless already changed)
-            if ($pointage->getCongerPayer() === $this) {
-                $pointage->setCongerPayer(null);
+            if ($pointage->getAutorisationSortie() === $this) {
+                $pointage->setAutorisationSortie(null);
             }
         }
 

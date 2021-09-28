@@ -1,3 +1,11 @@
 {% extends '@!EasyAdmin/layout.html.twig' %}
-{% block content %}
-	{{ form(form) }}{% endblock %}
+
+{% block main %}
+	<h1>Upload from Xlsx</h1>
+
+	{{ include('xlsx/_form.html.twig', {
+        form: form,
+        button_label: 'action.save'|trans,
+        include_back_to_home_link: true,
+    }, with_context = false) }}
+{% endblock %}

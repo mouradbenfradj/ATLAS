@@ -7,6 +7,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 
 class CongerCrudController extends AbstractCrudController
 {
@@ -23,6 +24,7 @@ class CongerCrudController extends AbstractCrudController
             AssociationField::new('employer'),
             DateField::new('debut'),
             DateField::new('fin'),
+            BooleanField::new('demiJourner'),
         ];
     }
 }

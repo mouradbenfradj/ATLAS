@@ -64,7 +64,9 @@ class DbfController extends AbstractController
                 while ($record = $dbfs->nextRecord()) {
                     $dateDbf = $dateService->dateDbfToStringY_m_d($record->attdate);
                     $isJourFerier = $jourFerierService->isJourFerier($dateDbf);
-                    if (!$isJourFerier) {
+                    $inDB = $pointageGeneratorService->inDB($dateDbf, $id);
+
+                    if (!$isJourFerier and !$inDB) {
                         $id->addPointage($pointageGeneratorService->fromDbfFile($record));
                     }
                 }

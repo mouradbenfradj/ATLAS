@@ -59,15 +59,8 @@ class Pointage
      */
     private $totaleRetard;
 
-    /**
-     * @ORM\Column(type="time", nullable=true)
-     */
-    private $autorisationSortie;
 
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $congerPayer;
+
 
     /**
      * @ORM\Column(type="float", nullable=true)
@@ -93,6 +86,16 @@ class Pointage
      * @ORM\ManyToOne(targetEntity=Horaire::class, inversedBy="pointages")
      */
     private $horaire;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Conger::class,cascade={"persist"}, inversedBy="pointages")
+     */
+    private $congerPayer;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=AutorisationSortie::class,cascade={"persist"}, inversedBy="pointages")
+     */
+    private $autorisationSortie;
 
     public function getId(): ?int
     {
@@ -194,30 +197,6 @@ class Pointage
         return $this;
     }
 
-    public function getAutorisationSortie(): ?\DateTimeInterface
-    {
-        return $this->autorisationSortie;
-    }
-
-    public function setAutorisationSortie(?\DateTimeInterface $autorisationSortie): self
-    {
-        $this->autorisationSortie = $autorisationSortie;
-
-        return $this;
-    }
-
-    public function getCongerPayer(): ?float
-    {
-        return $this->congerPayer;
-    }
-
-    public function setCongerPayer(?float $congerPayer): self
-    {
-        $this->congerPayer = $congerPayer;
-
-        return $this;
-    }
-
     public function getAbscence(): ?float
     {
         return $this->abscence;
@@ -274,6 +253,30 @@ class Pointage
     public function setHoraire(?Horaire $horaire): self
     {
         $this->horaire = $horaire;
+
+        return $this;
+    }
+
+    public function getCongerPayer(): ?Conger
+    {
+        return $this->congerPayer;
+    }
+
+    public function setCongerPayer(?Conger $congerPayer): self
+    {
+        $this->congerPayer = $congerPayer;
+
+        return $this;
+    }
+
+    public function getAutorisationSortie(): ?AutorisationSortie
+    {
+        return $this->autorisationSortie;
+    }
+
+    public function setAutorisationSortie(?AutorisationSortie $autorisationSortie): self
+    {
+        $this->autorisationSortie = $autorisationSortie;
 
         return $this;
     }

@@ -2,13 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Form\UploadType;
+use App\Service\PointageGeneratorService;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\Admin\PointageCrudController;
-use App\Service\PointageGeneratorService;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -16,6 +18,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class XlsxController extends AbstractController
 {
+
+    /**
+     * @var AdminUrlGenerator
+     */
+    private $adminUrlGenerator;
+
+    /**
+     * @param AdminUrlGenerator $adminUrlGenerator
+     */
+    public function __construct(AdminUrlGenerator $adminUrlGenerator)
+    {
+        $this->adminUrlGenerator = $adminUrlGenerator;
+    }
     /**
      * @Route("/", name="xlsx")
      */
@@ -30,7 +45,7 @@ class XlsxController extends AbstractController
     /**
      * @Route("/upload/{id}", name="xlsx_upload", methods={"GET","POST"})
      */
-    public function upload(Request $request, PointageGeneratorService $pointageGenerator, $id): Response
+    public function upload(Request $request,  PointageGeneratorService $pointageGeneratorService, User $id): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
@@ -39,8 +54,7 @@ class XlsxController extends AbstractController
             if ($xlsx) {
                 $reader = new Xlsx();
                 $spreadsheet = $reader->load($xlsx);
-
-                $pointageGenerator->fromXlsxFile($spreadsheet, $id);
+                $pointageGeneratorService->fromXlsxFile($spreadsheet, $id);
             }
 
             $url = $this->adminUrlGenerator
