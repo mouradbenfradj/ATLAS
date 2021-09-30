@@ -211,15 +211,25 @@ class PointageService
     public function heurNormalementTravailler(): DateTime
     {
         $time = new DateTime($this->horaireService->getHoraire()->getHeurFinTravaille()->format("H:i:s"));
-        $time->sub($this->horaireService->sumPause());
         if ($this->pointage->getAutorisationSortie())
-            $time->sub($this->timeService->dateTimeToDateInterval($this->pointage->getAutorisationSortie()->getTime()));
+            $time->sub(
+                $this->timeService->dateTimeToDateInterval(
+                    $this->pointage->getAutorisationSortie()->getTime()
+                )
+            );
+        $time->sub($this->horaireService->sumPause());
         $time = $this->timeService->diffTime($time, $this->horaireService->getHoraire()->getHeurDebutTravaille());
         return $this->timeService->dateIntervalToDateTime($time);
     }
+
     public function diff(): DateTime
     {
-        return $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($this->pointage->getNbrHeurTravailler(), $this->pointage->getHeurNormalementTravailler()));
+        return $this->timeService->dateIntervalToDateTime(
+            $this->timeService->diffTime(
+                $this->pointage->getNbrHeurTravailler(),
+                $this->pointage->getHeurNormalementTravailler()
+            )
+        );
     }
 
 

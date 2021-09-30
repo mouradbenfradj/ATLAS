@@ -12,6 +12,13 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Conger
 {
+    public function __toString()
+    {
+        if ($this->demiJourner)
+            return "0.5";
+        else
+            return "1";
+    }
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

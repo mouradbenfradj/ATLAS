@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Repository\AutorisationSortieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -12,6 +11,11 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class AutorisationSortie
 {
+    public function __toString()
+    {
+        return $this->time->format("H:i:s");
+    }
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
