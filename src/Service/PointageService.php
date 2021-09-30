@@ -2,8 +2,11 @@
 
 namespace App\Service;
 
+use App\Entity\AutorisationSortie;
+use App\Entity\Conger;
 use DateTime;
 use App\Entity\Pointage;
+use App\Entity\User;
 use App\Service\TimeService;
 use App\Service\HoraireService;
 use DateTimeInterface;
@@ -23,6 +26,13 @@ class PointageService
      * @var TimeService
      */
     private $timeService;
+
+    /**
+     * dateService
+     *
+     * @var DateService
+     */
+    private $dateService;
     /**
      * pointage
      *
@@ -42,10 +52,11 @@ class PointageService
      *
      * @param HoraireService $horaireService
      */
-    public function __construct(HoraireService $horaireService, TimeService $timeService)
+    public function __construct(HoraireService $horaireService, DateService $dateService, TimeService $timeService)
     {
         $this->horaireService = $horaireService;
         $this->timeService = $timeService;
+        $this->dateService = $dateService;
         $this->initBilan = [
             "interval" => 0,
             "nbrHeurTravailler" => 0,
@@ -84,30 +95,6 @@ class PointageService
             return null;
         $time = $this->timeService->diffTime($time, $this->pointage->getEntrer());
         return $this->timeService->dateIntervalToDateTime($time);
-    }
-
-    /**
-     * Get pointage
-     *
-     * @return  Pointage
-     */
-    public function getPointage()
-    {
-        return $this->pointage;
-    }
-
-    /**
-     * Set pointage
-     *
-     * @param  Pointage  $pointage  pointage
-     *
-     * @return  self
-     */
-    public function setPointage(Pointage $pointage)
-    {
-        $this->pointage = $pointage;
-
-        return $this;
     }
 
     public function nextIsWeek()
@@ -277,5 +264,129 @@ class PointageService
 
         $this->nextYear = $nextYear + 1;
         return $this;
+    }
+
+    /**
+     * Get pointage
+     *
+     * @return  Pointage
+     */
+    public function getPointage()
+    {
+        return $this->pointage;
+    }
+
+    /**
+     * Set pointage
+     *
+     * @param  Pointage  $pointage  pointage
+     *
+     * @return  self
+     */
+    public function setPointage(Pointage $pointage)
+    {
+        $this->pointage = $pointage;
+
+        return $this;
+    }
+
+    public function addLigne(array $ligne, User $user)
+    {
+        $this->pointage = new Pointage();
+        foreach ($ligne as $char => $colomn) {
+            switch ($char) {
+                case 'A':
+                    $this->pointage->setDate($this->dateService->dateString_d_m_Y_ToDateTime($colomn));
+                    break;
+                case 'B':
+                    $this->pointage->setHoraire($this->horaireService->getHoraireForDate($this->pointage->getDate()));
+                    break;
+                case 'C':
+                    if ($this->timeService->isTimeHis($colomn))
+                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
+                    if ($this->timeService->isTimeHi($colomn))
+                        $this->pointage->setEntrer($this->timeService->generateTime($colomn));
+                    break;
+                case 'D':
+                    if ($this->timeService->isTimeHis($colomn))
+                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
+                    if ($this->timeService->isTimeHi($colomn))
+                        $this->pointage->setSortie($this->timeService->generateTime($colomn));
+                    break;
+                case 'E':
+                    if ($this->pointage->getSortie() and $this->pointage->getEntrer())
+                        $this->pointage->setNbrHeurTravailler($this->nbrHeurTravailler());
+                    else
+                        $this->pointage->setNbrHeurTravailler(new DateTime("00:00:00"));
+                    break;
+                case 'F':
+                    if ($this->pointage->getSortie() and $this->pointage->getEntrer())
+                        $this->pointage->setRetardEnMinute($this->retardEnMinute());
+                    break;
+                case 'G':
+                    if ($this->timeService->isTimeHis($colomn))
+                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
+                    if ($this->timeService->isTimeHi($colomn))
+                        $this->pointage->setDepartAnticiper(new DateTime($colomn));
+                    break;
+                case 'H':
+
+                    if ($this->timeService->isTimeHis($colomn))
+                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
+                    if ($this->timeService->isTimeHi($colomn))
+                        $this->pointage->setRetardMidi($colomn);
+                    break;
+                case 'I':
+                    $this->pointage->setTotaleRetard($this->totalRetard());
+                case 'J':
+                    if ($this->timeService->isTimeHis($colomn))
+                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
+                    if ($this->timeService->isTimeHi($colomn)) {
+                        $autrisationSotie = new AutorisationSortie();
+                        $autrisationSotie->setDateAutorisation($this->pointage->getDate());
+                        $autrisationSotie->setTime(new DateTime($colomn));
+                        $autrisationSotie->setEmployer($user);
+                        $this->pointage->setAutorisationSortie($autrisationSotie);
+                    }
+                    break;
+                case 'K':
+                    switch ($colomn) {
+                        case '0.5':
+                            $conger = new Conger();
+                            $conger->setEmployer($user);
+                            $conger->setDebut($this->pointage->getDate());
+                            $conger->setFin($this->pointage->getDate());
+                            $conger->setDemiJourner(true);
+                            $this->pointage->setCongerPayer($conger);
+                            break;
+                        case '1':
+                            $conger = new Conger();
+                            $conger->setEmployer($user);
+                            $conger->setDebut($this->pointage->getDate());
+                            $conger->setFin($this->pointage->getDate());
+                            $conger->setDemiJourner(false);
+                            $this->pointage->setCongerPayer($conger);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case 'L':
+                    if ($colomn)
+                        $this->pointage->setAbscence($colomn);
+                    break;
+                case 'M':
+                    $this->pointage->setHeurNormalementTravailler($this->heurNormalementTravailler());
+                    break;
+                case 'N':
+                    $this->pointage->setDiff($this->diff());
+                    break;
+                default:
+                    //dump($ligne[$char]);
+                    break;
+            }
+        }
+        $user->addPointage($this->pointage);
+        return $user;
     }
 }

@@ -72,4 +72,14 @@ class TimeService
     {
         return new DateInterval('PT' . $this->margeDuRetard . 'M');
     }
+
+
+    public function isTimeHi($timeString)
+    {
+        return DateTime::createFromFormat('H:i', $timeString) !== false;
+    }
+    public function isTimeHis($timeString)
+    {
+        return DateTime::createFromFormat('H:i:s', $timeString) !== false;
+    }
 }

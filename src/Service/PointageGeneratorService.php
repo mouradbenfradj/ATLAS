@@ -2,8 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\AutorisationSortie;
-use App\Entity\Conger;
 use DateTime;
 use App\Entity\User;
 use App\Entity\Horaire;
@@ -11,7 +9,6 @@ use App\Entity\Pointage;
 use App\Service\DateService;
 use App\Service\JourFerierService;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 
 class PointageGeneratorService
 {
@@ -159,109 +156,12 @@ class PointageGeneratorService
             $sheetData = $sheet->toArray(null, true, true, true);
             foreach ($sheetData as  $ligne) {
                 $horaire = $this->em->getRepository(Horaire::class)->findOneBy(["horaire" => $ligne['B']]);
-                if (DateTime::createFromFormat('d/m/Y', $ligne['A']) !== false and $horaire) {
-                    $dateDbf = $this->dateService->dateDbfToStringY_m_d($ligne['A']);
-                    $isJourFerier = $this->jourFerierService->isJourFerier($dateDbf);
-                    $inDB = $this->inDB($dateDbf, $user);
-                    if (!$isJourFerier and !$inDB) {
-                        $pointage = new Pointage();
-                        foreach ($ligne as $char => $colomn) {
-                            switch ($char) {
-                                case 'A':
-                                    if ($colomn)
-                                        $pointage->setDate(DateTime::createFromFormat('d/m/Y', $colomn));
-                                    break;
-                                case 'B':
-                                    $pointage->setHoraire($this->horaireService->getHoraireForDate($pointage->getDate()));
-                                    break;
-                                case 'C':
-                                    if (DateTime::createFromFormat('H:i:s', $colomn) !== false)
-                                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
-                                    if (DateTime::createFromFormat('H:i', $colomn) !== false)
-                                        $pointage->setEntrer($this->timeService->generateTime($colomn));
-                                    break;
-                                case 'D':
-                                    if (DateTime::createFromFormat('H:i:s', $colomn) !== false)
-                                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
-                                    if (DateTime::createFromFormat('H:i', $colomn) !== false)
-                                        $pointage->setSortie($this->timeService->generateTime($colomn));
-                                    break;
-                                case 'E':
-                                    $this->pointageService->setPointage($pointage);
-                                    if ($pointage->getSortie())
-                                        $pointage->setNbrHeurTravailler($this->pointageService->nbrHeurTravailler());
-                                    else
-                                        $pointage->setNbrHeurTravailler(new DateTime("00:00:00"));
-                                    break;
-                                case 'F':
-                                    if ($pointage->getEntrer())
-                                        $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());
-                                    break;
-                                case 'G':
-                                    if (DateTime::createFromFormat('H:i:s', $colomn) !== false)
-                                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
-                                    if (DateTime::createFromFormat('H:i', $colomn) !== false)
-                                        $pointage->setDepartAnticiper(new DateTime($colomn));
-                                    break;
-                                case 'H':
-                                    if (DateTime::createFromFormat('H:i:s', $colomn) !== false)
-                                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
-                                    if (DateTime::createFromFormat('H:i', $colomn) !== false)
-                                        $pointage->setRetardMidi($colomn);
-                                    break;
-                                case 'I':
-                                    $pointage->setTotaleRetard($this->pointageService->totalRetard());
-                                case 'J':
-                                    if (DateTime::createFromFormat('H:i:s', $colomn) !== false)
-                                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
-                                    if (DateTime::createFromFormat('H:i', $colomn) !== false) {
-                                        $autrisationSotie = new AutorisationSortie();
-                                        $autrisationSotie->setDateAutorisation($pointage->getDate());
-                                        $autrisationSotie->setTime(new DateTime($colomn));
-                                        $autrisationSotie->setEmployer($user);
-                                        $pointage->setAutorisationSortie($autrisationSotie);
-                                    }
-                                    break;
-                                case 'K':
-                                    switch ($colomn) {
-                                        case '0.5':
-                                            $conger = new Conger();
-                                            $conger->setEmployer($user);
-                                            $conger->setDebut($pointage->getDate());
-                                            $conger->setFin($pointage->getDate());
-                                            $conger->setDemiJourner(true);
-                                            $pointage->setCongerPayer($conger);
-                                            break;
-                                        case '1':
-                                            $conger = new Conger();
-                                            $conger->setEmployer($user);
-                                            $conger->setDebut($pointage->getDate());
-                                            $conger->setFin($pointage->getDate());
-                                            $conger->setDemiJourner(false);
-                                            $pointage->setCongerPayer($conger);
-                                            break;
-                                        default:
-                                            break;
-                                    }
-
-                                    break;
-                                case 'L':
-                                    if ($colomn)
-                                        $pointage->setAbscence($colomn);
-                                    break;
-                                case 'M':
-                                    $pointage->setHeurNormalementTravailler($this->pointageService->heurNormalementTravailler());
-                                    break;
-                                case 'N':
-                                    $pointage->setDiff($this->pointageService->diff());
-                                    break;
-                                default:
-                                    //dump($ligne[$char]);
-                                    break;
-                            }
-                        }
-                        $user->addPointage($pointage);
-                    }
+                if ($this->dateService->isDate($ligne['A']) and $horaire) {
+                    $dateString = $this->dateService->dateToStringY_m_d($ligne['A']);
+                    $isJourFerier = $this->jourFerierService->isJourFerier($dateString);
+                    $inDB = $this->inDB($dateString, $user);
+                    if (!$isJourFerier and !$inDB)
+                        $user = $this->pointageService->addLigne($ligne, $user);
                 }
             }
         }
