@@ -1,47 +1,99 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Pointage bilanSemestiriel{% endblock %}
+{% macro secondsToMinutes(seconds) %}
+	{# set hours minus minutes/seconds #}
+	{% set hours = (seconds / 60)  // 60 %}
 
+	{% if hours  < 1 %}
+		{# set hours to nothing #}
+		{% set hours = null %}
+	{% else %}
+		{# output hours with a colon: #}
+		{% set hours = hours ~ ':' %}
+	{% endif %}
+
+	{# set minutes remain but no seconds and with a colon #}
+	{% set minutes = (seconds / 60)  % 60   ~ ':' %}
+
+	{# set seconds but no minutes or hours #}
+	{% set seconds = seconds % 60 %}
+	{% if seconds < 10 %}
+		{# add a leading zero if seconds are less than 10 #}
+		{% set seconds = '0' ~ seconds %}
+	{% endif %}
+
+	{{ hours }}{{ minutes}}{{ seconds }}
+
+{% endmacro %}
+{% block title %}Pointage index
+{% endblock %}
+
+{% block stylesheets %}
+	{{ encore_entry_link_tags('data') }}
+{% endblock %}
+{% block javascripts %}
+	{{ encore_entry_script_tags('data') }}
+{% endblock %}
+
+
+{% block header_body_title %}{% endblock %}
+{% block header_body_nav_title %}{% endblock %}
+{% block body_title %}bilan Mensuel
+{% endblock %}
 {% block body %}
-    <h1>Pointage bilanSemestiriel</h1>
+	<h1>Pointage bilan Mensuel</h1>
+	<table id="example1" class="table table-bordered table-striped">
+		<thead>
+			<tr>
+				<th>nombre année de travaille</th>
+				<th>Nbr Heures Travaillées</th>
+				<th>Retard en MIN</th>
+				<th>Départ anticipé</th>
+				<th>Retard midi</th>
+				<th>Total Retard</th>
+				<th>AS</th>
+				<th>CP</th>
+				<th>ABS</th>
+				<th>HT Normalement travaillées</th>
+				<th>Diff</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for pointage in bilan %}
+				<tr>
+					<td>{{ pointage.interval }}</td>
+					<td>{{ _self.secondsToMinutes( pointage.nbrHeurTravailler)  }}</td>
+					<td>{{ _self.secondsToMinutes(pointage.retardEnMinute)  }}</td>
+					<td>{{ _self.secondsToMinutes(pointage.departAnticiper) }}</td>
+					<td>{{ _self.secondsToMinutes( pointage.retardMidi)  }}</td>
+					<td>{{ _self.secondsToMinutes(pointage.totaleRetard)  }}</td>
+					<td>{{ _self.secondsToMinutes(pointage.autorisationSortie)  }}</td>
+					<td>{{ pointage.congerPayer }}</td>
+					<td>{{ pointage.abscence }}</td>
+					<td>{{ _self.secondsToMinutes(pointage.heurNormalementTravailler) }}</td>
+					<td>{{ _self.secondsToMinutes(pointage.diff)}}</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="15">no records found</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+		<tfoot>
+			<tr>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>semaine</th>
-                <th>Nbr Heures Travaillées</th>
-                <th>Retard en MIN</th>
-                <th>Départ anticipé</th>
-                <th>Retard midi</th>
-                <th>Total Retard</th>
-                <th>AS</th>
-                <th>CP</th>
-                <th>ABS</th>
-                <th>HT Normalement travaillées</th>
-                <th>Diff</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for pointage in pointages %}
-            <tr>
-                <td>{{ pointage.semaine }}</td>
-                <td>{{ pointage.nbrHeurTravailler ? pointage.nbrHeurTravailler|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.retardEnMinute ? pointage.retardEnMinute|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.departAnticiper ? pointage.departAnticiper|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.retardMidi ? pointage.retardMidi|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.totaleRetard ? pointage.totaleRetard|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.autorisationSortie ? pointage.autorisationSortie|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.congerPayer }}</td>
-                <td>{{ pointage.abscence }}</td>
-                <td>{{ pointage.heurNormalementTravailler ? pointage.heurNormalementTravailler|date('H:i:s') : '' }}</td>
-                <td>{{ pointage.diff ? pointage.diff|date('H:i:s') : '' }}</td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="15">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
+				<th>nombre année de travaille</th>
+				<th>Nbr Heures Travaillées</th>
+				<th>Retard en MIN</th>
+				<th>Départ anticipé</th>
+				<th>Retard midi</th>
+				<th>Total Retard</th>
+				<th>AS</th>
+				<th>CP</th>
+				<th>ABS</th>
+				<th>HT Normalement travaillées</th>
+				<th>Diff</th>
+			</tr>
+		</tfoot>
+	</table>
 {% endblock %}

@@ -31,15 +31,22 @@ class DefaultController extends AbstractController
             }
 
             $bilan["nbrHeurTravailler"] = $pointageService->bilan($pointage->getNbrHeurTravailler(), $bilan["nbrHeurTravailler"]);
-            $bilan["retardEnMinute"] = $pointageService->bilan($pointage->getRetardEnMinute(), $bilan["retardEnMinute"]);
+            if ($pointage->getRetardEnMinute())
+                $bilan["retardEnMinute"] = $pointageService->bilan($pointage->getRetardEnMinute(), $bilan["retardEnMinute"]);
             if ($pointage->getDepartAnticiper())
                 $bilan["departAnticiper"] = $pointageService->bilan($pointage->getDepartAnticiper(), $bilan["departAnticiper"]);
             if ($pointage->getRetardMidi())
                 $bilan["retardMidi"] = $pointageService->bilan($pointage->getRetardMidi(), $bilan["retardMidi"]);
             $bilan["totaleRetard"] = $pointageService->bilan($pointage->getTotaleRetard(), $bilan["totaleRetard"]);
             if ($pointage->getAutorisationSortie())
-                $bilan["autorisationSortie"] = $pointageService->bilan($pointage->getAutorisationSortie(), $bilan["autorisationSortie"]);
-            $bilan["congerPayer"] += $pointage->getCongerPayer();
+                $bilan["autorisationSortie"] = $pointageService->bilan($pointage->getAutorisationSortie()->getTime(), $bilan["autorisationSortie"]);
+            if ($pointage->getCongerPayer()) {
+                if ($pointage->getCongerPayer()->getDemiJourner()) {
+                    $bilan["congerPayer"] += 0.5;
+                } else {
+                    $bilan["congerPayer"] += 1;
+                }
+            }
             $bilan["abscence"] += $pointage->getAbscence();
             $bilan["heurNormalementTravailler"] = $pointageService->bilan($pointage->getHeurNormalementTravailler(), $bilan["heurNormalementTravailler"]);
             $bilan["diff"] = $pointageService->bilan($pointage->getDiff(), $bilan["diff"]);
