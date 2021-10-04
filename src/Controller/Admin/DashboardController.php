@@ -18,6 +18,17 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 
 class DashboardController extends AbstractDashboardController
 {
+
+    /**
+     * @Route("/admin/{user<\d+>}", name="admin_bilan")
+     */
+    public function nilan(User $user): Response
+    {
+        dump($user);
+        return $this->render('admin/bilan.html.twig', [
+            'bilan' => [],
+        ]);
+    }
     /**
      * @Route("/admin", name="admin_dashboard")
      */

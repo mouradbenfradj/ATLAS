@@ -9,6 +9,7 @@ use App\Entity\Pointage;
 use App\Service\DateService;
 use App\Service\JourFerierService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 class PointageGeneratorService
 {
@@ -44,6 +45,7 @@ class PointageGeneratorService
      * @var PointageService
      */
     private $pointageService;
+    private $flash;
 
     /**
      * @param EntityManagerInterface $em
@@ -59,7 +61,8 @@ class PointageGeneratorService
         JourFerierService $jourFerierService,
         DateService $dateService,
         TimeService $timeService,
-        HoraireService $horaireService
+        HoraireService $horaireService,
+        FlashBagInterface $flash
     ) {
         $this->em = $em;
         $this->jourFerierService = $jourFerierService;
@@ -67,6 +70,7 @@ class PointageGeneratorService
         $this->horaireService = $horaireService;
         $this->timeService = $timeService;
         $this->pointageService = $pointageService;
+        $this->flash = $flash;
     }
     /**
      * inDB
@@ -75,15 +79,14 @@ class PointageGeneratorService
      * @param User $user
      * 
      */
-    public function inDB(string $dateDbf, User $user)
+    public function dateInDB(User $user)
     {
-        return  $this->em->getRepository(Pointage::class)->findOneBy(
-            [
-                "employer" => $user,
-                "date" => new DateTime($dateDbf)
-            ]
-        );
+        return array_map(fn ($value): string => $value->getDate()->format('Y-m-d'), $this->em->getRepository(Pointage::class)->findByEmployer($user));
     }
+
+
+
+
     /**
      * fromDbfFile
      * 
@@ -146,26 +149,50 @@ class PointageGeneratorService
      *
      * @param [type] $spreadsheet
      * @param integer $userId
-     * @return void
+     * @return User
      */
-    public function fromXlsxFile($spreadsheet, User $user): void
+    public function fromXlsxFile($spreadsheet, User $user): User
     {
+        $nowDate = new DateTime();
+        $horaires = [];
+        $arrayDate = $this->dateInDB($user);
+        foreach ($this->em->getRepository(Horaire::class)->findAll() as $horaire) {
+            $horaires[$horaire->getHoraire()] = $horaire;
+        }
         $sheetCount = $spreadsheet->getSheetCount();
         for ($i = 0; $i < $sheetCount; $i++) {
             $sheet = $spreadsheet->getSheet($i);
             $sheetData = $sheet->toArray(null, true, true, true);
             foreach ($sheetData as  $ligne) {
-                $horaire = $this->em->getRepository(Horaire::class)->findOneBy(["horaire" => $ligne['B']]);
-                if ($this->dateService->isDate($ligne['A']) and $horaire) {
+                if ($this->dateService->isDate($ligne['A']) and isset($horaires[$ligne['B']])) {
                     $dateString = $this->dateService->dateToStringY_m_d($ligne['A']);
                     $isJourFerier = $this->jourFerierService->isJourFerier($dateString);
-                    $inDB = $this->inDB($dateString, $user);
-                    if (!$isJourFerier and !$inDB)
-                        $user = $this->pointageService->addLigne($ligne, $user);
+                    $date = $this->dateService->dateString_d_m_Y_ToDateTime($ligne['A']);
+                    if (
+                        $isJourFerier
+                        or
+                        $ligne['C'] == 'CP'
+                        or
+                        $this->timeService->isTimeHi($ligne['C'])
+                        or
+                        $this->timeService->isTimeHi($ligne['D'])
+                        or
+                        in_array($ligne['K'], ['1', '1.5'])
+                        or
+                        $ligne['L']
+                        or
+                        $nowDate >= $date
+                    ) {
+                        $horaire = $horaires[$ligne['B']];
+                        if (!$isJourFerier and !in_array($dateString, $arrayDate)) {
+                            array_push($arrayDate, $dateString);
+                            $user = $this->pointageService->addLigne($ligne, $user);
+                        }
+                    } else
+                        $this->flash->add('danger ', 'ignored ligne ' . implode(" | ", $ligne));
                 }
             }
         }
-        $this->em->persist($user);
-        $this->em->flush();
+        return $user;
     }
 }

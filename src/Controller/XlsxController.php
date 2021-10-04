@@ -54,7 +54,9 @@ class XlsxController extends AbstractController
             if ($xlsx) {
                 $reader = new Xlsx();
                 $spreadsheet = $reader->load($xlsx);
-                $pointageGeneratorService->fromXlsxFile($spreadsheet, $id);
+                $this->getDoctrine()->getManager()->persist($pointageGeneratorService->fromXlsxFile($spreadsheet, $id));
+                $this->getDoctrine()->getManager()->flush();
+                $this->addFlash('success', 'updated_successfully');
             }
 
             $url = $this->adminUrlGenerator

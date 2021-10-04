@@ -40,18 +40,20 @@ class PointageController extends AbstractController
     {
         $pointages = $pointageRepository->findBy(["employer" => $security->getUser()], ["date" => "ASC"]);
         $bilan = $pointageService->getInitBilan();
-        $thisYear = 0;
-        $thisMonth = 0;
+        $thisWeek = 0;
+        $countWeek = 1;
         $collectSemaine = [];
         foreach ($pointages as $index => $pointage) {
-
-            if ($thisYear . '-' . $thisMonth != $pointage->getDate()->format('Y-m')) {
-                if ($thisYear and $thisMonth)
+            if ($thisWeek != $pointage->getDate()->format('W')) {
+                if ($thisWeek) {
                     array_push($collectSemaine, $bilan);
-                $thisYear =  $pointage->getDate()->format('Y');
-                $thisMonth =  $pointage->getDate()->format('m');
+                    $countWeek++;
+                } else {
+                    $countWeek = $pointage->getDate()->format('W');
+                }
+                $thisWeek = $pointage->getDate()->format('W');
                 $bilan = $pointageService->getInitBilan();
-                $bilan["interval"] =  $pointage->getDate()->format('Y-m');
+                $bilan["interval"] = $countWeek;
             }
 
             $bilan["nbrHeurTravailler"] = $pointageService->bilan($pointage->getNbrHeurTravailler(), $bilan["nbrHeurTravailler"]);
@@ -76,11 +78,8 @@ class PointageController extends AbstractController
             $bilan["diff"] = $pointageService->bilan($pointage->getDiff(), $bilan["diff"]);
         }
         array_push($collectSemaine, $bilan);
-        return $this->render('pointage/bilanMensuel.html.twig', [
-            'bilan' => $collectSemaine,
-        ]);
         return $this->render('pointage/bilanSemestiriel.html.twig', [
-            'pointages' => $collectSemaine,
+            'bilan' => $collectSemaine,
         ]);
     }
     /**

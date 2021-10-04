@@ -29,6 +29,18 @@ class UserFixtures extends Fixture
             'mourad'
         ));
         $manager->persist($user);
+        $user = new User();
+        $user->setEmail("cherifcontact@gmail.com");
+        $user->setBadgenumbe(302);
+        $user->setFirstName("cherif");
+        $user->setLastName("k");
+        $user->setDebutTravaille(new DateTime("2021/01/01"));
+        $user->setRoles(['ROLE_EMPLOYER']);
+        $user->setPassword($this->passwordHasher->hashPassword(
+            $user,
+            'cherif'
+        ));
+        $manager->persist($user);
 
         $manager->flush();
     }

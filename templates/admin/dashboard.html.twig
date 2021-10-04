@@ -1,1 +1,34 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% macro secondsToMinutes(seconds) %}
+	{# set hours minus minutes/seconds #}
+	{% set hours = (seconds / 60)  // 60 %}
+
+	{% if hours  < 1 %}
+		{# set hours to nothing #}
+		{% set hours = null %}
+	{% else %}
+		{# output hours with a colon: #}
+		{% set hours = hours ~ ':' %}
+	{% endif %}
+
+	{# set minutes remain but no seconds and with a colon #}
+	{% set minutes = (seconds / 60)  % 60   ~ ':' %}
+
+	{# set seconds but no minutes or hours #}
+	{% set seconds = seconds % 60 %}
+	{% if seconds < 10 %}
+		{# add a leading zero if seconds are less than 10 #}
+		{% set seconds = '0' ~ seconds %}
+	{% endif %}
+
+	{{ hours }}{{ minutes}}{{ seconds }}
+
+{% endmacro %}
+{% block content_title %}The Title of the Page
+{% endblock %}
+{% block page_actions %}
+	<a class="btn btn-primary" href="{{ path('admin_bilan', {'user': 22}) }}">Some Action</a>
+{% endblock %}
+
+{% block main %}{% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends '@EasyAdmin/page/content.html.twig' %}
 
 {% macro secondsToMinutes(seconds) %}
 	{# set hours minus minutes/seconds #}
@@ -25,23 +25,13 @@
 	{{ hours }}{{ minutes}}{{ seconds }}
 
 {% endmacro %}
-{% block title %}Pointage index
+{% block content_title %}The Title of the Page
+{% endblock %}
+{% block page_actions %}
+	<a class="btn btn-primary" href="{{ path('admin_bilan', {'user': 23}) }}">Some Action</a>
 {% endblock %}
 
-{% block stylesheets %}
-	{{ encore_entry_link_tags('data') }}
-{% endblock %}
-{% block javascripts %}
-	{{ encore_entry_script_tags('data') }}
-{% endblock %}
-
-
-{% block header_body_title %}{% endblock %}
-{% block header_body_nav_title %}{% endblock %}
-{% block body_title %}bilan Semestriel
-{% endblock %}
-{% block body %}
-	<h1>Pointage bilan Semestriel</h1>
+{% block main %}
 	<table id="example1" class="table table-bordered table-striped">
 		<thead>
 			<tr>

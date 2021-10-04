@@ -39,13 +39,13 @@ class DateService
         return $date->format("Y-m-d");
     }
     /**
-     * @param string $dateDbf
+     * @param string $dateString
      * 
      * @return string
      */
-    public function dateToStringY_m_d(string $dateDbf)
+    public function dateToStringY_m_d(string $dateString)
     {
-        $date = DateTime::createFromFormat('d/m/Y', $dateDbf);
+        $date = DateTime::createFromFormat('d/m/Y', $dateString);
         return $date->format("Y-m-d");
     }
     public function isDate($dateString)

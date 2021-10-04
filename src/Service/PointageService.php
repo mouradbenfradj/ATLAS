@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Service\TimeService;
 use App\Service\HoraireService;
 use DateTimeInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 class PointageService
 {
@@ -41,6 +42,7 @@ class PointageService
     private $pointage;
 
     private $initBilan;
+    private $flash;
 
     /**
      *      
@@ -52,13 +54,19 @@ class PointageService
      *
      * @param HoraireService $horaireService
      */
-    public function __construct(HoraireService $horaireService, DateService $dateService, TimeService $timeService)
-    {
+    public function __construct(
+        FlashBagInterface $flash,
+        HoraireService $horaireService,
+        DateService $dateService,
+        TimeService $timeService
+    ) {
         $this->horaireService = $horaireService;
         $this->timeService = $timeService;
         $this->dateService = $dateService;
+        $this->flash = $flash;
+
         $this->initBilan = [
-            "interval" => 0,
+            "interval" => 1,
             "nbrHeurTravailler" => 0,
             "retardEnMinute" => 0,
             "departAnticiper" => 0,
@@ -302,51 +310,62 @@ class PointageService
                     $this->pointage->setHoraire($this->horaireService->getHoraireForDate($this->pointage->getDate()));
                     break;
                 case 'C':
-                    if ($this->timeService->isTimeHis($colomn))
-                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
                     if ($this->timeService->isTimeHi($colomn))
                         $this->pointage->setEntrer($this->timeService->generateTime($colomn));
+                    else {
+                        if (!in_array($ligne['K'], ['1']) and $colomn != 'CP' and !$colomn)
+                            $this->flash->add('warning', 'not set entrer ' . $colomn . ' of ligne ' . implode(" | ", $ligne));
+                    }
                     break;
                 case 'D':
-                    if ($this->timeService->isTimeHis($colomn))
-                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
                     if ($this->timeService->isTimeHi($colomn))
                         $this->pointage->setSortie($this->timeService->generateTime($colomn));
+                    else {
+                        if (!in_array($ligne['K'], ['1']) and $ligne['C'] != 'CP')
+                            $this->flash->add('warning', 'not set sortie ' . $colomn . ' of ligne ' . implode(" | ", $ligne));
+                    }
                     break;
                 case 'E':
                     if ($this->pointage->getSortie() and $this->pointage->getEntrer())
                         $this->pointage->setNbrHeurTravailler($this->nbrHeurTravailler());
-                    else
-                        $this->pointage->setNbrHeurTravailler(new DateTime("00:00:00"));
+                    else {
+                        $this->pointage->setNbrHeurTravailler(new DateTime('00:00:00'));
+                        if (!in_array($ligne['K'], ['1']) and $ligne['C'] != 'CP')
+                            $this->flash->add('warning', 'set to 0 nbrHeurTravailler, entrer ou sortie non saisie ' . $colomn . ' of ligne ' . implode(" | ", $ligne));
+                    }
                     break;
                 case 'F':
                     if ($this->pointage->getSortie() and $this->pointage->getEntrer())
                         $this->pointage->setRetardEnMinute($this->retardEnMinute());
                     break;
                 case 'G':
-                    if ($this->timeService->isTimeHis($colomn))
-                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
                     if ($this->timeService->isTimeHi($colomn))
                         $this->pointage->setDepartAnticiper(new DateTime($colomn));
+                    else {
+                        if ($colomn)
+                            $this->flash->add('warning', 'ignored departAnticiper' . $colomn . ' of ligne ' . implode(" | ", $ligne));
+                    }
                     break;
                 case 'H':
-
-                    if ($this->timeService->isTimeHis($colomn))
-                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
                     if ($this->timeService->isTimeHi($colomn))
-                        $this->pointage->setRetardMidi($colomn);
+                        $this->pointage->setRetardMidi($this->timeService->generateTime($colomn));
+                    else {
+                        if ($colomn)
+                            $this->flash->add('warning', 'ignored retardMidi' . $colomn . ' of ligne ' . implode(" | ", $ligne));
+                    }
                     break;
                 case 'I':
                     $this->pointage->setTotaleRetard($this->totalRetard());
                 case 'J':
-                    if ($this->timeService->isTimeHis($colomn))
-                        dd(DateTime::createFromFormat('H:i:s',  $colomn));
                     if ($this->timeService->isTimeHi($colomn)) {
                         $autrisationSotie = new AutorisationSortie();
                         $autrisationSotie->setDateAutorisation($this->pointage->getDate());
                         $autrisationSotie->setTime(new DateTime($colomn));
                         $autrisationSotie->setEmployer($user);
                         $this->pointage->setAutorisationSortie($autrisationSotie);
+                    } else {
+                        if ($colomn)
+                            $this->flash->add('warning', 'ignored autorisationSortie' . $colomn . ' of ligne ' . implode(" | ", $ligne));
                     }
                     break;
                 case 'K':
@@ -368,6 +387,17 @@ class PointageService
                             $this->pointage->setCongerPayer($conger);
                             break;
                         default:
+                            if ($ligne['C'] == 'CP' and !$colomn) {
+                                $conger = new Conger();
+                                $conger->setEmployer($user);
+                                $conger->setDebut($this->pointage->getDate());
+                                $conger->setFin($this->pointage->getDate());
+                                $conger->setDemiJourner(false);
+                                $this->pointage->setCongerPayer($conger);
+                                $this->flash->add('warning', 'cp added automatically of ligne ' . implode(" | ", $ligne));
+                            }
+                            if ($colomn)
+                                $this->flash->add('warning', 'ignored congerPayer' . $colomn . ' of ligne ' . implode(" | ", $ligne));
                             break;
                     }
                     break;

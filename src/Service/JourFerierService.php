@@ -2,11 +2,7 @@
 
 namespace App\Service;
 
-use DateTime;
 use DateInterval;
-use App\Entity\User;
-use App\Entity\Horaire;
-use App\Entity\Pointage;
 use App\Entity\JourFerier;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -27,6 +23,8 @@ class JourFerierService
      */
     private $jourFeriers;
 
+    private $ignoreDay;
+
     /**
      * __construct
      * 
@@ -36,37 +34,22 @@ class JourFerierService
     {
         $this->em = $em;
         $this->jourFeriers = $this->em->getRepository(JourFerier::class)->findAll();
+        $this->ignoreDay = [];
+        foreach ($this->jourFeriers as $jf) {
+            $dt = $jf->getDebut();
+            do {
+                array_push($this->ignoreDay, $dt->format("Y-m-d"));
+                $dt->add(new DateInterval('P1D'));
+            } while ($dt <= $jf->getFin());
+        }
     }
 
     /**
      * @return string[]
      */
-    public function allDates()
-    {
-        $ignoreDay = [];
-        foreach ($this->jourFeriers as $jf) {
-            $dt = $jf->getDebut();
-            do {
-                array_push($ignoreDay, $dt->format("Y-m-d"));
-                $dt->add(new DateInterval('P1D'));
-            } while ($dt <= $jf->getFin());
-        }
-        return $ignoreDay;
-    }
-    /**
-     * @return string[]
-     */
     public function isJourFerier(string $date)
     {
-        $ignoreDay = [];
-        foreach ($this->jourFeriers as $jf) {
-            $dt = $jf->getDebut();
-            do {
-                array_push($ignoreDay, $dt->format("Y-m-d"));
-                $dt->add(new DateInterval('P1D'));
-            } while ($dt <= $jf->getFin());
-        }
-        if (in_array($date, $ignoreDay)) {
+        if (in_array($date, $this->ignoreDay)) {
             return true;
         } else {
             return false;
