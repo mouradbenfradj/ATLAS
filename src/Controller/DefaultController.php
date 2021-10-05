@@ -27,7 +27,7 @@ class DefaultController extends AbstractController
         foreach ($pointages as $index => $pointage) {
             if ($thisYear != $pointage->getDate()->format('Y')) {
                 $thisYear =  $pointage->getDate()->format('Y');
-                $bilan["interval"] = $bilan["interval"] + 1;
+                $bilan["date"] = $bilan["date"] + 1;
             }
 
             $bilan["nbrHeurTravailler"] = $pointageService->bilan($pointage->getNbrHeurTravailler(), $bilan["nbrHeurTravailler"]);

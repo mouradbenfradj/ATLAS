@@ -83,17 +83,17 @@ class Pointage
     private $employer;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Horaire::class, inversedBy="pointages")
+     * @ORM\ManyToOne(targetEntity=Horaire::class, inversedBy="pointages", fetch="EAGER")
      */
     private $horaire;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Conger::class,cascade={"persist"}, inversedBy="pointages")
+     * @ORM\ManyToOne(targetEntity=Conger::class,cascade={"persist"}, inversedBy="pointages", fetch="EAGER")
      */
     private $congerPayer;
 
     /**
-     * @ORM\ManyToOne(targetEntity=AutorisationSortie::class,cascade={"persist"}, inversedBy="pointages")
+     * @ORM\ManyToOne(targetEntity=AutorisationSortie::class,cascade={"persist"}, inversedBy="pointages", fetch="EAGER")
      */
     private $autorisationSortie;
 

@@ -82,7 +82,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $demission;
 
     /**
-     * @ORM\OneToMany(targetEntity=Pointage::class,cascade={"persist"}, mappedBy="employer")
+     * @ORM\OneToMany(targetEntity=Pointage::class,cascade={"persist"}, mappedBy="employer", fetch="EAGER")
      */
     private $pointages;
 

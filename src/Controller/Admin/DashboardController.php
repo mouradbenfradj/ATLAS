@@ -2,39 +2,114 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\AutorisationSortie;
+use App\Entity\User;
 use App\Entity\Conger;
 use App\Entity\Horaire;
-use App\Entity\JourFerier;
 use App\Entity\Pointage;
-use App\Entity\User;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
-use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use App\Entity\JourFerier;
+use App\Service\PointageService;
+use App\Entity\AutorisationSortie;
+use App\Repository\UserRepository;
+use App\Repository\PointageRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
+use Symfony\Component\Security\Core\User\UserInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 
 class DashboardController extends AbstractDashboardController
 {
 
-    /**
-     * @Route("/admin/{user<\d+>}", name="admin_bilan")
-     */
-    public function nilan(User $user): Response
+    private $adminContextProvider;
+    private $pointageService;
+
+    public function __construct(AdminContextProvider $adminContextProvider, PointageService $pointageService)
     {
-        dump($user);
-        return $this->render('admin/bilan.html.twig', [
-            'bilan' => [],
-        ]);
+        $this->adminContextProvider = $adminContextProvider;
+        $this->pointageService = $pointageService;
     }
     /**
      * @Route("/admin", name="admin_dashboard")
      */
     public function index(): Response
     {
-        return $this->render('admin/dashboard.html.twig');
+        if (!empty($this->adminContextProvider->getContext()->getRequest()->request->all())) {
+            $user = $this->getDoctrine()->getRepository(User::class)->find($this->adminContextProvider->getContext()->getRequest()->request->get('user'));
+        } else
+            $user = $this->getUser();
+
+        $bilan = $this->pointageService->getInitBilan();
+        $thisWeek = 0;
+        $countWeek = 1;
+        $collectSemaine = [];
+        foreach ($user->getPointages() as  $pointage) {
+            $this->pointageService->setPointage($pointage);
+            $this->pointageService->setHoraireServiceHoraire();
+            if ($thisWeek != $pointage->getDate()->format('W')) {
+                if ($thisWeek) {
+                    $bilan["colspan"] = 4;
+                    $bilan["date"] = "Semaine " . $bilan["date"];
+                    array_push($collectSemaine, $bilan);
+                    $countWeek++;
+                } /* else {
+                    $countWeek = $pointage->getDate()->format('W');
+                } */
+                $bilan = $this->pointageService->getInitBilan();
+                $bilan["date"] = $countWeek;
+            }
+
+            array_push($collectSemaine, [
+                "colspan" => 1,
+                "date" =>  $pointage->getdate()->format('d/m/Y'),
+                "horaire" =>  $pointage->getHoraire(),
+                "entrer" =>  $pointage->getEntrer() ? $pointage->getEntrer()->format('H:i:s') : "",
+                "sortie" =>  $pointage->getSortie() ? $pointage->getSortie()->format('H:i:s') : "",
+                "nbrHeurTravailler" => $pointage->getNbrHeurTravailler() ? $pointage->getNbrHeurTravailler()->format('H:i:s') : "",
+                "retardEnMinute" => $pointage->getRetardEnMinute() ? $pointage->getRetardEnMinute()->format('H:i:s') : "",
+                "departAnticiper" => $pointage->getDepartAnticiper() ? $pointage->getDepartAnticiper()->format('H:i:s') : "",
+                "retardMidi" => $pointage->getRetardMidi() ? $pointage->getRetardMidi()->format('H:i:s') : "",
+                "totaleRetard" => $pointage->getTotaleRetard() ? $pointage->getTotaleRetard()->format('H:i:s') : "",
+                "autorisationSortie" => $pointage->getAutorisationSortie() ? $pointage->getAutorisationSortie()->getTime()->format('H:i:s') : "",
+                "congerPayer" =>  $pointage->getCongerPayer(),
+                "abscence" => $pointage->getAbscence(),
+                "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format('H:i:s') : "",
+                "diff" => $pointage->getDiff() ? $pointage->getDiff()->format('H:i:s') : "",
+            ]);
+            $thisWeek = $pointage->getDate()->format('W');
+
+            $bilan["nbrHeurTravailler"] = $this->pointageService->bilan($pointage->getNbrHeurTravailler(), $bilan["nbrHeurTravailler"]);
+            if ($pointage->getRetardEnMinute())
+                $bilan["retardEnMinute"] = $this->pointageService->bilan($pointage->getRetardEnMinute(), $bilan["retardEnMinute"]);
+            if ($pointage->getDepartAnticiper())
+                $bilan["departAnticiper"] = $this->pointageService->bilan($pointage->getDepartAnticiper(), $bilan["departAnticiper"]);
+            if ($pointage->getRetardMidi())
+                $bilan["retardMidi"] = $this->pointageService->bilan($pointage->getRetardMidi(), $bilan["retardMidi"]);
+            $bilan["totaleRetard"] = $this->pointageService->bilan($pointage->getTotaleRetard(), $bilan["totaleRetard"]);
+            if ($pointage->getAutorisationSortie())
+                $bilan["autorisationSortie"] = $this->pointageService->bilan($pointage->getAutorisationSortie()->getTime(), $bilan["autorisationSortie"]);
+            if ($pointage->getCongerPayer()) {
+                if ($pointage->getCongerPayer()->getDemiJourner()) {
+                    $bilan["congerPayer"] += 0.5;
+                } else {
+                    $bilan["congerPayer"] += 1;
+                }
+            }
+            $bilan["abscence"] += $pointage->getAbscence();
+            $bilan["heurNormalementTravailler"] = $this->pointageService->bilan(
+                $pointage->getHeurNormalementTravailler(),
+                $bilan["heurNormalementTravailler"]
+            );
+            $bilan["diff"] = $this->pointageService->bilan($pointage->getDiff(), $bilan["diff"]);
+        }
+        if (!empty($collectSemaine))
+            array_push($collectSemaine, $bilan);
+        return $this->render('admin/dashboard.html.twig', [
+            'users' => $this->getDoctrine()->getRepository(User::class)->findAll(),
+            'bilan' => $collectSemaine
+        ]);
     }
 
     public function configureDashboard(): Dashboard

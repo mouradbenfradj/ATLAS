@@ -23,21 +23,21 @@ class PointageCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->onlyOnIndex(),
-            DateField::new('date'),
-            AssociationField::new('horaire'),
-            TimeField::new('entrer'),
-            TimeField::new('sortie'),
-            TimeField::new('nbrHeurTravailler'),
+            AssociationField::new('employer'),
+            DateField::new('date')->setRequired(true),
+            AssociationField::new('horaire')->setRequired(true),
+            TimeField::new('entrer')->setRequired(true),
+            TimeField::new('sortie')->setRequired(true),
+            TimeField::new('nbrHeurTravailler')->onlyOnIndex(),
             TimeField::new('retardEnMinute'),
             TimeField::new('departAnticiper'),
             TimeField::new('retardMidi'),
-            TimeField::new('totaleRetard'),
+            TimeField::new('totaleRetard')->onlyOnIndex(),
             AssociationField::new('autorisationSortie'),
             AssociationField::new('congerPayer'),
             NumberField::new('abscence'),
-            TimeField::new('heurNormalementTravailler'),
-            TimeField::new('diff'),
-            AssociationField::new('employer'),
+            TimeField::new('heurNormalementTravailler')->onlyOnIndex(),
+            TimeField::new('diff')->onlyOnIndex(),
         ];
     }
     public function configureFilters(Filters $filters): Filters

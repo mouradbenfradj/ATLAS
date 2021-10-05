@@ -66,7 +66,11 @@ class PointageService
         $this->flash = $flash;
 
         $this->initBilan = [
-            "interval" => 1,
+            "colspan" => 1,
+            "date" => null,
+            "horaire" => null,
+            "entrer" => null,
+            "sortie" => null,
             "nbrHeurTravailler" => 0,
             "retardEnMinute" => 0,
             "departAnticiper" => 0,
@@ -85,6 +89,10 @@ class PointageService
         $total += $time->format('i') * 60;  // Convert the minutes to seconds and add to our total
         $total += $time->format('s'); // Add the seconds to our total
         return $total;
+    }
+    public function setHoraireServiceHoraire()
+    {
+        $this->horaireService->setHoraire($this->pointage->getHoraire());
     }
 
     public function nbrHeurTravailler()
