@@ -103,21 +103,6 @@ class HoraireService
     }
 
     /**
-     * sumPause
-     *
-     * @return DateInterval
-     */
-    public function sumPause(): DateInterval
-    {
-        $e = new DateTime('00:00:00');
-        $e->add($this->diffPauseMatinalTime());
-        $e->add($this->diffPauseDejeunerTime());
-        $e->add($this->diffPauseMidiTime());
-        return $this->timeService->dateTimeToDateInterval($e);
-    }
-
-
-    /**
      * Get horaire
      *
      * @return  Horaire

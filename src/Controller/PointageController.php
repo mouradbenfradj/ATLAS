@@ -39,47 +39,8 @@ class PointageController extends AbstractController
     public function bilanSemestiriel(PointageRepository $pointageRepository, Security $security, PointageService $pointageService): Response
     {
         $pointages = $pointageRepository->findBy(["employer" => $security->getUser()], ["date" => "ASC"]);
-        $bilan = $pointageService->getInitBilan();
-        $thisWeek = 0;
-        $countWeek = 1;
-        $collectSemaine = [];
-        foreach ($pointages as $index => $pointage) {
-            if ($thisWeek != $pointage->getDate()->format('W')) {
-                if ($thisWeek) {
-                    array_push($collectSemaine, $bilan);
-                    $countWeek++;
-                } else {
-                    $countWeek = $pointage->getDate()->format('W');
-                }
-                $thisWeek = $pointage->getDate()->format('W');
-                $bilan = $pointageService->getInitBilan();
-                $bilan["interval"] = $countWeek;
-            }
-
-            $bilan["nbrHeurTravailler"] = $pointageService->bilan($pointage->getNbrHeurTravailler(), $bilan["nbrHeurTravailler"]);
-            if ($pointage->getRetardEnMinute())
-                $bilan["retardEnMinute"] = $pointageService->bilan($pointage->getRetardEnMinute(), $bilan["retardEnMinute"]);
-            if ($pointage->getDepartAnticiper())
-                $bilan["departAnticiper"] = $pointageService->bilan($pointage->getDepartAnticiper(), $bilan["departAnticiper"]);
-            if ($pointage->getRetardMidi())
-                $bilan["retardMidi"] = $pointageService->bilan($pointage->getRetardMidi(), $bilan["retardMidi"]);
-            $bilan["totaleRetard"] = $pointageService->bilan($pointage->getTotaleRetard(), $bilan["totaleRetard"]);
-            if ($pointage->getAutorisationSortie())
-                $bilan["autorisationSortie"] = $pointageService->bilan($pointage->getAutorisationSortie()->getTime(), $bilan["autorisationSortie"]);
-            if ($pointage->getCongerPayer()) {
-                if ($pointage->getCongerPayer()->getDemiJourner()) {
-                    $bilan["congerPayer"] += 0.5;
-                } else {
-                    $bilan["congerPayer"] += 1;
-                }
-            }
-            $bilan["abscence"] += $pointage->getAbscence();
-            $bilan["heurNormalementTravailler"] = $pointageService->bilan($pointage->getHeurNormalementTravailler(), $bilan["heurNormalementTravailler"]);
-            $bilan["diff"] = $pointageService->bilan($pointage->getDiff(), $bilan["diff"]);
-        }
-        array_push($collectSemaine, $bilan);
         return $this->render('pointage/bilanSemestiriel.html.twig', [
-            'bilan' => $collectSemaine,
+            'bilan' =>  $pointageService->getBilanSemestriel($pointages),
         ]);
     }
     /**
@@ -93,45 +54,9 @@ class PointageController extends AbstractController
     public function bilanMensuel(PointageRepository $pointageRepository, Security $security, PointageService $pointageService): Response
     {
         $pointages = $pointageRepository->findBy(["employer" => $security->getUser()], ["date" => "ASC"]);
-        $bilan = $pointageService->getInitBilan();
-        $thisYear = 0;
-        $thisMonth = 0;
-        $collectSemaine = [];
-        foreach ($pointages as $index => $pointage) {
 
-            if ($thisYear . '-' . $thisMonth != $pointage->getDate()->format('Y-m')) {
-                if ($thisYear and $thisMonth)
-                    array_push($collectSemaine, $bilan);
-                $thisYear =  $pointage->getDate()->format('Y');
-                $thisMonth =  $pointage->getDate()->format('m');
-                $bilan = $pointageService->getInitBilan();
-                $bilan["interval"] =  $pointage->getDate()->format('Y-m');
-            }
-
-            $bilan["nbrHeurTravailler"] = $pointageService->bilan($pointage->getNbrHeurTravailler(), $bilan["nbrHeurTravailler"]);
-            if ($pointage->getRetardEnMinute())
-                $bilan["retardEnMinute"] = $pointageService->bilan($pointage->getRetardEnMinute(), $bilan["retardEnMinute"]);
-            if ($pointage->getDepartAnticiper())
-                $bilan["departAnticiper"] = $pointageService->bilan($pointage->getDepartAnticiper(), $bilan["departAnticiper"]);
-            if ($pointage->getRetardMidi())
-                $bilan["retardMidi"] = $pointageService->bilan($pointage->getRetardMidi(), $bilan["retardMidi"]);
-            $bilan["totaleRetard"] = $pointageService->bilan($pointage->getTotaleRetard(), $bilan["totaleRetard"]);
-            if ($pointage->getAutorisationSortie())
-                $bilan["autorisationSortie"] = $pointageService->bilan($pointage->getAutorisationSortie()->getTime(), $bilan["autorisationSortie"]);
-            if ($pointage->getCongerPayer()) {
-                if ($pointage->getCongerPayer()->getDemiJourner()) {
-                    $bilan["congerPayer"] += 0.5;
-                } else {
-                    $bilan["congerPayer"] += 1;
-                }
-            }
-            $bilan["abscence"] += $pointage->getAbscence();
-            $bilan["heurNormalementTravailler"] = $pointageService->bilan($pointage->getHeurNormalementTravailler(), $bilan["heurNormalementTravailler"]);
-            $bilan["diff"] = $pointageService->bilan($pointage->getDiff(), $bilan["diff"]);
-        }
-        array_push($collectSemaine, $bilan);
         return $this->render('pointage/bilanMensuel.html.twig', [
-            'bilan' => $collectSemaine,
+            'bilan' =>  $pointageService->getBilanMensuel($pointages),
         ]);
     }
     /**
@@ -140,45 +65,8 @@ class PointageController extends AbstractController
     public function bilanAnnuel(PointageRepository $pointageRepository, Security $security, PointageService $pointageService): Response
     {
         $pointages = $pointageRepository->findBy(["employer" => $security->getUser()], ["date" => "ASC"]);
-        $bilan = $pointageService->getInitBilan();
-        $thisYear = 0;
-        $collectAnnuel = [];
-        foreach ($pointages as $index => $pointage) {
-
-            if ($thisYear != $pointage->getDate()->format('Y')) {
-                if ($thisYear)
-                    array_push($collectAnnuel, $bilan);
-                $thisYear =  $pointage->getDate()->format('Y');
-                $bilan = $pointageService->getInitBilan();
-
-                $bilan["interval"] =  $pointage->getDate()->format('Y');
-            }
-
-            $bilan["nbrHeurTravailler"] = $pointageService->bilan($pointage->getNbrHeurTravailler(), $bilan["nbrHeurTravailler"]);
-            if ($pointage->getRetardEnMinute())
-                $bilan["retardEnMinute"] = $pointageService->bilan($pointage->getRetardEnMinute(), $bilan["retardEnMinute"]);
-            if ($pointage->getDepartAnticiper())
-                $bilan["departAnticiper"] = $pointageService->bilan($pointage->getDepartAnticiper(), $bilan["departAnticiper"]);
-            if ($pointage->getRetardMidi())
-                $bilan["retardMidi"] = $pointageService->bilan($pointage->getRetardMidi(), $bilan["retardMidi"]);
-            $bilan["totaleRetard"] = $pointageService->bilan($pointage->getTotaleRetard(), $bilan["totaleRetard"]);
-            if ($pointage->getAutorisationSortie())
-                $bilan["autorisationSortie"] = $pointageService->bilan($pointage->getAutorisationSortie()->getTime(), $bilan["autorisationSortie"]);
-            if ($pointage->getCongerPayer()) {
-                if ($pointage->getCongerPayer()->getDemiJourner()) {
-                    $bilan["congerPayer"] += 0.5;
-                } else {
-                    $bilan["congerPayer"] += 1;
-                }
-            }
-            $bilan["abscence"] += $pointage->getAbscence();
-            $bilan["heurNormalementTravailler"] = $pointageService->bilan($pointage->getHeurNormalementTravailler(), $bilan["heurNormalementTravailler"]);
-            $bilan["diff"] = $pointageService->bilan($pointage->getDiff(), $bilan["diff"]);
-        }
-        array_push($collectAnnuel, $bilan);
-
         return $this->render('pointage/bilanAnnuel.html.twig', [
-            'bilan' => $collectAnnuel,
+            'bilan' =>  $pointageService->getBilanAnnuel($pointages),
         ]);
     }
 

@@ -62,7 +62,7 @@
 		<tbody>
 			{% for pointage in bilan %}
 				<tr>
-					<td>{{ pointage.interval }}</td>
+					<td>{{ pointage.date }}</td>
 					<td>{{ _self.secondsToMinutes( pointage.nbrHeurTravailler)  }}</td>
 					<td>{{ _self.secondsToMinutes(pointage.retardEnMinute)  }}</td>
 					<td>{{ _self.secondsToMinutes(pointage.departAnticiper) }}</td>
