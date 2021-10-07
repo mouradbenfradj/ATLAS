@@ -9,6 +9,7 @@ use App\Entity\Pointage;
 use App\Entity\JourFerier;
 use App\Service\PointageService;
 use App\Entity\AutorisationSortie;
+use App\Entity\Config;
 use App\Repository\UserRepository;
 use App\Repository\PointageRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,10 +41,12 @@ class DashboardController extends AbstractDashboardController
             $user = $this->getDoctrine()->getRepository(User::class)->find($this->adminContextProvider->getContext()->getRequest()->request->get('user'));
         else
             $user = $this->getUser();
-        $collectSemaine = $this->pointageService->getBilanGeneral($user->getPointages());
+        //usort($user->getPointages(), fn ($a, $b) => $a['date'] > $b['date'])
+        $collectGeneral = $this->pointageService->getBilanGeneral($user->getPointages());
         return $this->render('admin/dashboard.html.twig', [
             'users' => $this->getDoctrine()->getRepository(User::class)->findAll(),
-            'bilan' => $collectSemaine
+            'userBilan' =>  $user,
+            'bilan' => $collectGeneral
         ]);
     }
 
@@ -69,6 +72,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Employer', 'fas fa-list', User::class),
         ]);
         yield MenuItem::subMenu('Config', 'fa fa-article')->setSubItems([
+            MenuItem::linkToCrud('Config', 'fas fa-list', Config::class),
             MenuItem::linkToCrud('Jour Ferier', 'fas fa-list', JourFerier::class),
             MenuItem::linkToCrud('Horaire', 'fas fa-list', Horaire::class),
         ]);

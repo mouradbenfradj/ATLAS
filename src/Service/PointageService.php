@@ -49,6 +49,7 @@ class PointageService
      * @var int
      */
     private $nextYear;
+    private $configService;
     /**
      * __construct
      *
@@ -58,15 +59,18 @@ class PointageService
         FlashBagInterface $flash,
         HoraireService $horaireService,
         DateService $dateService,
-        TimeService $timeService
+        TimeService $timeService,
+        ConfigService $configService
     ) {
         $this->horaireService = $horaireService;
         $this->timeService = $timeService;
         $this->dateService = $dateService;
         $this->flash = $flash;
+        $this->configService = $configService;
 
         $this->initBilan = [
             "colspan" => 1,
+            "background" => null,
             "date" => null,
             "horaire" => null,
             "entrer" => null,
@@ -192,14 +196,10 @@ class PointageService
         foreach ($pointages as  $pointage) {
             $this->setPointage($pointage);
             $this->setHoraireServiceHoraire();
-
-
-
-
-
             if ($thisWeek != $pointage->getDate()->format('W')) {
                 $bilan["date"] = $countWeek;
                 if ($thisWeek) {
+                    $bilan["background"] = "Orange";
                     $bilan["colspan"] = 4;
                     $bilan["date"] = "Semaine " . $bilan["date"];
                     array_push($collectGeneral, $bilan);
@@ -211,37 +211,63 @@ class PointageService
             }
             if ($thisYear . '-' . $thisMonth != $pointage->getDate()->format('Y-m')) {
                 $bilanMonth["date"] =   $thisYear . '-' . $thisMonth;
+                $bilanMonth["background"] = "DodgerBlue";
                 $bilanMonth["colspan"] = 4;
                 if ($thisYear and  $thisMonth)
                     array_push($collectGeneral,  $bilanMonth);
-
-                $thisYear =  $pointage->getDate()->format('Y');
-                $thisMonth =  $pointage->getDate()->format('m');
                 $bilanMonth = $this->initBilan;
+            }
+            if ($thisYear != $pointage->getDate()->format('Y')) {
+                $bilanYear["date"] =     $thisYear;
+                $bilanYear["background"] = "MediumSeaGreen";
+                $bilanMonth["colspan"] = 4;
+                if ($thisYear)
+                    array_push($collectGeneral, $bilanYear);
+                $bilanYear = $this->initBilan;
             }
             $bilan = $this->calculateurBilan($pointage, $bilan);
             $bilanMonth = $this->calculateurBilan($pointage, $bilanMonth);
             $bilanYear = $this->calculateurBilan($pointage, $bilanYear);
 
-
-            array_push($collectGeneral, [
-                "colspan" => 1,
-                "date" =>  $pointage->getdate()->format('d/m/Y'),
-                "horaire" =>  $pointage->getHoraire(),
-                "entrer" =>  $pointage->getEntrer() ? $pointage->getEntrer()->format('H:i:s') : "",
-                "sortie" =>  $pointage->getSortie() ? $pointage->getSortie()->format('H:i:s') : "",
-                "nbrHeurTravailler" => $pointage->getNbrHeurTravailler() ? $pointage->getNbrHeurTravailler()->format('H:i:s') : "",
-                "retardEnMinute" => $pointage->getRetardEnMinute() ? $pointage->getRetardEnMinute()->format('H:i:s') : "",
-                "departAnticiper" => $pointage->getDepartAnticiper() ? $pointage->getDepartAnticiper()->format('H:i:s') : "",
-                "retardMidi" => $pointage->getRetardMidi() ? $pointage->getRetardMidi()->format('H:i:s') : "",
-                "totaleRetard" => $pointage->getTotaleRetard() ? $pointage->getTotaleRetard()->format('H:i:s') : "",
-                "autorisationSortie" => $pointage->getAutorisationSortie() ? $pointage->getAutorisationSortie()->getTime()->format('H:i:s') : "",
-                "congerPayer" =>  $pointage->getCongerPayer(),
-                "abscence" => $pointage->getAbscence(),
-                "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format('H:i:s') : "",
-                "diff" => $pointage->getDiff() ? $pointage->getDiff()->format('H:i:s') : "",
-            ]);
             $thisWeek = $pointage->getDate()->format('W');
+            $thisMonth =  $pointage->getDate()->format('m');
+            $thisYear =  $pointage->getDate()->format('Y');
+            if ($pointage->getCongerPayer() and $pointage->getCongerPayer() != "0.5")
+                array_push($collectGeneral, [
+                    "colspan" => 1,
+                    "date" =>  $pointage->getdate()->format('d/m/Y'),
+                    "horaire" =>  $pointage->getHoraire(),
+                    "entrer" =>  $pointage->getCongerPayer()->gettype(),
+                    "sortie" =>  $pointage->getCongerPayer()->gettype(),
+                    "nbrHeurTravailler" => $pointage->getNbrHeurTravailler() ? $pointage->getNbrHeurTravailler()->format('H:i:s') : "",
+                    "retardEnMinute" => $pointage->getRetardEnMinute() ? $pointage->getRetardEnMinute()->format('H:i:s') : "",
+                    "departAnticiper" => $pointage->getDepartAnticiper() ? $pointage->getDepartAnticiper()->format('H:i:s') : "",
+                    "retardMidi" => $pointage->getRetardMidi() ? $pointage->getRetardMidi()->format('H:i:s') : "",
+                    "totaleRetard" => $pointage->getTotaleRetard() ? $pointage->getTotaleRetard()->format('H:i:s') : "",
+                    "autorisationSortie" => $pointage->getAutorisationSortie() ? $pointage->getAutorisationSortie()->getTime()->format('H:i:s') : "",
+                    "congerPayer" =>  $pointage->getCongerPayer(),
+                    "abscence" => $pointage->getAbscence(),
+                    "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format('H:i:s') : "",
+                    "diff" => $pointage->getDiff() ? $pointage->getDiff()->format('H:i:s') : "",
+                ]);
+            else
+                array_push($collectGeneral, [
+                    "colspan" => 1,
+                    "date" =>  $pointage->getdate()->format('d/m/Y'),
+                    "horaire" =>  $pointage->getHoraire(),
+                    "entrer" =>  $pointage->getEntrer() ? $pointage->getEntrer()->format('H:i:s') : "",
+                    "sortie" =>  $pointage->getSortie() ? $pointage->getSortie()->format('H:i:s') : "",
+                    "nbrHeurTravailler" => $pointage->getNbrHeurTravailler() ? $pointage->getNbrHeurTravailler()->format('H:i:s') : "",
+                    "retardEnMinute" => $pointage->getRetardEnMinute() ? $pointage->getRetardEnMinute()->format('H:i:s') : "",
+                    "departAnticiper" => $pointage->getDepartAnticiper() ? $pointage->getDepartAnticiper()->format('H:i:s') : "",
+                    "retardMidi" => $pointage->getRetardMidi() ? $pointage->getRetardMidi()->format('H:i:s') : "",
+                    "totaleRetard" => $pointage->getTotaleRetard() ? $pointage->getTotaleRetard()->format('H:i:s') : "",
+                    "autorisationSortie" => $pointage->getAutorisationSortie() ? $pointage->getAutorisationSortie()->getTime()->format('H:i:s') : "",
+                    "congerPayer" =>  $pointage->getCongerPayer(),
+                    "abscence" => $pointage->getAbscence(),
+                    "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format('H:i:s') : "",
+                    "diff" => $pointage->getDiff() ? $pointage->getDiff()->format('H:i:s') : "",
+                ]);
         }
         if (!empty($collectGeneral))
             array_push($collectGeneral, $bilan);
@@ -458,7 +484,17 @@ class PointageService
                         $autrisationSotie->setDateAutorisation($this->pointage->getDate());
                         $autrisationSotie->setTime(new DateTime($colomn));
                         $autrisationSotie->setEmployer($user);
+                        //if ($this->configService->getConfig()->getReinitialisationC() and ($lastYear != $date->format('Y')))
+                        $user->setSoldConger($this->configService->getConfig()->getDebutSoldConger());
+                        //if ($this->configService->getConfig()->getReinitialisationAS() and ($lastYear != $date->format('Y')))
+                        $user->setSoldAutorisationSortie($this->configService->getConfig()->getdebutSoldAS());
+                        //$lastYear = $date->format('Y');
                         $this->pointage->setAutorisationSortie($autrisationSotie);
+                        dump($user->getSoldAutorisationSortie());
+                        $soldAS = new DateTime($user->getSoldAutorisationSortie()->format("H:i:s"));
+                        $soldAS->sub($this->timeService->dateTimeToDateInterval(new DateTime($colomn)));
+                        $user->setSoldAutorisationSortie($soldAS);
+                        dump($user->getSoldAutorisationSortie());
                     } else {
                         if ($colomn)
                             $this->flash->add('warning', 'ignored autorisationSortie' . $colomn . ' of ligne ' . implode(" | ", $ligne));
@@ -468,7 +504,9 @@ class PointageService
                     switch ($colomn) {
                         case '0.5':
                             $conger = new Conger();
+                            $conger->setType("CP");
                             $conger->setEmployer($user);
+                            $user->setSoldConger($user->getSoldConger() - 0.5);
                             $conger->setDebut($this->pointage->getDate());
                             $conger->setFin($this->pointage->getDate());
                             $conger->setDemiJourner(true);
@@ -476,16 +514,26 @@ class PointageService
                             break;
                         case '1':
                             $conger = new Conger();
+                            if ($ligne['C'] == 'CM')
+                                $conger->setType("CM");
+                            else
+                                $conger->setType("CP");
                             $conger->setEmployer($user);
+                            $user->setSoldConger($user->getSoldConger() - 1);
                             $conger->setDebut($this->pointage->getDate());
                             $conger->setFin($this->pointage->getDate());
                             $conger->setDemiJourner(false);
                             $this->pointage->setCongerPayer($conger);
                             break;
                         default:
-                            if ($ligne['C'] == 'CP' and !$colomn) {
+                            if (($ligne['C'] == 'CP' or $ligne['C'] == 'CM') and !$colomn) {
                                 $conger = new Conger();
+                                if ($ligne['C'] == 'CM')
+                                    $conger->setType("CM");
+                                else
+                                    $conger->setType("CP");
                                 $conger->setEmployer($user);
+                                $user->setSoldConger($user->getSoldConger() - 1);
                                 $conger->setDebut($this->pointage->getDate());
                                 $conger->setFin($this->pointage->getDate());
                                 $conger->setDemiJourner(false);

@@ -4,6 +4,7 @@ namespace App\EventSubscriber;
 
 use App\Entity\Pointage;
 use App\Entity\User;
+use App\Service\ConfigService;
 use App\Service\PointageService;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityUpdatedEvent;
@@ -14,11 +15,13 @@ class EasyAdminSubscriber implements EventSubscriberInterface
 {
     private $passwordHasher;
     private $pointageService;
+    private $configService;
 
-    public function __construct(UserPasswordHasherInterface $passwordHasher, PointageService $pointageService)
+    public function __construct(UserPasswordHasherInterface $passwordHasher, ConfigService $configService, PointageService $pointageService)
     {
         $this->passwordHasher = $passwordHasher;
         $this->pointageService = $pointageService;
+        $this->configService = $configService;
     }
 
     public static function getSubscribedEvents()
@@ -40,6 +43,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             $entity,
             $entity->getPassword()
         ));
+        dd($entity);
         /* 
         $slug = $this->slugger->slugify($entity->getTitle());
         $entity->setSlug($slug); */

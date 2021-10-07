@@ -5,9 +5,10 @@ namespace App\Controller\Admin;
 use App\Entity\Conger;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 
 class CongerCrudController extends AbstractCrudController
 {
@@ -21,6 +22,7 @@ class CongerCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->onlyOnIndex(),
+            TextField::new('type'),
             AssociationField::new('employer'),
             DateField::new('debut'),
             DateField::new('fin'),

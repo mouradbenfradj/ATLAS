@@ -50,7 +50,11 @@
 		</thead>
 		<tbody>
 			{% for pointage in bilan %}
-				<tr>
+				{% if pointage.background is defined  %}
+					<tr  style="background-color:{{ pointage.background }}">
+				{% else %}
+					<tr >
+				{% endif %}
 					<td colspan="{{pointage.colspan }}">{{ pointage.date }}</td>
  					{% if pointage.colspan == 1 %}
 						<td>{{ pointage.horaire }}</td>

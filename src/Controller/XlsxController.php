@@ -43,9 +43,9 @@ class XlsxController extends AbstractController
 
 
     /**
-     * @Route("/upload/{id}", name="xlsx_upload", methods={"GET","POST"})
+     * @Route("/upload/{user}", name="xlsx_upload", methods={"GET","POST"})
      */
-    public function upload(Request $request,  PointageGeneratorService $pointageGeneratorService, User $id): Response
+    public function upload(Request $request,  PointageGeneratorService $pointageGeneratorService, User $user): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
@@ -54,7 +54,7 @@ class XlsxController extends AbstractController
             if ($xlsx) {
                 $reader = new Xlsx();
                 $spreadsheet = $reader->load($xlsx);
-                $this->getDoctrine()->getManager()->persist($pointageGeneratorService->fromXlsxFile($spreadsheet, $id));
+                $this->getDoctrine()->getManager()->persist($pointageGeneratorService->fromXlsxFile($spreadsheet, $user));
                 $this->getDoctrine()->getManager()->flush();
                 $this->addFlash('success', 'updated_successfully');
             }
@@ -65,7 +65,7 @@ class XlsxController extends AbstractController
                 ->generateUrl();
             return $this->redirect($url);
             //$table = new TableReader($dbf);
-            //$pointageGenerator->fromDbfFile($table, $id);
+            //$pointageGenerator->fromDbfFile($table, $user);
         }
         return $this->render('xlsx/upload.html.twig', [
             'form' => $form->createView(),

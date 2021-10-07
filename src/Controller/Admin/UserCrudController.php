@@ -12,7 +12,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
 
 class UserCrudController extends AbstractCrudController
 {
@@ -46,7 +48,10 @@ class UserCrudController extends AbstractCrudController
             TextField::new('qualification'),
             IntegerField::new('matricule'),
             DateField::new('debutTravaille'),
-            DateField::new('demission')
+            DateField::new('demission'),
+            NumberField::new('soldConger'),
+            TimeField::new('soldAutorisationSortie'),
+
         ];
     }
 
@@ -55,13 +60,13 @@ class UserCrudController extends AbstractCrudController
         $dbfGenerator = Action::new('dbfGenerator', 'generate depui DbF File')
             ->linkToRoute('dbf_upload', function (User $user): array {
                 return [
-                    'id' => $user->getId()
+                    'user' => $user->getId()
                 ];
             });
         $wlsxGenerator = Action::new('xlsxGenerator', 'generate depui Xlsx File')
             ->linkToRoute('xlsx_upload', function (User $user): array {
                 return [
-                    'id' => $user->getId()
+                    'user' => $user->getId()
                 ];
             });
         $actions->add(Crud::PAGE_INDEX, $dbfGenerator);

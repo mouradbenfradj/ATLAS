@@ -19,6 +19,8 @@ class UserFixtures extends Fixture
     {
         $user = new User();
         $user->setEmail("mourad.ben.fradj@gmail.com");
+        $user->setSoldConger(0);
+        $user->setSoldAutorisationSortie(new DateTime("00:00:00"));
         $user->setBadgenumbe(207);
         $user->setFirstName("Mourad");
         $user->setLastName("Ben Fradj");
@@ -32,6 +34,8 @@ class UserFixtures extends Fixture
         $user = new User();
         $user->setEmail("cherifcontact@gmail.com");
         $user->setBadgenumbe(302);
+        $user->setSoldConger(0);
+        $user->setSoldAutorisationSortie(new DateTime("00:00:00"));
         $user->setFirstName("cherif");
         $user->setLastName("k");
         $user->setDebutTravaille(new DateTime("2021/01/01"));

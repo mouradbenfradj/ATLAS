@@ -25,7 +25,7 @@
 	{{ hours }}{{ minutes}}{{ seconds }}
 
 {% endmacro %}
-{% block content_title %}The Title of the Page
+{% block content_title %}Bilan de l'employer {{userBilan.lastName}} {{userBilan.firstName}} 
 {% endblock %}
 {% block page_actions %}
 <form action="{{ path('admin_dashboard') }}" method="post">
@@ -61,7 +61,11 @@
 		</thead>
 		<tbody>
 			{% for pointage in bilan %}
-				<tr>
+				{% if pointage.background is defined  %}
+					<tr  style="background-color:{{ pointage.background }}">
+				{% else %}
+					<tr >
+				{% endif %}
 					<td colspan="{{pointage.colspan }}">{{ pointage.date }}</td>
  					{% if pointage.colspan == 1 %}
 						<td>{{ pointage.horaire }}</td>

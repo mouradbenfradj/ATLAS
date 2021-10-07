@@ -96,6 +96,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $autorisationSorties;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $soldConger;
+
+    /**
+     * @ORM\Column(type="time")
+     */
+    private $soldAutorisationSortie;
+
     public function __construct()
     {
         $this->pointages = new ArrayCollection();
@@ -374,6 +384,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $autorisationSorty->setEmployer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSoldConger(): ?int
+    {
+        return $this->soldConger;
+    }
+
+    public function setSoldConger(int $soldConger): self
+    {
+        $this->soldConger = $soldConger;
+
+        return $this;
+    }
+
+    public function getSoldAutorisationSortie(): ?\DateTimeInterface
+    {
+        return $this->soldAutorisationSortie;
+    }
+
+    public function setSoldAutorisationSortie(\DateTimeInterface $soldAutorisationSortie): self
+    {
+        $this->soldAutorisationSortie = $soldAutorisationSortie;
 
         return $this;
     }
