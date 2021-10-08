@@ -17,7 +17,7 @@ class SecurityController extends AbstractController
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('@EasyAdmin/page/login.html.twig', [
+        return $this->render('security/login.html.twig', [
             // parameters usually defined in Symfony login forms
             'error' => $error,
             'last_username' => $lastUsername,
@@ -33,14 +33,14 @@ class SecurityController extends AbstractController
             // the title visible above the login form (define this option only if you are
             // rendering the login template in a regular Symfony controller; when rendering
             // it from an EasyAdmin Dashboard this is automatically set as the Dashboard title)
-            'page_title' => 'ACME login',
+            'page_title' => 'ATLAS login',
 
             // the string used to generate the CSRF token. If you don't define
             // this parameter, the login form won't include a CSRF token
             'csrf_token_intention' => 'authenticate',
 
             // the URL users are redirected to after the login (default: '/admin')
-            'target_path' => $this->generateUrl('admin_dashboard'),
+            'target_path' => $this->generateUrl('default'),
 
             // the label displayed for the username form field (the |trans filter is applied to it)
             'username_label' => 'Your username',
@@ -61,7 +61,7 @@ class SecurityController extends AbstractController
             'forgot_password_enabled' => true,
 
             // the path (i.e. a relative or absolute URL) to visit when clicking the "forgot password?" link (default: '#')
-            //'forgot_password_path' => $this->generateUrl('...', ['...' => '...']),
+            'forgot_password_path' => $this->generateUrl('app_forgot_password_request'/* , ['...' => '...'] */),
 
             // the label displayed for the "forgot password?" link (the |trans filter is applied to it)
             'forgot_password_label' => 'Forgot your password?',

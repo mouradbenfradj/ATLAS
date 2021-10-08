@@ -485,16 +485,8 @@ class PointageService
                         $autrisationSotie->setTime(new DateTime($colomn));
                         $autrisationSotie->setEmployer($user);
                         //if ($this->configService->getConfig()->getReinitialisationC() and ($lastYear != $date->format('Y')))
-                        $user->setSoldConger($this->configService->getConfig()->getDebutSoldConger());
                         //if ($this->configService->getConfig()->getReinitialisationAS() and ($lastYear != $date->format('Y')))
-                        $user->setSoldAutorisationSortie($this->configService->getConfig()->getdebutSoldAS());
                         //$lastYear = $date->format('Y');
-                        $this->pointage->setAutorisationSortie($autrisationSotie);
-                        dump($user->getSoldAutorisationSortie());
-                        $soldAS = new DateTime($user->getSoldAutorisationSortie()->format("H:i:s"));
-                        $soldAS->sub($this->timeService->dateTimeToDateInterval(new DateTime($colomn)));
-                        $user->setSoldAutorisationSortie($soldAS);
-                        dump($user->getSoldAutorisationSortie());
                     } else {
                         if ($colomn)
                             $this->flash->add('warning', 'ignored autorisationSortie' . $colomn . ' of ligne ' . implode(" | ", $ligne));
@@ -506,7 +498,6 @@ class PointageService
                             $conger = new Conger();
                             $conger->setType("CP");
                             $conger->setEmployer($user);
-                            $user->setSoldConger($user->getSoldConger() - 0.5);
                             $conger->setDebut($this->pointage->getDate());
                             $conger->setFin($this->pointage->getDate());
                             $conger->setDemiJourner(true);
@@ -519,7 +510,6 @@ class PointageService
                             else
                                 $conger->setType("CP");
                             $conger->setEmployer($user);
-                            $user->setSoldConger($user->getSoldConger() - 1);
                             $conger->setDebut($this->pointage->getDate());
                             $conger->setFin($this->pointage->getDate());
                             $conger->setDemiJourner(false);
@@ -533,7 +523,6 @@ class PointageService
                                 else
                                     $conger->setType("CP");
                                 $conger->setEmployer($user);
-                                $user->setSoldConger($user->getSoldConger() - 1);
                                 $conger->setDebut($this->pointage->getDate());
                                 $conger->setFin($this->pointage->getDate());
                                 $conger->setDemiJourner(false);

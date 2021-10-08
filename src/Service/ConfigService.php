@@ -7,7 +7,17 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class ConfigService
 {
+    /**
+     * config
+     *
+     * @var Config
+     */
     private $config;
+    /**
+     * __construct
+     *
+     * @param EntityManagerInterface $em
+     */
     public function __construct(EntityManagerInterface $em)
     {
         $this->config = $em->getRepository(Config::class)->findOneBy(['active' => true]);

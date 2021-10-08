@@ -7,6 +7,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
@@ -40,7 +41,6 @@ class UserCrudController extends AbstractCrudController
                         'SuperAdmin' => 'ROLE_SUPER_ADMIN'
                     ]
                 ),
-            TextField::new('password')->hideOnIndex(),
             IntegerField::new('userID'),
             IntegerField::new('badgenumbe'),
             TextField::new('firstName'),
@@ -49,8 +49,9 @@ class UserCrudController extends AbstractCrudController
             IntegerField::new('matricule'),
             DateField::new('debutTravaille'),
             DateField::new('demission'),
-            NumberField::new('soldConger'),
-            TimeField::new('soldAutorisationSortie'),
+            NumberField::new('soldConger')->onlyOnIndex(),
+            TimeField::new('soldAutorisationSortie')->onlyOnIndex(),
+            BooleanField::new('isVerified'),
 
         ];
     }
