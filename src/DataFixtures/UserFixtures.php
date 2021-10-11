@@ -6,11 +6,10 @@ use App\Entity\User;
 use App\Service\ConfigService;
 use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserFixtures extends Fixture implements DependentFixtureInterface
+class UserFixtures extends Fixture
 {
     /**
      * passwordHasher
@@ -18,22 +17,15 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
      * @var UserPasswordHasherInterface
      */
     private $passwordHasher;
-    /**
-     * configService
-     *
-     * @var ConfigService
-     */
-    private $configService;
+
     /**
      * __construct
      *
      * @param UserPasswordHasherInterface $passwordHasher
-     * @param ConfigService $configService
      */
-    public function __construct(UserPasswordHasherInterface $passwordHasher, ConfigService $configService)
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
     {
         $this->passwordHasher = $passwordHasher;
-        $this->configService = $configService;
     }
     /**
      * load
@@ -56,9 +48,9 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
             $user,
             'mourad'
         ));
-
-        $user->setSoldConger($this->configService->getConfig()->getDebutSoldConger());
-        $user->setSoldAutorisationSortie($this->configService->getConfig()->getDebutSoldAS());
+        $user->setIsVerified(true);
+        $user->setSoldConger(0);
+        $user->setSoldAutorisationSortie(new DateTime('23:00:00'));
 
         $manager->persist($user);
         $user = new User();
@@ -75,21 +67,13 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
             'cherif'
         ));
 
-        $user->setSoldConger($this->configService->getConfig()->getDebutSoldConger());
-        $user->setSoldAutorisationSortie($this->configService->getConfig()->getDebutSoldAS());
+        $user->setIsVerified(true);
+        $user->setSoldConger(0);
+        $user->setSoldAutorisationSortie(new DateTime('23:00:00'));
 
         $manager->persist($user);
 
         $manager->flush();
     }
 
-    /**
-     * getDependencies
-     *
-     * @return void
-     */
-    public function getDependencies()
-    {
-        return [ConfigFixtures::class];
-    }
 }

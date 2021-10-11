@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Conger{% endblock %}
+
+{% block body %}
+    <h1>Conger</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ conger.id }}</td>
+            </tr>
+            <tr>
+                <th>Debut</th>
+                <td>{{ conger.debut ? conger.debut|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Fin</th>
+                <td>{{ conger.fin ? conger.fin|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>DemiJourner</th>
+                <td>{{ conger.demiJourner ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ conger.type }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('conger_index') }}">back to list</a>
+
+    <a href="{{ path('conger_edit', {'id': conger.id}) }}">edit</a>
+
+    {{ include('conger/_delete_form.html.twig') }}
+{% endblock %}
