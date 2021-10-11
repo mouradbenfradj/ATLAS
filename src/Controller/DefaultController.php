@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use DateTime;
-use DateInterval;
 use App\Service\PointageService;
 use App\Repository\PointageRepository;
 use Symfony\Component\Security\Core\Security;

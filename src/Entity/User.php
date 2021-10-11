@@ -113,11 +113,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $isVerified = false;
 
+    /**
+     * @ORM\OneToMany(targetEntity=WorkTime::class, mappedBy="employer", orphanRemoval=true)
+     */
+    private $workTimes;
+
     public function __construct()
     {
         $this->pointages = new ArrayCollection();
         $this->congers = new ArrayCollection();
         $this->autorisationSorties = new ArrayCollection();
+        $this->workTimes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -427,6 +433,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): self
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|WorkTime[]
+     */
+    public function getWorkTimes(): Collection
+    {
+        return $this->workTimes;
+    }
+
+    public function addWorkTime(WorkTime $workTime): self
+    {
+        if (!$this->workTimes->contains($workTime)) {
+            $this->workTimes[] = $workTime;
+            $workTime->setEmployer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWorkTime(WorkTime $workTime): self
+    {
+        if ($this->workTimes->removeElement($workTime)) {
+            // set the owning side to null (unless already changed)
+            if ($workTime->getEmployer() === $this) {
+                $workTime->setEmployer(null);
+            }
+        }
 
         return $this;
     }

@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-
+{% block linkheader %}{% endblock %}
 {% macro secondsToMinutes(seconds) %}
 	{# set hours minus minutes/seconds #}
 	{% set hours = (seconds / 60)  // 60 %}
@@ -25,10 +25,10 @@
 	{{ hours }}{{ minutes}}{{ seconds }}
 
 {% endmacro %}
+{% block titleheader %} Bilan General {% endblock %}
 {% block body_title %}bilan General
 {% endblock %}
 {% block body %}
-	<h1>Pointage bilan General</h1>
 	<table id="example1" class="table table-bordered table-striped">
 		<thead>
 			<tr>

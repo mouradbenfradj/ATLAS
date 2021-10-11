@@ -2,20 +2,17 @@
 
 namespace App\Entity;
 
-use App\Repository\HoraireRepository;
+use App\Repository\WorkTimeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=HoraireRepository::class)
+ * @ORM\Entity(repositoryClass=WorkTimeRepository::class)
  */
-class Horaire
+class WorkTime
 {
-    public function __toString()
-    {
-        return $this->horaire;
-    }
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -24,7 +21,14 @@ class Horaire
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="workTimes")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $employer;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Horaire::class, inversedBy="workTimes")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $horaire;
 
@@ -39,59 +43,53 @@ class Horaire
     private $dateFin;
 
     /**
-     * @ORM\Column(type="time")
+     * @ORM\Column(type="time", nullable=true)
      */
     private $heurDebutTravaille;
 
     /**
-     * @ORM\Column(type="time")
+     * @ORM\Column(type="time", nullable=true)
      */
     private $heurFinTravaille;
 
     /**
-     * @ORM\Column(type="time")
+     * @ORM\Column(type="time", nullable=true)
      */
     private $debutPauseMatinal;
 
     /**
-     * @ORM\Column(type="time")
+     * @ORM\Column(type="time", nullable=true)
      */
     private $finPauseMatinal;
 
     /**
-     * @ORM\Column(type="time")
+     * @ORM\Column(type="time", nullable=true)
      */
     private $debutPauseDejeuner;
 
     /**
-     * @ORM\Column(type="time")
+     * @ORM\Column(type="time", nullable=true)
      */
     private $finPauseDejeuner;
 
     /**
-     * @ORM\Column(type="time")
+     * @ORM\Column(type="time", nullable=true)
      */
     private $debutPauseMidi;
 
     /**
-     * @ORM\Column(type="time")
+     * @ORM\Column(type="time", nullable=true)
      */
     private $finPauseMidi;
 
     /**
-     * @ORM\OneToMany(targetEntity=Pointage::class, mappedBy="horaire")
+     * @ORM\OneToMany(targetEntity=Pointage::class, mappedBy="workTime")
      */
     private $pointages;
-
-    /**
-     * @ORM\OneToMany(targetEntity=WorkTime::class, mappedBy="horaire", orphanRemoval=true)
-     */
-    private $workTimes;
 
     public function __construct()
     {
         $this->pointages = new ArrayCollection();
-        $this->workTimes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -99,12 +97,24 @@ class Horaire
         return $this->id;
     }
 
-    public function getHoraire(): ?string
+    public function getEmployer(): ?User
+    {
+        return $this->employer;
+    }
+
+    public function setEmployer(?User $employer): self
+    {
+        $this->employer = $employer;
+
+        return $this;
+    }
+
+    public function getHoraire(): ?Horaire
     {
         return $this->horaire;
     }
 
-    public function setHoraire(string $horaire): self
+    public function setHoraire(?Horaire $horaire): self
     {
         $this->horaire = $horaire;
 
@@ -135,13 +145,12 @@ class Horaire
         return $this;
     }
 
-
     public function getHeurDebutTravaille(): ?\DateTimeInterface
     {
         return $this->heurDebutTravaille;
     }
 
-    public function setHeurDebutTravaille(\DateTimeInterface $heurDebutTravaille): self
+    public function setHeurDebutTravaille(?\DateTimeInterface $heurDebutTravaille): self
     {
         $this->heurDebutTravaille = $heurDebutTravaille;
 
@@ -153,7 +162,7 @@ class Horaire
         return $this->heurFinTravaille;
     }
 
-    public function setHeurFinTravaille(\DateTimeInterface $heurFinTravaille): self
+    public function setHeurFinTravaille(?\DateTimeInterface $heurFinTravaille): self
     {
         $this->heurFinTravaille = $heurFinTravaille;
 
@@ -165,7 +174,7 @@ class Horaire
         return $this->debutPauseMatinal;
     }
 
-    public function setDebutPauseMatinal(\DateTimeInterface $debutPauseMatinal): self
+    public function setDebutPauseMatinal(?\DateTimeInterface $debutPauseMatinal): self
     {
         $this->debutPauseMatinal = $debutPauseMatinal;
 
@@ -177,7 +186,7 @@ class Horaire
         return $this->finPauseMatinal;
     }
 
-    public function setFinPauseMatinal(\DateTimeInterface $finPauseMatinal): self
+    public function setFinPauseMatinal(?\DateTimeInterface $finPauseMatinal): self
     {
         $this->finPauseMatinal = $finPauseMatinal;
 
@@ -189,7 +198,7 @@ class Horaire
         return $this->debutPauseDejeuner;
     }
 
-    public function setDebutPauseDejeuner(\DateTimeInterface $debutPauseDejeuner): self
+    public function setDebutPauseDejeuner(?\DateTimeInterface $debutPauseDejeuner): self
     {
         $this->debutPauseDejeuner = $debutPauseDejeuner;
 
@@ -201,7 +210,7 @@ class Horaire
         return $this->finPauseDejeuner;
     }
 
-    public function setFinPauseDejeuner(\DateTimeInterface $finPauseDejeuner): self
+    public function setFinPauseDejeuner(?\DateTimeInterface $finPauseDejeuner): self
     {
         $this->finPauseDejeuner = $finPauseDejeuner;
 
@@ -213,7 +222,7 @@ class Horaire
         return $this->debutPauseMidi;
     }
 
-    public function setDebutPauseMidi(\DateTimeInterface $debutPauseMidi): self
+    public function setDebutPauseMidi(?\DateTimeInterface $debutPauseMidi): self
     {
         $this->debutPauseMidi = $debutPauseMidi;
 
@@ -225,7 +234,7 @@ class Horaire
         return $this->finPauseMidi;
     }
 
-    public function setFinPauseMidi(\DateTimeInterface $finPauseMidi): self
+    public function setFinPauseMidi(?\DateTimeInterface $finPauseMidi): self
     {
         $this->finPauseMidi = $finPauseMidi;
 
@@ -244,7 +253,7 @@ class Horaire
     {
         if (!$this->pointages->contains($pointage)) {
             $this->pointages[] = $pointage;
-            $pointage->setHoraire($this);
+            $pointage->setWorkTime($this);
         }
 
         return $this;
@@ -254,38 +263,8 @@ class Horaire
     {
         if ($this->pointages->removeElement($pointage)) {
             // set the owning side to null (unless already changed)
-            if ($pointage->getHoraire() === $this) {
-                $pointage->setHoraire(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|WorkTime[]
-     */
-    public function getWorkTimes(): Collection
-    {
-        return $this->workTimes;
-    }
-
-    public function addWorkTime(WorkTime $workTime): self
-    {
-        if (!$this->workTimes->contains($workTime)) {
-            $this->workTimes[] = $workTime;
-            $workTime->setHoraire($this);
-        }
-
-        return $this;
-    }
-
-    public function removeWorkTime(WorkTime $workTime): self
-    {
-        if ($this->workTimes->removeElement($workTime)) {
-            // set the owning side to null (unless already changed)
-            if ($workTime->getHoraire() === $this) {
-                $workTime->setHoraire(null);
+            if ($pointage->getWorkTime() === $this) {
+                $pointage->setWorkTime(null);
             }
         }
 

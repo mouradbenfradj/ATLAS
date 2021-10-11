@@ -97,6 +97,11 @@ class Pointage
      */
     private $autorisationSortie;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=WorkTime::class, inversedBy="pointages")
+     */
+    private $workTime;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -277,6 +282,18 @@ class Pointage
     public function setAutorisationSortie(?AutorisationSortie $autorisationSortie): self
     {
         $this->autorisationSortie = $autorisationSortie;
+
+        return $this;
+    }
+
+    public function getWorkTime(): ?WorkTime
+    {
+        return $this->workTime;
+    }
+
+    public function setWorkTime(?WorkTime $workTime): self
+    {
+        $this->workTime = $workTime;
 
         return $this;
     }
