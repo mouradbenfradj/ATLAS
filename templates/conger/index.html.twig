@@ -1,41 +1,48 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Conger index{% endblock %}
+{% block title %}Conger index
+{% endblock %}
+
+{% block titleheader %}
+    Conger
+{% endblock %}
+{% block linkheader %}
+    Conger
+{% endblock %}
+{% block content_title %}
+    <a href="{{ path('conger_new') }}">Demande nouveau conger</a>
+{% endblock %}
 
 {% block body %}
-    <h1>Conger index</h1>
-
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
                 <th>Debut</th>
                 <th>Fin</th>
                 <th>DemiJourner</th>
                 <th>Type</th>
-                <th>actions</th>
+                {#                 <th>actions</th>
+                                 #}
             </tr>
         </thead>
         <tbody>
-        {% for conger in congers %}
-            <tr>
-                <td>{{ conger.id }}</td>
-                <td>{{ conger.debut ? conger.debut|date('Y-m-d') : '' }}</td>
-                <td>{{ conger.fin ? conger.fin|date('Y-m-d') : '' }}</td>
-                <td>{{ conger.demiJourner ? 'Yes' : 'No' }}</td>
-                <td>{{ conger.type }}</td>
-                <td>
-                    <a href="{{ path('conger_show', {'id': conger.id}) }}">show</a>
-                    <a href="{{ path('conger_edit', {'id': conger.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
+            {% for conger in congers %}
+                <tr>
+                    <td>{{ conger.debut ? conger.debut|date('Y-m-d') : '' }}</td>
+                    <td>{{ conger.fin ? conger.fin|date('Y-m-d') : '' }}</td>
+                    <td>{{ conger.demiJourner ? 'Yes' : 'No' }}</td>
+                    <td>{{ conger.type }}</td>
+                    {# <td>
+                                                                <a href="{{ path('conger_show', {'id': conger.id}) }}">show</a>
+                                                                <a href="{{ path('conger_edit', {'id': conger.id}) }}">edit</a>
+                                                            </td> #}
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6">no records found</td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('conger_new') }}">Create new</a>
 {% endblock %}

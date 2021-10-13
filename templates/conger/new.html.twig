@@ -1,11 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Conger{% endblock %}
+{% block title %}New Conger
+{% endblock %}
+{% block titleheader %}
+    New Conger
+{% endblock %}
+{% block linkheader %}
+    New Conger
+{% endblock %}
+{% block content_title %}{% endblock %}
 
 {% block body %}
-    <h1>Create new Conger</h1>
-
     {{ include('conger/_form.html.twig') }}
-
-    <a href="{{ path('conger_index') }}">back to list</a>
+    {# <h1>Create new Conger</h1>
+    
+        {{ include('conger/_form.html.twig') }}
+    
+        <a href="{{ path('conger_index') }}">back to list</a> #}
 {% endblock %}
