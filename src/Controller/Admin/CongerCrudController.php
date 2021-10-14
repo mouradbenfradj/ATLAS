@@ -27,6 +27,8 @@ class CongerCrudController extends AbstractCrudController
             DateField::new('debut'),
             DateField::new('fin'),
             BooleanField::new('demiJourner'),
+            BooleanField::new('valider'),
+            BooleanField::new('refuser'),
         ];
     }
 }

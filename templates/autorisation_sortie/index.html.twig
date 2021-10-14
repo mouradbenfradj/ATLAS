@@ -2,28 +2,36 @@
 
 {% block title %}AutorisationSortie index{% endblock %}
 
-{% block body %}
-    <h1>AutorisationSortie index</h1>
 
+{% block titleheader %}
+    Autorisation Sortie
+{% endblock %}
+{% block linkheader %}
+    Autorisation Sortie
+{% endblock %}
+{% block content_title %}
+<a href="{{ path('autorisation_sortie_new') }}">Demande autorisation de sortie</a>
+{% endblock %}
+{% block body %}
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
+                {#<th>Id</th>#}
                 <th>DateAutorisation</th>
                 <th>Time</th>
-                <th>actions</th>
+                {#<th>actions</th>#}
             </tr>
         </thead>
         <tbody>
         {% for autorisation_sortie in autorisation_sorties %}
-            <tr>
-                <td>{{ autorisation_sortie.id }}</td>
+                <tr {% if autorisation_sortie.valider and not autorisation_sortie.refuser  %}style="background-color:Lime"{% elseif not autorisation_sortie.valider and autorisation_sortie.refuser %}style="background-color:Tomato"{% else %}style="background-color:Orange"{% endif %}>
+               {#<td>{{ autorisation_sortie.id }}</td> #}
                 <td>{{ autorisation_sortie.dateAutorisation ? autorisation_sortie.dateAutorisation|date('Y-m-d') : '' }}</td>
                 <td>{{ autorisation_sortie.time ? autorisation_sortie.time|date('H:i:s') : '' }}</td>
-                <td>
+                {# <td>
                     <a href="{{ path('autorisation_sortie_show', {'id': autorisation_sortie.id}) }}">show</a>
                     <a href="{{ path('autorisation_sortie_edit', {'id': autorisation_sortie.id}) }}">edit</a>
-                </td>
+                </td> #}
             </tr>
         {% else %}
             <tr>
@@ -32,6 +40,4 @@
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('autorisation_sortie_new') }}">Create new</a>
 {% endblock %}

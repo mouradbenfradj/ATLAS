@@ -5,10 +5,11 @@ namespace App\Controller;
 use App\Entity\Conger;
 use App\Form\CongerType;
 use App\Repository\CongerRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * @Route("/conger")
@@ -28,7 +29,7 @@ class CongerController extends AbstractController
     /**
      * @Route("/new", name="conger_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request,Security $security): Response
     {
         $conger = new Conger();
         $form = $this->createForm(CongerType::class, $conger);
@@ -36,6 +37,7 @@ class CongerController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
+            $conger->setEmployer($security->getUser());
             $entityManager->persist($conger);
             $entityManager->flush();
 

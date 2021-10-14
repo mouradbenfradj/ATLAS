@@ -22,18 +22,25 @@ class DbfController extends AbstractController
 {
 
     /**
+     * adminUrlGenerator
+     *
      * @var AdminUrlGenerator
      */
     private $adminUrlGenerator;
 
     /**
+     * __construct
+     *
      * @param AdminUrlGenerator $adminUrlGenerator
+     * @return void
      */
     public function __construct(AdminUrlGenerator $adminUrlGenerator)
     {
         $this->adminUrlGenerator = $adminUrlGenerator;
     }
+
     /**
+     * index
      * @Route("/", name="dbf")
      * @return Response
      */
@@ -46,14 +53,23 @@ class DbfController extends AbstractController
 
 
     /**
-     * @Route("/upload/{id}", name="dbf_upload", methods={"GET","POST"})
+     * upload
+     * @Route("/upload/{user}", name="dbf_upload", methods={"GET","POST"})
+     *
      * @param Request $request
+     * @param DateService $dateService
+     * @param JourFerierService $jourFerierService
      * @param PointageGeneratorService $pointageGeneratorService
-     * @param User $id
-     * 
+     * @param User $user
      * @return Response
      */
-    public function upload(Request $request, DateService $dateService, JourFerierService $jourFerierService, PointageGeneratorService $pointageGeneratorService, User $id): Response
+    public function upload(
+        Request $request,
+        DateService $dateService,
+        JourFerierService $jourFerierService,
+        PointageGeneratorService $pointageGeneratorService,
+        User $user
+    ): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
@@ -64,10 +80,10 @@ class DbfController extends AbstractController
                 while ($record = $dbfs->nextRecord()) {
                     $dateDbf = $dateService->dateToStringY_m_d($record->attdate);
                     $isJourFerier = $jourFerierService->isJourFerier($dateDbf);
-                    $inDB = $pointageGeneratorService->dateInDB($id);
+                    $inDB = $pointageGeneratorService->dateInDB($user);
 
                     if (!$isJourFerier and !in_array($dateDbf, $inDB)) {
-                        $id->addPointage($pointageGeneratorService->fromDbfFile($record));
+                        $user->addPointage($pointageGeneratorService->fromDbfFile($record));
                     }
                 }
                 $this->getDoctrine()->getManager()->flush();

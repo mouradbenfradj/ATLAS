@@ -58,19 +58,17 @@ class UserCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        $dbfGenerator = Action::new('dbfGenerator', 'generate depui DbF File')
-            ->linkToRoute('dbf_upload', function (User $user): array {
+        $dbfGenerator = Action::new('dbfGenerator', 'generate depui DbF File')->linkToRoute('dbf_upload', function (User $user): array {
                 return [
                     'user' => $user->getId()
                 ];
             });
-        $wlsxGenerator = Action::new('xlsxGenerator', 'generate depui Xlsx File')
-            ->linkToRoute('xlsx_upload', function (User $user): array {
+        $xlsxGenerator = Action::new('xlsxGenerator', 'generate depui Xlsx File')->linkToRoute('xlsx_upload', function (User $user): array {
                 return [
                     'user' => $user->getId()
                 ];
             });
         $actions->add(Crud::PAGE_INDEX, $dbfGenerator);
-        return $actions->add(Crud::PAGE_INDEX, $wlsxGenerator);
+        return $actions->add(Crud::PAGE_INDEX, $xlsxGenerator);
     }
 }

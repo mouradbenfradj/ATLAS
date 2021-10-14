@@ -44,6 +44,16 @@ class AutorisationSortie
      */
     private $pointages;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $valider;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $refuser;
+
     public function __construct()
     {
         $this->pointages = new ArrayCollection();
@@ -116,6 +126,30 @@ class AutorisationSortie
                 $pointage->setAutorisationSortie(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getValider(): ?bool
+    {
+        return $this->valider;
+    }
+
+    public function setValider(?bool $valider): self
+    {
+        $this->valider = $valider;
+
+        return $this;
+    }
+
+    public function getRefuser(): ?bool
+    {
+        return $this->refuser;
+    }
+
+    public function setRefuser(?bool $refuser): self
+    {
+        $this->refuser = $refuser;
 
         return $this;
     }

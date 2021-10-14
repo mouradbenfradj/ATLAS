@@ -29,22 +29,38 @@ class PointageGeneratorService
     private $em;
 
     /**
+     * dateService
+     *
      * @var DateService
      */
     private $dateService;
 
     /**
+     * timeService
+     *
      * @var TimeService
      */
     private $timeService;
+
     /**
+     * horaireService
+     *
      * @var HoraireService
      */
     private $horaireService;
+
     /**
+     * pointageService
+     *
      * @var PointageService
      */
     private $pointageService;
+
+    /**
+     * flash
+     *
+     * @var FlashBagInterface
+     */
     private $flash;
 
     /**
@@ -72,26 +88,22 @@ class PointageGeneratorService
         $this->pointageService = $pointageService;
         $this->flash = $flash;
     }
+
     /**
      * inDB
-     * 
+     *
      * @param string $dateDbf
      * @param User $user
-     * 
      */
     public function dateInDB(User $user)
     {
         return array_map(fn ($value): string => $value->getDate()->format('Y-m-d'), $this->em->getRepository(Pointage::class)->findByEmployer($user));
     }
 
-
-
-
     /**
      * fromDbfFile
-     * 
+     *
      * @param  $record
-     * 
      * @return Pointage
      */
     public function fromDbfFile($record): Pointage
@@ -113,7 +125,7 @@ class PointageGeneratorService
         $pointage->setHeurNormalementTravailler($this->pointageService->heurNormalementTravailler());
         $pointage->setDiff($this->pointageService->diff());
         return $pointage;
-        /*  
+        /*
                     $record->userid;
                     $record->badgenumbe;
                     $record->ssn;

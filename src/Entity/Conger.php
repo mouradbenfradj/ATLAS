@@ -19,6 +19,7 @@ class Conger
         else
             return "1";
     }
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -41,10 +42,6 @@ class Conger
      */
     private $fin;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $demiJourner;
 
     /**
      * @ORM\OneToMany(targetEntity=Pointage::class, mappedBy="congerPayer")
@@ -65,6 +62,11 @@ class Conger
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $refuser;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $demiJourner;
 
     public function __construct()
     {
@@ -109,18 +111,6 @@ class Conger
     public function setFin(\DateTimeInterface $fin): self
     {
         $this->fin = $fin;
-
-        return $this;
-    }
-
-    public function getDemiJourner(): ?bool
-    {
-        return $this->demiJourner;
-    }
-
-    public function setDemiJourner(bool $demiJourner): self
-    {
-        $this->demiJourner = $demiJourner;
 
         return $this;
     }
@@ -187,6 +177,18 @@ class Conger
     public function setRefuser(?bool $refuser): self
     {
         $this->refuser = $refuser;
+
+        return $this;
+    }
+
+    public function getDemiJourner(): ?bool
+    {
+        return $this->demiJourner;
+    }
+
+    public function setDemiJourner(?bool $demiJourner): self
+    {
+        $this->demiJourner = $demiJourner;
 
         return $this;
     }
