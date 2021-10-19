@@ -25,6 +25,7 @@ class XlsxController extends AbstractController
     private $adminUrlGenerator;
 
     /**
+     * __construct
      * @param AdminUrlGenerator $adminUrlGenerator
      */
     public function __construct(AdminUrlGenerator $adminUrlGenerator)
@@ -32,7 +33,9 @@ class XlsxController extends AbstractController
         $this->adminUrlGenerator = $adminUrlGenerator;
     }
     /**
+     * index
      * @Route("/", name="xlsx")
+     * @return Response
      */
     public function index(): Response
     {
@@ -43,9 +46,19 @@ class XlsxController extends AbstractController
 
 
     /**
+     * upload
      * @Route("/upload/{user}", name="xlsx_upload", methods={"GET","POST"})
+     *
+     * @param Request $request
+     * @param PointageGeneratorService $pointageGeneratorService
+     * @param User $user
+     * @return Response
      */
-    public function upload(Request $request,  PointageGeneratorService $pointageGeneratorService, User $user): Response
+    public function upload(
+        Request $request,
+        PointageGeneratorService $pointageGeneratorService,
+        User $user
+    ): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
@@ -54,7 +67,10 @@ class XlsxController extends AbstractController
             if ($xlsx) {
                 $reader = new Xlsx();
                 $spreadsheet = $reader->load($xlsx);
-                $this->getDoctrine()->getManager()->persist($pointageGeneratorService->fromXlsxFile($spreadsheet, $user));
+                $this->getDoctrine()->getManager()->persist($pointageGeneratorService->fromXlsxFile(
+                    $spreadsheet,
+                    $user
+                ));
                 $this->getDoctrine()->getManager()->flush();
                 $this->addFlash('success', 'updated_successfully');
             }

@@ -11,23 +11,14 @@ class DateService
     }
 
     /**
-     * @param string $dateDbf
-     * 
-     * @return DateTime
-     */
-    public function dateDbfToDateTime(string $dateDbf)
-    {
-        return DateTime::createFromFormat('d/m/Y', $dateDbf);
-    }
-    /**
-     * @param string $dateDbf
-     * 
+     * @param string $dateString_d_m_Y_ToDateTime
      * @return DateTime
      */
     public function dateString_d_m_Y_ToDateTime(string $dateString): DateTime
     {
         return DateTime::createFromFormat('d/m/Y', $dateString);
     }
+    
     /**
      * @param string $dateDbf
      * 

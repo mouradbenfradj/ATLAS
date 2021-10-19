@@ -296,12 +296,11 @@ class PointageService
     {
         $time = new DateTime($this->horaireService->getHoraire()->getHeurDebutTravaille()->format("H:i:s"));
         $time->add($this->timeService->margeDuRetard());
-        if ($time >= $this->pointage->getEntrer())
-            return null;
         if (!$this->pointage->getCongerPayer()) {
-
+            if ($time >= $this->pointage->getEntrer())
+                return null;
             $time = $this->timeService->diffTime($time, $this->pointage->getEntrer());
-        }
+            }
         return $this->timeService->dateIntervalToDateTime($time);
     }
 

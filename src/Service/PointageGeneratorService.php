@@ -109,10 +109,20 @@ class PointageGeneratorService
     public function fromDbfFile($record): Pointage
     {
         $pointage = new Pointage();
-        $pointage->setDate($this->dateService->dateDbfToDateTime($record->attdate));
+        $pointage->setDate($this->dateService->dateString_d_m_Y_ToDateTime($record->attdate));
         $pointage->setHoraire($this->horaireService->getHoraireForDate($pointage->getDate()));
-        $pointage->setEntrer($this->timeService->generateTime($record->starttime));
-        $pointage->setSortie($this->timeService->generateTime($record->endtime));
+        if ($record->starttime != "" and  DateTime::createFromFormat('H:i',$record->starttime) !== false)
+            $pointage->setEntrer(new DateTime($record->starttime));
+        else{
+            $pointage->setEntrer(new DateTime("00:00:00"));
+            $this->flash->add('danger ', 'saisie automatique de l\'heur d\'entrer a 00:00:00 pour la date ' . $record->attdate);
+        }
+        if ($record->endtime != "" and  DateTime::createFromFormat('H:i',$record->endtime) !== false)
+            $pointage->setSortie(new DateTime($record->endtime));
+        else{
+            $pointage->setSortie(new DateTime("23:00:00"));
+            $this->flash->add('danger ', 'saisie automatique de l\'heur de sortie a 23:00:00 pour la date ' . $record->attdate);
+        }
         $this->pointageService->setPointage($pointage);
         $pointage->setNbrHeurTravailler($this->pointageService->nbrHeurTravailler());
         $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());

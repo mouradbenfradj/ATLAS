@@ -10,6 +10,7 @@ use App\Entity\JourFerier;
 use App\Service\PointageService;
 use App\Entity\AutorisationSortie;
 use App\Entity\Config;
+use App\Entity\WorkTime;
 use App\Repository\UserRepository;
 use App\Repository\PointageRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -75,6 +76,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Config', 'fas fa-list', Config::class),
             MenuItem::linkToCrud('Jour Ferier', 'fas fa-list', JourFerier::class),
             MenuItem::linkToCrud('Horaire', 'fas fa-list', Horaire::class),
+            MenuItem::linkToCrud('WorkTime', 'fas fa-list', WorkTime::class),
         ]);
     }
 

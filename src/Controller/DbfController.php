@@ -81,11 +81,11 @@ class DbfController extends AbstractController
                     $dateDbf = $dateService->dateToStringY_m_d($record->attdate);
                     $isJourFerier = $jourFerierService->isJourFerier($dateDbf);
                     $inDB = $pointageGeneratorService->dateInDB($user);
-
                     if (!$isJourFerier and !in_array($dateDbf, $inDB)) {
                         $user->addPointage($pointageGeneratorService->fromDbfFile($record));
                     }
                 }
+
                 $this->getDoctrine()->getManager()->flush();
 
                 $this->addFlash('success', 'id.updated_successfully');

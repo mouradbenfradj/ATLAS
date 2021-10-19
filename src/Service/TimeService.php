@@ -19,10 +19,10 @@ class TimeService
      * 
      * @return DateTime
      */
-    public function generateTime(string $time): DateTime
+    public function generateTime(string $timeString): DateTime
     {
-        if ($time != "")
-            return new DateTime($time);
+        if ($timeString != "" and  DateTime::createFromFormat('H:i', $timeString) !== false)
+            return new DateTime($timeString);
         else
             return new DateTime("00:00:00");
     }
