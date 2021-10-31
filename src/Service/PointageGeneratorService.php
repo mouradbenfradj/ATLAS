@@ -90,14 +90,16 @@ class PointageGeneratorService
     }
 
     /**
-     * inDB
+     * dateInDB
      *
-     * @param string $dateDbf
      * @param User $user
      */
     public function dateInDB(User $user)
     {
-        return array_map(fn ($value): string => $value->getDate()->format('Y-m-d'), $this->em->getRepository(Pointage::class)->findByEmployer($user));
+        return array_map(
+            fn ($date): string => $date->getDate()->format('Y-m-d'),
+            $this->em->getRepository(Pointage::class)->findBy(["employer"=>$user])
+        );
     }
 
     /**
