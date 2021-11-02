@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Conger;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -18,6 +19,27 @@ class CongerRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Conger::class);
     }
+
+    /**
+     * findOneByEmployerAndDate
+     *
+     * @param string $date
+     * @param User $employer
+     * @return Conger|null
+     */
+    public function findOneByEmployerAndDate(string $date, User $employer): ?Conger
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.employer = :employer')
+            ->andWhere('c.debut <= :date')
+            ->andWhere('c.fin >= :date')
+            ->setParameter('employer', $employer)
+            ->setParameter('date', $date)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+
 
     // /**
     //  * @return Conger[] Returns an array of Conger objects
@@ -35,7 +57,6 @@ class CongerRepository extends ServiceEntityRepository
         ;
     }
     */
-
     /*
     public function findOneBySomeField($value): ?Conger
     {

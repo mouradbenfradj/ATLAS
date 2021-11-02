@@ -98,74 +98,8 @@ class PointageGeneratorService
     {
         return array_map(
             fn ($date): string => $date->getDate()->format('Y-m-d'),
-            $this->em->getRepository(Pointage::class)->findBy(["employer"=>$user])
+            $this->em->getRepository(Pointage::class)->findBy(["employer" => $user])
         );
-    }
-
-    /**
-     * fromDbfFile
-     *
-     * @param  $record
-     * @return Pointage
-     */
-    public function fromDbfFile($record): Pointage
-    {
-        $pointage = new Pointage();
-        $pointage->setDate($this->dateService->dateString_d_m_Y_ToDateTime($record->attdate));
-        $pointage->setHoraire($this->horaireService->getHoraireForDate($pointage->getDate()));
-        if ($record->starttime != "" and  DateTime::createFromFormat('H:i',$record->starttime) !== false)
-            $pointage->setEntrer(new DateTime($record->starttime));
-        else{
-            $pointage->setEntrer(new DateTime("00:00:00"));
-            $this->flash->add('danger ', 'saisie automatique de l\'heur d\'entrer a 00:00:00 pour la date ' . $record->attdate);
-        }
-        if ($record->endtime != "" and  DateTime::createFromFormat('H:i',$record->endtime) !== false)
-            $pointage->setSortie(new DateTime($record->endtime));
-        else{
-            $pointage->setSortie(new DateTime("23:00:00"));
-            $this->flash->add('danger ', 'saisie automatique de l\'heur de sortie a 23:00:00 pour la date ' . $record->attdate);
-        }
-        $this->pointageService->setPointage($pointage);
-        $pointage->setNbrHeurTravailler($this->pointageService->nbrHeurTravailler());
-        $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());
-        $pointage->setDepartAnticiper(null);
-        $pointage->setRetardMidi(null);
-        $pointage->setTotaleRetard($this->pointageService->totalRetard());
-        $pointage->setAutorisationSortie(null);
-        $pointage->setCongerPayer(null);
-        $pointage->setAbscence(null);
-        $pointage->setHeurNormalementTravailler($this->pointageService->heurNormalementTravailler());
-        $pointage->setDiff($this->pointageService->diff());
-        return $pointage;
-        /*
-                    $record->userid;
-                    $record->badgenumbe;
-                    $record->ssn;
-                    $record->username;
-                    $record->autosch;
-                    $record->attdate;
-                    $record->schid;
-                    $record->clockintim;
-                    $record->clockoutti;
-                    $record->;
-                    $record->;
-                    $record->workday;
-                    $record->realworkda;
-                    $record->late;
-                    $record->early;
-                    $record->absent;
-                    $record->overtime;
-                    $record->worktime;
-                    $record->exceptioni;
-                    $record->mustin;
-                    $record->mustout;
-                    $record->deptid;
-                    $record->sspedaynor;
-                    $record->sspedaywee;
-                    $record->sspedayhol;
-                    $record->atttime;
-                    $record->attchktime; 
-                */
     }
 
     /**

@@ -18,7 +18,7 @@ class DateService
     {
         return DateTime::createFromFormat('d/m/Y', $dateString);
     }
-    
+
     /**
      * @param string $dateDbf
      * 
@@ -30,11 +30,12 @@ class DateService
         return $date->format("Y-m-d");
     }
     /**
+     * dateToStringY_m_d
      * @param string $dateString
-     * 
+     *
      * @return string
      */
-    public function dateToStringY_m_d(string $dateString)
+    public function dateToStringY_m_d(string $dateString): string
     {
         $date = DateTime::createFromFormat('d/m/Y', $dateString);
         return $date->format("Y-m-d");
