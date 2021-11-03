@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Conger;
 use App\Entity\User;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -34,7 +35,7 @@ class CongerRepository extends ServiceEntityRepository
             ->andWhere('c.debut <= :date')
             ->andWhere('c.fin >= :date')
             ->setParameter('employer', $employer)
-            ->setParameter('date', $date)
+            ->setParameter('date', new DateTime($date))
             ->getQuery()
             ->getOneOrNullResult();
     }

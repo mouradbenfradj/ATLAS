@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
+use DateTime;
+use App\Entity\User;
 use App\Entity\AutorisationSortie;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method AutorisationSortie|null find($id, $lockMode = null, $lockVersion = null)
@@ -17,6 +19,17 @@ class AutorisationSortieRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, AutorisationSortie::class);
+    }
+    public function findOneByEmployerAndDate(string $date, User $employer): ?AutorisationSortie
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.employer = :employer')
+            ->andWhere('a.debut <= :date')
+            ->andWhere('a.fin >= :date')
+            ->setParameter('employer', $employer)
+            ->setParameter('date', new DateTime($date))
+            ->getQuery()
+            ->getOneOrNullResult();;
     }
 
     // /**

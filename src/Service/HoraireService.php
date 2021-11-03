@@ -60,13 +60,13 @@ class HoraireService
      * @param EntityManagerInterface $em
      * @param TimeService $timeService
      */
-    public function __construct(EntityManagerInterface $em, TimeService $timeService,Security $security)
+    public function __construct(EntityManagerInterface $em, TimeService $timeService, Security $security)
     {
         $this->em = $em;
         $this->timeService = $timeService;
         $this->horaires = $this->em->getRepository(Horaire::class)->findAll();
         $this->workTime = $this->em->getRepository(WorkTime::class)->findAll();
-        $this->security= $security;
+        $this->security = $security;
     }
 
     /**
@@ -88,38 +88,39 @@ class HoraireService
         $trouve = false;
         $workTime  = reset($this->workTime);
         $workTime = current($this->workTime);
-        do{
-            if (
-                $dateTime >= $workTime->getDateDebut()
-            and $dateTime <= $workTime->getDateFin()
-            and $this->security->getUser() == $workTime->getEmployer()
-            and $this->horaire == $workTime->getHoraire()
-            ) {
-                if( $workTime->getHeurDebutTravaille())
-                 $this->horaire->setHeurDebutTravaille( $workTime->getHeurDebutTravaille());
-                if( $workTime->getHeurFinTravaille())
-                 $this->horaire->setHeurFinTravaille( $workTime->getHeurFinTravaille());
-                if( $workTime->getDebutPauseMatinal())
-                 $this->horaire->setDebutPauseMatinal( $workTime->getDebutPauseMatinal());
-                if( $workTime->getDebutPauseMidi())
-                 $this->horaire->setDebutPauseMidi( $workTime->getDebutPauseMidi());
-                if( $workTime->getDebutPauseDejeuner())
-                 $this->horaire->setDebutPauseDejeuner( $workTime->getDebutPauseDejeuner());
-                if( $workTime->getFinPauseMatinal())
-                 $this->horaire->setFinPauseMatinal( $workTime->getFinPauseMatinal());
-                if( $workTime->getFinPauseMidi())
-               $this->horaire->setFinPauseMidi( $workTime->getFinPauseMidi());
-                if( $workTime->getFinPauseDejeuner())
-               $this->horaire->setFinPauseDejeuner( $workTime->getFinPauseDejeuner());
-                $trouve = true;
-            }
-        }  while ($workTime = next($this->workTime) and !$trouve) ;
+        if ($workTime)
+            do {
+                if (
+                    $dateTime >= $workTime->getDateDebut()
+                    and $dateTime <= $workTime->getDateFin()
+                    and $this->security->getUser() == $workTime->getEmployer()
+                    and $this->horaire == $workTime->getHoraire()
+                ) {
+                    if ($workTime->getHeurDebutTravaille())
+                        $this->horaire->setHeurDebutTravaille($workTime->getHeurDebutTravaille());
+                    if ($workTime->getHeurFinTravaille())
+                        $this->horaire->setHeurFinTravaille($workTime->getHeurFinTravaille());
+                    if ($workTime->getDebutPauseMatinal())
+                        $this->horaire->setDebutPauseMatinal($workTime->getDebutPauseMatinal());
+                    if ($workTime->getDebutPauseMidi())
+                        $this->horaire->setDebutPauseMidi($workTime->getDebutPauseMidi());
+                    if ($workTime->getDebutPauseDejeuner())
+                        $this->horaire->setDebutPauseDejeuner($workTime->getDebutPauseDejeuner());
+                    if ($workTime->getFinPauseMatinal())
+                        $this->horaire->setFinPauseMatinal($workTime->getFinPauseMatinal());
+                    if ($workTime->getFinPauseMidi())
+                        $this->horaire->setFinPauseMidi($workTime->getFinPauseMidi());
+                    if ($workTime->getFinPauseDejeuner())
+                        $this->horaire->setFinPauseDejeuner($workTime->getFinPauseDejeuner());
+                    $trouve = true;
+                }
+            } while ($workTime = next($this->workTime) and !$trouve);
         return   $this->horaire;
     }
 
 
 
-    
+
 
     /**
      *diffPauseMatinalTime
