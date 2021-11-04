@@ -10,6 +10,7 @@ use App\Entity\JourFerier;
 use App\Service\PointageService;
 use App\Entity\AutorisationSortie;
 use App\Entity\Config;
+use App\Entity\Dbf;
 use App\Entity\WorkTime;
 use App\Repository\UserRepository;
 use App\Repository\PointageRepository;
@@ -70,6 +71,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Autorisation Sortie', 'fas fa-list', AutorisationSortie::class),
             MenuItem::linkToCrud('Conger', 'fas fa-list', Conger::class),
             MenuItem::linkToCrud('Pointage', 'fas fa-list', Pointage::class),
+            MenuItem::linkToCrud('Dbf', 'fas fa-list', Dbf::class),
             MenuItem::linkToCrud('Employer', 'fas fa-list', User::class),
         ]);
         yield MenuItem::subMenu('Config', 'fa fa-article')->setSubItems([

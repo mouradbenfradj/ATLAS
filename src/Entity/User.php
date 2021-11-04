@@ -84,17 +84,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $demission;
 
     /**
-     * @ORM\OneToMany(targetEntity=Pointage::class,cascade={"persist"}, mappedBy="employer", fetch="EAGER")
+     * @ORM\OneToMany(targetEntity=Pointage::class,cascade={"persist"}, mappedBy="employer", orphanRemoval=true, fetch="EAGER")
      */
     private $pointages;
 
     /**
-     * @ORM\OneToMany(targetEntity=Conger::class, mappedBy="employer")
+     * @ORM\OneToMany(targetEntity=Conger::class, mappedBy="employer", orphanRemoval=true, fetch="EAGER")
      */
     private $congers;
 
     /**
-     * @ORM\OneToMany(targetEntity=AutorisationSortie::class, mappedBy="employer")
+     * @ORM\OneToMany(targetEntity=AutorisationSortie::class, mappedBy="employer", orphanRemoval=true, fetch="EAGER")
      */
     private $autorisationSorties;
 
@@ -118,12 +118,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $workTimes;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Dbf::class,cascade={"persist"}, mappedBy="employer", orphanRemoval=true, fetch="EAGER")
+     */
+    private $dbfs;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Abscence::class, mappedBy="employer",cascade={"persist"}, orphanRemoval=true, fetch="EAGER")
+     */
+    private $abscences;
+
     public function __construct()
     {
         $this->pointages = new ArrayCollection();
         $this->congers = new ArrayCollection();
         $this->autorisationSorties = new ArrayCollection();
         $this->workTimes = new ArrayCollection();
+        $this->dbfs = new ArrayCollection();
+        $this->abscences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -461,6 +473,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($workTime->getEmployer() === $this) {
                 $workTime->setEmployer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Dbf[]
+     */
+    public function getDbfs(): Collection
+    {
+        return $this->dbfs;
+    }
+
+    public function addDbf(Dbf $dbf): self
+    {
+        if (!$this->dbfs->contains($dbf)) {
+            $this->dbfs[] = $dbf;
+            $dbf->setEmployer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDbf(Dbf $dbf): self
+    {
+        if ($this->dbfs->removeElement($dbf)) {
+            // set the owning side to null (unless already changed)
+            if ($dbf->getEmployer() === $this) {
+                $dbf->setEmployer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Abscence[]
+     */
+    public function getAbscences(): Collection
+    {
+        return $this->abscences;
+    }
+
+    public function addAbscence(Abscence $abscence): self
+    {
+        if (!$this->abscences->contains($abscence)) {
+            $this->abscences[] = $abscence;
+            $abscence->setEmployer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAbscence(Abscence $abscence): self
+    {
+        if ($this->abscences->removeElement($abscence)) {
+            // set the owning side to null (unless already changed)
+            if ($abscence->getEmployer() === $this) {
+                $abscence->setEmployer(null);
             }
         }
 

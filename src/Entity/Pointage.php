@@ -59,14 +59,6 @@ class Pointage
      */
     private $totaleRetard;
 
-
-
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $abscence;
-
     /**
      * @ORM\Column(type="time")
      */
@@ -101,6 +93,11 @@ class Pointage
      * @ORM\ManyToOne(targetEntity=WorkTime::class, inversedBy="pointages")
      */
     private $workTime;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Abscence::class, inversedBy="pointages")
+     */
+    private $abscence;
 
     public function getId(): ?int
     {
@@ -202,17 +199,6 @@ class Pointage
         return $this;
     }
 
-    public function getAbscence(): ?float
-    {
-        return $this->abscence;
-    }
-
-    public function setAbscence(?float $abscence): self
-    {
-        $this->abscence = $abscence;
-
-        return $this;
-    }
 
     public function getHeurNormalementTravailler(): ?\DateTimeInterface
     {
@@ -294,6 +280,18 @@ class Pointage
     public function setWorkTime(?WorkTime $workTime): self
     {
         $this->workTime = $workTime;
+
+        return $this;
+    }
+
+    public function getAbscence(): ?Abscence
+    {
+        return $this->abscence;
+    }
+
+    public function setAbscence(?Abscence $abscence): self
+    {
+        $this->abscence = $abscence;
 
         return $this;
     }

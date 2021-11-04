@@ -8,6 +8,34 @@ use DateInterval;
 class TimeService
 {
     /**
+     * timeStringToDateTime
+     *
+     * @param string $timeString
+     * @return DateTime|null
+     */
+    public function timeStringToDateTime(string $timeString): ?DateTime
+    {
+        $time = null;
+        if (DateTime::createFromFormat('H:i', $timeString))
+            $time = DateTime::createFromFormat('H:i', $timeString);
+        elseif (DateTime::createFromFormat('H:i:', $timeString))
+            $time = DateTime::createFromFormat('H:i:', $timeString);
+        return $time;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
      * margeDuRetard
      */
     private $margeDuRetard = 30;
@@ -78,6 +106,11 @@ class TimeService
     {
         return DateTime::createFromFormat('H:i', $timeString) !== false;
     }
+    public function timeString_HiToDateTime($timeString): DateTime
+    {
+        return DateTime::createFromFormat('H:i', $timeString);
+    }
+
     public function isTimeHis($timeString)
     {
         return DateTime::createFromFormat('H:i:s', $timeString) !== false;

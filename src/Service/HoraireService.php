@@ -79,6 +79,8 @@ class HoraireService
         $resultat = current($this->horaires);
         $trouve = false;
         while ($horaire = next($this->horaires) and !$trouve) {
+            if (!$horaire->getDateFin())
+                $horaire->setDateFin(new DateTime());
             if ($dateTime >= $horaire->getDateDebut() and $dateTime <= $horaire->getDateFin()) {
                 $resultat = $horaire;
                 $trouve = true;
@@ -88,7 +90,9 @@ class HoraireService
         $trouve = false;
         $workTime  = reset($this->workTime);
         $workTime = current($this->workTime);
-        if ($workTime)
+        if ($workTime) {
+            if (!$workTime->getDateFin())
+                $workTime->setDateFin(new DateTime());
             do {
                 if (
                     $dateTime >= $workTime->getDateDebut()
@@ -96,25 +100,34 @@ class HoraireService
                     and $this->security->getUser() == $workTime->getEmployer()
                     and $this->horaire == $workTime->getHoraire()
                 ) {
-                    if ($workTime->getHeurDebutTravaille())
+                    if ($workTime->getHeurDebutTravaille()) {
                         $this->horaire->setHeurDebutTravaille($workTime->getHeurDebutTravaille());
-                    if ($workTime->getHeurFinTravaille())
+                    }
+                    if ($workTime->getHeurFinTravaille()) {
                         $this->horaire->setHeurFinTravaille($workTime->getHeurFinTravaille());
-                    if ($workTime->getDebutPauseMatinal())
+                    }
+                    if ($workTime->getDebutPauseMatinal()) {
                         $this->horaire->setDebutPauseMatinal($workTime->getDebutPauseMatinal());
-                    if ($workTime->getDebutPauseMidi())
+                    }
+                    if ($workTime->getDebutPauseMidi()) {
                         $this->horaire->setDebutPauseMidi($workTime->getDebutPauseMidi());
-                    if ($workTime->getDebutPauseDejeuner())
+                    }
+                    if ($workTime->getDebutPauseDejeuner()) {
                         $this->horaire->setDebutPauseDejeuner($workTime->getDebutPauseDejeuner());
-                    if ($workTime->getFinPauseMatinal())
+                    }
+                    if ($workTime->getFinPauseMatinal()) {
                         $this->horaire->setFinPauseMatinal($workTime->getFinPauseMatinal());
-                    if ($workTime->getFinPauseMidi())
+                    }
+                    if ($workTime->getFinPauseMidi()) {
                         $this->horaire->setFinPauseMidi($workTime->getFinPauseMidi());
-                    if ($workTime->getFinPauseDejeuner())
+                    }
+                    if ($workTime->getFinPauseDejeuner()) {
                         $this->horaire->setFinPauseDejeuner($workTime->getFinPauseDejeuner());
+                    }
                     $trouve = true;
                 }
             } while ($workTime = next($this->workTime) and !$trouve);
+        }
         return   $this->horaire;
     }
 

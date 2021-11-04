@@ -6,18 +6,37 @@ use DateTime;
 
 class DateService
 {
-    public function __construct()
-    {
-    }
-
     /**
-     * @param string $dateString_d_m_Y_ToDateTime
+     * dateString_d_m_Y_ToDateTime
+     *
+     * @param string $dateString
      * @return DateTime
      */
     public function dateString_d_m_Y_ToDateTime(string $dateString): DateTime
     {
         return DateTime::createFromFormat('d/m/Y', $dateString);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * @param string $dateDbf
@@ -39,6 +58,10 @@ class DateService
     {
         $date = DateTime::createFromFormat('d/m/Y', $dateString);
         return $date->format("Y-m-d");
+    }
+    public function dateString_d_m_Y_ToDate_Y_m_d(string $dateString): DateTime
+    {
+        return DateTime::createFromFormat('d/m/Y', $dateString);
     }
     public function isDate($dateString)
     {

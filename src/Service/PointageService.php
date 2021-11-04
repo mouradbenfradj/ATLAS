@@ -190,15 +190,19 @@ class PointageService
         $bilanMonth = $this->initBilan;
         $bilanYear = $this->initBilan;
         $thisWeek = 0;
+        $nextWeek = 0;
         $thisMonth = 0;
         $thisYear = 0;
         $countWeek = 1;
         foreach ($pointages as  $pointage) {
             $this->setPointage($pointage);
             $this->setHoraireServiceHoraire();
-            if ($thisWeek != $pointage->getDate()->format('W')) {
+            dump($thisWeek);
+            dump($nextWeek);
+            $thisWeek = $pointage->getDate()->format('W');
+            if ($thisWeek >=  $nextWeek) {
                 $bilan["date"] = $countWeek;
-                if ($thisWeek) {
+                if ($nextWeek) {
                     $bilan["background"] = "Orange";
                     $bilan["colspan"] = 4;
                     $bilan["date"] = "Semaine " . $bilan["date"];
@@ -207,7 +211,10 @@ class PointageService
                     $countWeek++;
                 }
 
-                $thisWeek = $pointage->getDate()->format('W');
+                $nextWeek = $pointage->getDate()->format('W') + 1;
+
+                dump($thisWeek);
+                dump($nextWeek);
             }
             if ($thisYear . '-' . $thisMonth != $pointage->getDate()->format('Y-m')) {
                 $bilanMonth["date"] =   $thisYear . '-' . $thisMonth;
@@ -229,45 +236,25 @@ class PointageService
             $bilanMonth = $this->calculateurBilan($pointage, $bilanMonth);
             $bilanYear = $this->calculateurBilan($pointage, $bilanYear);
 
-            $thisWeek = $pointage->getDate()->format('W');
             $thisMonth =  $pointage->getDate()->format('m');
             $thisYear =  $pointage->getDate()->format('Y');
-            if ($pointage->getCongerPayer() and $pointage->getCongerPayer() != "0.5")
-                array_push($collectGeneral, [
-                    "colspan" => 1,
-                    "date" =>  $pointage->getdate()->format('d/m/Y'),
-                    "horaire" =>  $pointage->getHoraire(),
-                    "entrer" =>  $pointage->getCongerPayer()->gettype(),
-                    "sortie" =>  $pointage->getCongerPayer()->gettype(),
-                    "nbrHeurTravailler" => $pointage->getNbrHeurTravailler() ? $pointage->getNbrHeurTravailler()->format('H:i:s') : "",
-                    "retardEnMinute" => $pointage->getRetardEnMinute() ? $pointage->getRetardEnMinute()->format('H:i:s') : "",
-                    "departAnticiper" => $pointage->getDepartAnticiper() ? $pointage->getDepartAnticiper()->format('H:i:s') : "",
-                    "retardMidi" => $pointage->getRetardMidi() ? $pointage->getRetardMidi()->format('H:i:s') : "",
-                    "totaleRetard" => $pointage->getTotaleRetard() ? $pointage->getTotaleRetard()->format('H:i:s') : "",
-                    "autorisationSortie" => $pointage->getAutorisationSortie() ? $pointage->getAutorisationSortie()->getTime()->format('H:i:s') : "",
-                    "congerPayer" =>  $pointage->getCongerPayer(),
-                    "abscence" => $pointage->getAbscence(),
-                    "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format('H:i:s') : "",
-                    "diff" => $pointage->getDiff() ? $pointage->getDiff()->format('H:i:s') : "",
-                ]);
-            else
-                array_push($collectGeneral, [
-                    "colspan" => 1,
-                    "date" =>  $pointage->getdate()->format('d/m/Y'),
-                    "horaire" =>  $pointage->getHoraire(),
-                    "entrer" =>  $pointage->getEntrer() ? $pointage->getEntrer()->format('H:i:s') : "",
-                    "sortie" =>  $pointage->getSortie() ? $pointage->getSortie()->format('H:i:s') : "",
-                    "nbrHeurTravailler" => $pointage->getNbrHeurTravailler() ? $pointage->getNbrHeurTravailler()->format('H:i:s') : "",
-                    "retardEnMinute" => $pointage->getRetardEnMinute() ? $pointage->getRetardEnMinute()->format('H:i:s') : "",
-                    "departAnticiper" => $pointage->getDepartAnticiper() ? $pointage->getDepartAnticiper()->format('H:i:s') : "",
-                    "retardMidi" => $pointage->getRetardMidi() ? $pointage->getRetardMidi()->format('H:i:s') : "",
-                    "totaleRetard" => $pointage->getTotaleRetard() ? $pointage->getTotaleRetard()->format('H:i:s') : "",
-                    "autorisationSortie" => $pointage->getAutorisationSortie() ? $pointage->getAutorisationSortie()->getTime()->format('H:i:s') : "",
-                    "congerPayer" =>  $pointage->getCongerPayer(),
-                    "abscence" => $pointage->getAbscence(),
-                    "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format('H:i:s') : "",
-                    "diff" => $pointage->getDiff() ? $pointage->getDiff()->format('H:i:s') : "",
-                ]);
+            array_push($collectGeneral, [
+                "colspan" => 1,
+                "date" =>  $pointage->getdate()->format('d/m/Y'),
+                "horaire" =>  $pointage->getHoraire(),
+                "entrer" =>  $pointage->getEntrer() ? $pointage->getEntrer()->format('H:i:s') : "",
+                "sortie" =>  $pointage->getSortie() ? $pointage->getSortie()->format('H:i:s') : "",
+                "nbrHeurTravailler" => $pointage->getNbrHeurTravailler() ? $pointage->getNbrHeurTravailler()->format('H:i:s') : "",
+                "retardEnMinute" => $pointage->getRetardEnMinute() ? $pointage->getRetardEnMinute()->format('H:i:s') : "",
+                "departAnticiper" => $pointage->getDepartAnticiper() ? $pointage->getDepartAnticiper()->format('H:i:s') : "",
+                "retardMidi" => $pointage->getRetardMidi() ? $pointage->getRetardMidi()->format('H:i:s') : "",
+                "totaleRetard" => $pointage->getTotaleRetard() ? $pointage->getTotaleRetard()->format('H:i:s') : "",
+                "autorisationSortie" => $pointage->getAutorisationSortie() ? $pointage->getAutorisationSortie()->getTime()->format('H:i:s') : "",
+                "congerPayer" =>  $pointage->getCongerPayer(),
+                "abscence" => $pointage->getAbscence(),
+                "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format('H:i:s') : "",
+                "diff" => $pointage->getDiff() ? $pointage->getDiff()->format('H:i:s') : "",
+            ]);
         }
         if (!empty($collectGeneral))
             array_push($collectGeneral, $bilan);
