@@ -19,6 +19,10 @@ class Abscence
      */
     private $id;
 
+    public function __toString()
+    {
+        return "1";
+    }
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="abscences")
      */

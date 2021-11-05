@@ -31,42 +31,40 @@ class PointageController extends AbstractController
     /**
      * @Route("/bilanSemestiriel", name="bilan_semestiriel", methods={"GET"})
      * 
-     * @param PointageRepository $pointageRepository
      * @param Security $security
      * @param PointageService $pointageService
      * @return Response
      */
-    public function bilanSemestiriel(PointageRepository $pointageRepository, Security $security, PointageService $pointageService): Response
+    public function bilanSemestiriel(Security $security, PointageService $pointageService): Response
     {
-        $pointages = $pointageRepository->findBy(["employer" => $security->getUser()], ["date" => "ASC"]);
         return $this->render('pointage/bilanSemestiriel.html.twig', [
-            'bilan' =>  $pointageService->getBilanSemestriel($pointages),
+            'bilan' =>  $pointageService->getBilanSemestriel($security->getUser()->getPointages()),
         ]);
     }
     /**
      * @Route("/bilanMensuel", name="bilan_mensuel", methods={"GET"})
-     * 
-     * @param PointageRepository $pointageRepository
+     *
      * @param Security $security
      * @param PointageService $pointageService
      * @return Response
      */
-    public function bilanMensuel(PointageRepository $pointageRepository, Security $security, PointageService $pointageService): Response
+    public function bilanMensuel(Security $security, PointageService $pointageService): Response
     {
-        $pointages = $pointageRepository->findBy(["employer" => $security->getUser()], ["date" => "ASC"]);
 
         return $this->render('pointage/bilanMensuel.html.twig', [
-            'bilan' =>  $pointageService->getBilanMensuel($pointages),
+            'bilan' =>  $pointageService->getBilanMensuel($security->getUser()->getPointages()),
         ]);
     }
     /**
      * @Route("/bilanAnnuel", name="bilan_annuel", methods={"GET"})
+     * @param Security $security
+     * @param PointageService $pointageService
+     * @return Response
      */
-    public function bilanAnnuel(PointageRepository $pointageRepository, Security $security, PointageService $pointageService): Response
+    public function bilanAnnuel(Security $security, PointageService $pointageService): Response
     {
-        $pointages = $pointageRepository->findBy(["employer" => $security->getUser()], ["date" => "ASC"]);
         return $this->render('pointage/bilanAnnuel.html.twig', [
-            'bilan' =>  $pointageService->getBilanAnnuel($pointages),
+            'bilan' =>  $pointageService->getBilanAnnuel($security->getUser()->getPointages()),
         ]);
     }
 

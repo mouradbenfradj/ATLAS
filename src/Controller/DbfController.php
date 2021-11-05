@@ -190,46 +190,39 @@ class DbfController extends AbstractController
                         $abscence->setDebut($dbf->getAttDate());
                         $abscence->setFin($dbf->getAttDate());
                         $pointage->setAbscence($abscence);
+                        $this->pointageService->setPointage($pointage);
+                        $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());
+                        $pointage->setTotaleRetard($this->pointageService->totalRetard());
+                        $pointage->setHeurNormalementTravailler($this->pointageService->heurNormalementTravailler());
+                        $pointage->setDiff($this->pointageService->diff());
+                        //dd($pointage);
                         $entityManager->remove($dbf);
+                        $user->addAbscence($abscence);
+                        $user->addPointage($pointage);
                     } else if (!$dbf->getStarttime() and !$dbf->getEndtime() and $conger and !$conger->getDemiJourner()) {
                         $pointage->setCongerPayer($conger ? $conger : null);
+                        dd($pointage);
                         $entityManager->remove($dbf);
+                        $user->addPointage($pointage);
                     } else if ($dbf->getStarttime() and $dbf->getEndtime() /* and !$conger and !$autorisationSortie */) {
                         $pointage->setCongerPayer($conger ? $conger : null);
                         $pointage->setAutorisationSortie($autorisationSortie ? $autorisationSortie : null);
                         $pointage->setEntrer($dbf->getStarttime());
                         $pointage->setSortie($dbf->getEndtime());
-
-
                         $this->pointageService->setPointage($pointage);
-
                         $pointage->setNbrHeurTravailler($this->pointageService->nbrHeurTravailler());
                         $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());
-                        /*  if ($record->starttime != "" and $this->timeService->isTimeHi($record->starttime))
-                        else {
-                            $pointage->setEntrer(new DateTime("00:00:00"));
-                            $this->flash->add('danger ', 'saisie automatique de l\'heur d\'entrer a 00:00:00 pour la date ' . $record->attdate);
-                        } */
-                        /* if ($record->endtime != ""  and $this->timeService->isTimeHi($record->endtime))
-                            $pointage->setSortie(new DateTime($record->endtime));
-                        else {
-                            $pointage->setSortie(new DateTime("23:00:00"));
-                            $this->flash->add('danger ', 'saisie automatique de l\'heur de sortie a 23:00:00 pour la date ' . $record->attdate);
-                        } */
-
-
-                        /*
-                        $pointage->setDepartAnticiper(null);
-                        $pointage->setRetardMidi(null);
                         $pointage->setTotaleRetard($this->pointageService->totalRetard());
                         $pointage->setHeurNormalementTravailler($this->pointageService->heurNormalementTravailler());
-                        $pointage->setDiff($this->pointageService->diff()); */
+                        $pointage->setDiff($this->pointageService->diff());
+                        /*$pointage->setDepartAnticiper(null);
+                        $pointage->setRetardMidi(null);*/
                         $entityManager->remove($dbf);
+                        $user->addPointage($pointage);
                     }
-                    $user->addPointage($pointage);
                 }
 
-                dd($user->getPointages()->toArray());
+                //dd($user->getPointages()->toArray());
 
 
 

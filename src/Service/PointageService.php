@@ -2,14 +2,15 @@
 
 namespace App\Service;
 
-use App\Entity\AutorisationSortie;
-use App\Entity\Conger;
 use DateTime;
-use App\Entity\Pointage;
 use App\Entity\User;
+use App\Entity\Conger;
+use DateTimeInterface;
+use App\Entity\Pointage;
 use App\Service\TimeService;
 use App\Service\HoraireService;
-use DateTimeInterface;
+use App\Entity\AutorisationSortie;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 class PointageService
@@ -45,7 +46,7 @@ class PointageService
     private $flash;
 
     /**
-     *      
+     *
      * @var int
      */
     private $nextYear;
@@ -89,8 +90,10 @@ class PointageService
     }
 
 
-    public function bilan(DateTimeInterface $time, int $total)
+    public function bilan(?DateTimeInterface $time, int $total)
     {
+        if (!$time)
+            return $total;
         $total += $time->format('H') * 3600; // Convert the hours to seconds and add to our total
         $total += $time->format('i') * 60;  // Convert the minutes to seconds and add to our total
         $total += $time->format('s'); // Add the seconds to our total
@@ -110,13 +113,12 @@ class PointageService
         if ($pointage->getAutorisationSortie())
             $bilan["autorisationSortie"] = $this->bilan($pointage->getAutorisationSortie()->getTime(), $bilan["autorisationSortie"]);
         if ($pointage->getCongerPayer()) {
-            if ($pointage->getCongerPayer()->getDemiJourner()) {
+            if ($pointage->getCongerPayer()->getDemiJourner())
                 $bilan["congerPayer"] += 0.5;
-            } else {
+            else
                 $bilan["congerPayer"] += 1;
-            }
         }
-        $bilan["abscence"] += $pointage->getAbscence();
+        $bilan["abscence"] = $pointage->getAbscence() ? $bilan["abscence"] + 1 : $bilan["abscence"];
         $bilan["heurNormalementTravailler"] = $this->bilan($pointage->getHeurNormalementTravailler(), $bilan["heurNormalementTravailler"]);
         $bilan["diff"] = $this->bilan($pointage->getDiff(), $bilan["diff"]);
         return $bilan;
@@ -182,11 +184,41 @@ class PointageService
         return $collectAnnuel;
     }
 
-
-    public function getBilanGeneral($pointages)
+    /**
+     * getBilanGeneral
+     *
+     * @param Collection $pointages
+     * @return array
+     */
+    public function getBilanGeneral(Collection $pointages): array
     {
+        $pointages = $pointages->toArray();
+        usort($pointages, fn ($a, $b) => $a->getDate() > $b->getDate());
+
         $collectGeneral = [];
         $bilan = $this->initBilan;
+        foreach ($pointages as  $pointage) {
+            $this->setPointage($pointage);
+
+            array_push($collectGeneral, [
+                "colspan" => 1,
+                "date" =>  $pointage->getdate()->format('Y-m-d'),
+                "horaire" =>  $pointage->getHoraire(),
+                "entrer" =>  $pointage->getEntrer() ? $pointage->getEntrer()->format('H:i:s') : "",
+                "sortie" =>  $pointage->getSortie() ? $pointage->getSortie()->format('H:i:s') : "",
+                "nbrHeurTravailler" => $pointage->getNbrHeurTravailler() ? $pointage->getNbrHeurTravailler()->format('H:i:s') : "",
+                "retardEnMinute" => $pointage->getRetardEnMinute() ? $pointage->getRetardEnMinute()->format('H:i:s') : "",
+                "departAnticiper" => $pointage->getDepartAnticiper() ? $pointage->getDepartAnticiper()->format('H:i:s') : "",
+                "retardMidi" => $pointage->getRetardMidi() ? $pointage->getRetardMidi()->format('H:i:s') : "",
+                "totaleRetard" => $pointage->getTotaleRetard() ? $pointage->getTotaleRetard()->format('H:i:s') : "",
+                "autorisationSortie" => $pointage->getAutorisationSortie() ? $pointage->getAutorisationSortie()->getTime()->format('H:i:s') : "",
+                "congerPayer" =>  $pointage->getCongerPayer(),
+                "abscence" => $pointage->getAbscence(),
+                "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format('H:i:s') : "",
+                "diff" => $pointage->getDiff() ? $pointage->getDiff()->format('H:i:s') : "",
+            ]);
+        }
+        /*
         $bilanMonth = $this->initBilan;
         $bilanYear = $this->initBilan;
         $thisWeek = 0;
@@ -197,8 +229,6 @@ class PointageService
         foreach ($pointages as  $pointage) {
             $this->setPointage($pointage);
             $this->setHoraireServiceHoraire();
-            dump($thisWeek);
-            dump($nextWeek);
             $thisWeek = $pointage->getDate()->format('W');
             if ($thisWeek >=  $nextWeek) {
                 $bilan["date"] = $countWeek;
@@ -212,9 +242,6 @@ class PointageService
                 }
 
                 $nextWeek = $pointage->getDate()->format('W') + 1;
-
-                dump($thisWeek);
-                dump($nextWeek);
             }
             if ($thisYear . '-' . $thisMonth != $pointage->getDate()->format('Y-m')) {
                 $bilanMonth["date"] =   $thisYear . '-' . $thisMonth;
@@ -238,26 +265,10 @@ class PointageService
 
             $thisMonth =  $pointage->getDate()->format('m');
             $thisYear =  $pointage->getDate()->format('Y');
-            array_push($collectGeneral, [
-                "colspan" => 1,
-                "date" =>  $pointage->getdate()->format('d/m/Y'),
-                "horaire" =>  $pointage->getHoraire(),
-                "entrer" =>  $pointage->getEntrer() ? $pointage->getEntrer()->format('H:i:s') : "",
-                "sortie" =>  $pointage->getSortie() ? $pointage->getSortie()->format('H:i:s') : "",
-                "nbrHeurTravailler" => $pointage->getNbrHeurTravailler() ? $pointage->getNbrHeurTravailler()->format('H:i:s') : "",
-                "retardEnMinute" => $pointage->getRetardEnMinute() ? $pointage->getRetardEnMinute()->format('H:i:s') : "",
-                "departAnticiper" => $pointage->getDepartAnticiper() ? $pointage->getDepartAnticiper()->format('H:i:s') : "",
-                "retardMidi" => $pointage->getRetardMidi() ? $pointage->getRetardMidi()->format('H:i:s') : "",
-                "totaleRetard" => $pointage->getTotaleRetard() ? $pointage->getTotaleRetard()->format('H:i:s') : "",
-                "autorisationSortie" => $pointage->getAutorisationSortie() ? $pointage->getAutorisationSortie()->getTime()->format('H:i:s') : "",
-                "congerPayer" =>  $pointage->getCongerPayer(),
-                "abscence" => $pointage->getAbscence(),
-                "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format('H:i:s') : "",
-                "diff" => $pointage->getDiff() ? $pointage->getDiff()->format('H:i:s') : "",
-            ]);
+            
         }
         if (!empty($collectGeneral))
-            array_push($collectGeneral, $bilan);
+            array_push($collectGeneral, $bilan); */
         return $collectGeneral;
     }
     public function setHoraireServiceHoraire()
@@ -277,20 +288,25 @@ class PointageService
 
     public function retardEnMinute()
     {
-        if ($this->pointage->getCongerPayer() and !$this->pointage->getCongerPayer()->getDemiJourner()) {
-            return null;
-        } elseif ($this->pointage->getCongerPayer() and $this->pointage->getCongerPayer()->getDemiJourner()) {
-            return new DateTime("00:00:00");
+        $debutHeurDeTravaille = new DateTime($this->horaireService->getHoraire()->getHeurDebutTravaille()->format("H:i:s"));
+        if ($this->pointage->getEntrer())
+            $entrer = new DateTime(date('H:i:s', strtotime($this->pointage->getEntrer()->format("H:i:s"))));
+        else
+            $entrer = $debutHeurDeTravaille;
+        if ($this->pointage->getCongerPayer() and $this->pointage->getCongerPayer()->getDemiJourner()) {
+            dump('CP');
+            dump($entrer);
+            dd($debutHeurDeTravaille);
+        } elseif ($this->pointage->getCongerPayer() and $this->pointage->getAutorisationSortie()) {
+            dump('AS');
+            dump($entrer);
+            dd($debutHeurDeTravaille);
         } else {
-            $time = new DateTime($this->horaireService->getHoraire()->getHeurDebutTravaille()->format("H:i:s"));
-            $time->add($this->timeService->margeDuRetard());
-
-            if (strtotime($time->format("H:i:s")) >= strtotime($this->pointage->getEntrer()->format("H:i:s")))
-                return null;
-
-            $time = $this->timeService->diffTime($time, $this->pointage->getEntrer());
-            dd($time);
-            return $this->timeService->dateIntervalToDateTime($time);
+            $debutHeurDeTravaille->add($this->timeService->margeDuRetard());
+            if ($debutHeurDeTravaille >= $entrer)
+                return new DateTime("00:00:00");
+            $debutHeurDeTravaille = $this->timeService->diffTime(new DateTime(date('H:i:s', strtotime($debutHeurDeTravaille->format("H:i:s")))), $entrer);
+            return $this->timeService->dateIntervalToDateTime($debutHeurDeTravaille);
         }
     }
 
@@ -302,23 +318,17 @@ class PointageService
      */
     public function totalRetard(): DateTime
     {
-        if ($this->pointage->getCongerPayer() and !$this->pointage->getCongerPayer()->getDemiJourner()) {
-            return new DateTime("00:00:00");
-        } elseif ($this->pointage->getCongerPayer() and $this->pointage->getCongerPayer()->getDemiJourner()) {
-            return new DateTime("00:00:00");
-        } else {
-            $e = new DateTime('00:00:00');
-            if ($this->pointage->getRetardEnMinute()) {
-                $e->add($this->timeService->dateTimeToDateInterval($this->pointage->getRetardEnMinute()));
-            }
-            if ($this->pointage->getDepartAnticiper()) {
-                $e->add($this->timeService->dateTimeToDateInterval($this->pointage->getDepartAnticiper()));
-            }
-            if ($this->pointage->getRetardMidi()) {
-                $e->add($this->timeService->dateTimeToDateInterval($this->pointage->getRetardMidi()));
-            }
-            return $e;
+        $e = new DateTime('00:00:00');
+        if ($this->pointage->getRetardEnMinute()) {
+            $e->add($this->timeService->dateTimeToDateInterval($this->pointage->getRetardEnMinute()));
         }
+        if ($this->pointage->getDepartAnticiper()) {
+            $e->add($this->timeService->dateTimeToDateInterval($this->pointage->getDepartAnticiper()));
+        }
+        if ($this->pointage->getRetardMidi()) {
+            $e->add($this->timeService->dateTimeToDateInterval($this->pointage->getRetardMidi()));
+        }
+        return $e;
     }
 
     /**
@@ -328,39 +338,32 @@ class PointageService
      */
     public function heurNormalementTravailler(): DateTime
     {
-        if ($this->pointage->getCongerPayer() and !$this->pointage->getCongerPayer()->getDemiJourner()) {
-            return new DateTime("00:00:00");
-        } elseif ($this->pointage->getCongerPayer() and $this->pointage->getCongerPayer()->getDemiJourner()) {
-            return new DateTime("00:00:00");
+        $heurFinTravaille = new DateTime($this->horaireService->getHoraire()->getHeurFinTravaille()->format("H:i:s"));
+        $heurDebutTravaille = $this->horaireService->getHoraire()->getHeurDebutTravaille();
+        if ($this->pointage->getCongerPayer() and $this->pointage->getCongerPayer()->getDemiJourner()) {
+            dd('demijourner heur normalement travailer');
         } else {
-            $time = new DateTime($this->horaireService->getHoraire()->getHeurFinTravaille()->format("H:i:s"));
-            if ($this->pointage->getAutorisationSortie()) {
-                $time->sub(
-                    $this->timeService->dateTimeToDateInterval(
-                        $this->pointage->getAutorisationSortie()->getTime()
-                    )
-                );
-            }
-            $e = new DateTime('00:00:00');
-            if (!$this->pointage->getCongerPayer()) {
-                $e->add($this->horaireService->diffPauseMatinalTime());
-                $e->add($this->horaireService->diffPauseDejeunerTime());
-                $e->add($this->horaireService->diffPauseMidiTime());
-            }
-            $time->sub($this->timeService->dateTimeToDateInterval($e));
-            $time = $this->timeService->diffTime($time, $this->horaireService->getHoraire()->getHeurDebutTravaille());
-            return $this->timeService->dateIntervalToDateTime($time);
+            if ($this->pointage->getAutorisationSortie())
+                $heurFinTravaille->sub($this->timeService->dateTimeToDateInterval($this->pointage->getAutorisationSortie()->getTime()));
+            $e = $this->horaireService->sumPause();
+            $heurFinTravaille->sub($this->timeService->dateTimeToDateInterval($e));
+            $heurFinTravaille = $this->timeService->diffTime($heurFinTravaille, $heurDebutTravaille);
+            return $this->timeService->dateIntervalToDateTime($heurFinTravaille);
         }
     }
 
     public function diff(): DateTime
     {
-        return $this->timeService->dateIntervalToDateTime(
-            $this->timeService->diffTime(
-                $this->pointage->getNbrHeurTravailler(),
-                $this->pointage->getHeurNormalementTravailler()
-            )
-        );
+        if ($this->pointage->getNbrHeurTravailler())
+
+            return $this->timeService->dateIntervalToDateTime(
+                $this->timeService->diffTime(
+                    $this->pointage->getNbrHeurTravailler(),
+                    $this->pointage->getHeurNormalementTravailler()
+                )
+            );
+        else
+            return $this->pointage->getHeurNormalementTravailler();
     }
 
     /**

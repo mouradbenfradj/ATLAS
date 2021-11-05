@@ -19,9 +19,8 @@ class DefaultController extends AbstractController
      */
     public function index(PointageRepository $pointageRepository, Security $security, PointageService $pointageService): Response
     {
-        $pointages = $pointageRepository->findBy(["employer" => $security->getUser()], ["date" => "ASC"]);
         return $this->render('default/index.html.twig', [
-            'bilan' => $pointageService->getBilanGeneral($pointages)
+            'bilan' => $pointageService->getBilanGeneral($security->getUser()->getPointages())
         ]);
     }
 }
