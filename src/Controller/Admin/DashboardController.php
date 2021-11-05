@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Abscence;
 use App\Entity\User;
 use App\Entity\Conger;
 use App\Entity\Horaire;
@@ -68,6 +69,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToRoute('Bilan semestiriel', 'fas fa-list', 'default_index'),
         ]);
         yield MenuItem::subMenu('Users', 'fa fa-article')->setSubItems([
+            MenuItem::linkToCrud('Abscence', 'fas fa-list', Abscence::class),
             MenuItem::linkToCrud('Autorisation Sortie', 'fas fa-list', AutorisationSortie::class),
             MenuItem::linkToCrud('Conger', 'fas fa-list', Conger::class),
             MenuItem::linkToCrud('Pointage', 'fas fa-list', Pointage::class),

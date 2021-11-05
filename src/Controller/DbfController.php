@@ -15,8 +15,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\Admin\PointageCrudController;
 use App\Entity\Abscence;
+use App\Entity\AutorisationSortie;
 use App\Entity\Conger;
 use App\Entity\Dbf;
+use App\Repository\AutorisationSortieRepository;
 use App\Repository\DbfRepository;
 use App\Service\AutorisationSortieService;
 use App\Service\CongerService;
@@ -117,9 +119,10 @@ class DbfController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $dbf = $form->get('upload')->getData();
             if ($dbf) {
+                $entityManager = $this->getDoctrine()->getManager();
                 $dateDbfInDb = array_map(
                     fn ($date): string => $date->getAttdate()->format('Y-m-d'),
-                    $dbfRepository->findBy(["employer" => $user])
+                    $user->getDbfs()->toArray()
                 );
                 $dbfs = new TableReader($dbf);
                 $datePointageInDB = $this->pointageGeneratorService->dateInDB($user);
@@ -161,24 +164,72 @@ class DbfController extends AbstractController
                         $dbf->setAttchktime(explode(" ", $record->attchktime));
                         $dbf->setEmployer($user);
                         $user->addDbf($dbf);
+                        $entityManager->persist($user);
                     }
                 }
+                $entityManager->flush();
+
                 foreach ($user->getDbfs() as $dbf) {
+                    $abscence = current(array_filter(array_map(
+                        fn ($abscence): ?Abscence => ($abscence->getDebut() <= $dbf->getAttDate() and $dbf->getAttDate() <= $abscence->getFin()) ? $abscence : null,
+                        $user->getAbscences()->toArray()
+                    )));
                     $conger = current(array_filter(array_map(
                         fn ($conger): ?Conger => ($conger->getDebut() <= $dbf->getAttDate() and $dbf->getAttDate() <= $conger->getFin()) ? $conger : null,
                         $user->getCongers()->toArray()
                     )));
-
-                    if (!$dbf->getStarttime() and !$dbf->getEndtime() and !$conger) {
+                    $autorisationSortie = current(array_filter(array_map(
+                        fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $dbf->getAttDate() and $dbf->getAttDate() <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
+                        $user->getAutorisationSorties()->toArray()
+                    )));
+                    $pointage = new Pointage();
+                    $pointage->setDate($dbf->getAttDate());
+                    $pointage->setHoraire($this->horaireService->getHoraireForDate($pointage->getDate()));
+                    if (!$dbf->getStarttime() and !$dbf->getEndtime() and !$conger and !$abscence) {
                         $abscence = new Abscence();
                         $abscence->setDebut($dbf->getAttDate());
                         $abscence->setFin($dbf->getAttDate());
-                        $user->addAbscence($abscence);
-                        dd($user);
+                        $pointage->setAbscence($abscence);
+                        $entityManager->remove($dbf);
+                    } else if (!$dbf->getStarttime() and !$dbf->getEndtime() and $conger and !$conger->getDemiJourner()) {
+                        $pointage->setCongerPayer($conger ? $conger : null);
+                        $entityManager->remove($dbf);
+                    } else if ($dbf->getStarttime() and $dbf->getEndtime() /* and !$conger and !$autorisationSortie */) {
+                        $pointage->setCongerPayer($conger ? $conger : null);
+                        $pointage->setAutorisationSortie($autorisationSortie ? $autorisationSortie : null);
+                        $pointage->setEntrer($dbf->getStarttime());
+                        $pointage->setSortie($dbf->getEndtime());
+
+
+                        $this->pointageService->setPointage($pointage);
+
+                        $pointage->setNbrHeurTravailler($this->pointageService->nbrHeurTravailler());
+                        $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());
+                        /*  if ($record->starttime != "" and $this->timeService->isTimeHi($record->starttime))
+                        else {
+                            $pointage->setEntrer(new DateTime("00:00:00"));
+                            $this->flash->add('danger ', 'saisie automatique de l\'heur d\'entrer a 00:00:00 pour la date ' . $record->attdate);
+                        } */
+                        /* if ($record->endtime != ""  and $this->timeService->isTimeHi($record->endtime))
+                            $pointage->setSortie(new DateTime($record->endtime));
+                        else {
+                            $pointage->setSortie(new DateTime("23:00:00"));
+                            $this->flash->add('danger ', 'saisie automatique de l\'heur de sortie a 23:00:00 pour la date ' . $record->attdate);
+                        } */
+
+
+                        /*
+                        $pointage->setDepartAnticiper(null);
+                        $pointage->setRetardMidi(null);
+                        $pointage->setTotaleRetard($this->pointageService->totalRetard());
+                        $pointage->setHeurNormalementTravailler($this->pointageService->heurNormalementTravailler());
+                        $pointage->setDiff($this->pointageService->diff()); */
+                        $entityManager->remove($dbf);
                     }
+                    $user->addPointage($pointage);
                 }
 
-                dd($user->getDbfs());
+                dd($user->getPointages()->toArray());
 
 
 
@@ -219,7 +270,7 @@ class DbfController extends AbstractController
                     $pointage->setDiff($this->pointageService->diff());
                     $user->addPointage($pointage); */
 
-                $this->getDoctrine()->getManager()->flush();
+                $entityManager->flush();
                 $this->addFlash('success', 'id.updated_successfully');
             }
             $url = $this->adminUrlGenerator

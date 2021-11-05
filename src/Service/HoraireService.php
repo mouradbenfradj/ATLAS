@@ -154,6 +154,15 @@ class HoraireService
     {
         return  $this->timeService->diffTime($this->horaire->getFinPauseDejeuner(), $this->horaire->getDebutPauseDejeuner());
     }
+
+    public function sumPause()
+    {
+        $e = new DateTime('00:00:00');
+        $e->add($this->diffPauseMatinalTime());
+        $e->add($this->diffPauseDejeunerTime());
+        $e->add($this->diffPauseMidiTime());
+        return $e;
+    }
     /**
      * diffPauseMidiTime
      *

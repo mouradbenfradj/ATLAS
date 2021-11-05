@@ -269,18 +269,10 @@ class PointageService
     {
         $entrer =  $this->pointage->getEntrer();
         $sortie = $this->pointage->getSortie();
-        if (!$entrer and !$sortie) {
-            return new DateTime("00:00:00");
-        } else {
-            $time = new DateTime($sortie->format("H:i:s"));
-            $e = new DateTime('00:00:00');
-            $e->add($this->horaireService->diffPauseMatinalTime());
-            $e->add($this->horaireService->diffPauseDejeunerTime());
-            $e->add($this->horaireService->diffPauseMidiTime());
-            $time->sub($this->timeService->dateTimeToDateInterval($e));
-            $time = $this->timeService->diffTime($time,  $entrer);
-            return $this->timeService->dateIntervalToDateTime($time);
-        }
+        $time = new DateTime($sortie->format("H:i:s"));
+        $time->sub($this->timeService->dateTimeToDateInterval($this->horaireService->sumPause()));
+        $time = $this->timeService->diffTime($time,  $entrer);
+        return $this->timeService->dateIntervalToDateTime($time);
     }
 
     public function retardEnMinute()
@@ -292,12 +284,12 @@ class PointageService
         } else {
             $time = new DateTime($this->horaireService->getHoraire()->getHeurDebutTravaille()->format("H:i:s"));
             $time->add($this->timeService->margeDuRetard());
-            if (!$this->pointage->getCongerPayer()) {
-                if ($time >= $this->pointage->getEntrer()) {
-                    return null;
-                }
-                $time = $this->timeService->diffTime($time, $this->pointage->getEntrer());
-            }
+
+            if (strtotime($time->format("H:i:s")) >= strtotime($this->pointage->getEntrer()->format("H:i:s")))
+                return null;
+
+            $time = $this->timeService->diffTime($time, $this->pointage->getEntrer());
+            dd($time);
             return $this->timeService->dateIntervalToDateTime($time);
         }
     }

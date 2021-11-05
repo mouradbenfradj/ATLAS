@@ -11,15 +11,16 @@ class CongerFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
-        $conger = new Conger();
+        /* $conger = new Conger();
         $conger->setDebut(new DateTime("2021-01-15"));
+        $conger->setFin(new DateTime("2021-01-15"));
         /*  $conger->setIncSoldConger(1.9);
         $conger->setIncAutorisationSortie(new DateTime("00:00:00"));
         $conger->setActive(true);
         $conger->setReinitialisationC(false);
-        $conger->setReinitialisationAS(true); */
+        $conger->setReinitialisationAS(true); 
         $manager->persist($conger);
 
-        $manager->flush();
+        $manager->flush(); */
     }
 }
