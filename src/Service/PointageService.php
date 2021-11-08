@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Abscence;
 use DateTime;
 use App\Entity\User;
 use App\Entity\Conger;
@@ -10,7 +11,9 @@ use App\Entity\Pointage;
 use App\Service\TimeService;
 use App\Service\HoraireService;
 use App\Entity\AutorisationSortie;
+use App\Entity\Dbf;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 class PointageService
@@ -51,6 +54,7 @@ class PointageService
      */
     private $nextYear;
     private $configService;
+    private $manager;
     /**
      * __construct
      *
@@ -61,13 +65,15 @@ class PointageService
         HoraireService $horaireService,
         DateService $dateService,
         TimeService $timeService,
-        ConfigService $configService
+        ConfigService $configService,
+        EntityManagerInterface $manager
     ) {
         $this->horaireService = $horaireService;
         $this->timeService = $timeService;
         $this->dateService = $dateService;
         $this->flash = $flash;
         $this->configService = $configService;
+        $this->manager = $manager;
 
         $this->initBilan = [
             "colspan" => 1,
@@ -194,15 +200,28 @@ class PointageService
     {
         $pointages = $pointages->toArray();
         usort($pointages, fn ($a, $b) => $a->getDate() > $b->getDate());
-
         $collectGeneral = [];
-        $bilan = $this->initBilan;
-        foreach ($pointages as  $pointage) {
+        $bilanWeek = $this->initBilan;
+        $countWeek = 1;
+        $nextWeek = new DateTime("0000-00-00");
+        foreach ($pointages as $index => $pointage) {
             $this->setPointage($pointage);
+            $pointageDate = $pointage->getdate();
+            if ($pointage->getdate() >=  $nextWeek and $index) {
+                $bilanWeek["date"] = $countWeek;
+                $bilanWeek["background"] = "Orange";
+                $bilanWeek["colspan"] = 4;
+                $bilanWeek["date"] = "Semaine " . $bilanWeek["date"];
+                array_push($collectGeneral, $bilanWeek);
+                $bilanWeek = $this->initBilan;
+                $countWeek++;
+            }
+            $bilanWeek = $this->calculateurBilan($pointage, $bilanWeek);
 
+            //if (!($pointageDate->format("W") == 0) and  !($pointageDate->format("W") == 6))
             array_push($collectGeneral, [
                 "colspan" => 1,
-                "date" =>  $pointage->getdate()->format('Y-m-d'),
+                "date" =>  $pointageDate->format('Y-m-d'),
                 "horaire" =>  $pointage->getHoraire(),
                 "entrer" =>  $pointage->getEntrer() ? $pointage->getEntrer()->format('H:i:s') : "",
                 "sortie" =>  $pointage->getSortie() ? $pointage->getSortie()->format('H:i:s') : "",
@@ -217,6 +236,7 @@ class PointageService
                 "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format('H:i:s') : "",
                 "diff" => $pointage->getDiff() ? $pointage->getDiff()->format('H:i:s') : "",
             ]);
+            $nextWeek = $pointage->getdate()->setISODate($pointage->getdate()->format('o'), $pointage->getdate()->format('W') + 1);
         }
         /*
         $bilanMonth = $this->initBilan;
@@ -271,6 +291,43 @@ class PointageService
             array_push($collectGeneral, $bilan); */
         return $collectGeneral;
     }
+
+    public function dbfUpdated(Dbf $dbf)
+    {
+        $user = $dbf->getEmployer();
+        $abscence = current(array_filter(array_map(
+            fn ($abscence): ?Abscence => ($abscence->getDebut() <= $dbf->getAttDate() and $dbf->getAttDate() <= $abscence->getFin()) ? $abscence : null,
+            $user->getAbscences()->toArray()
+        )));
+        $conger = current(array_filter(array_map(
+            fn ($conger): ?Conger => ($conger->getDebut() <= $dbf->getAttDate() and $dbf->getAttDate() <= $conger->getFin()) ? $conger : null,
+            $user->getCongers()->toArray()
+        )));
+        $autorisationSortie = current(array_filter(array_map(
+            fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $dbf->getAttDate() and $dbf->getAttDate() <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
+            $user->getAutorisationSorties()->toArray()
+        )));
+        $pointage = new Pointage();
+        $pointage->setDate($dbf->getAttDate());
+        $pointage->setHoraire($this->horaireService->getHoraireForDate($pointage->getDate()));
+        $pointage->setCongerPayer($conger ? $conger : null);
+        $pointage->setAutorisationSortie($autorisationSortie ? $autorisationSortie : null);
+        $pointage->setEntrer($dbf->getStarttime());
+        $pointage->setSortie($dbf->getEndtime());
+        $this->setPointage($pointage);
+        $pointage->setNbrHeurTravailler($this->nbrHeurTravailler());
+        $pointage->setRetardEnMinute($this->retardEnMinute());
+        $pointage->setTotaleRetard($this->totalRetard());
+        $pointage->setHeurNormalementTravailler($this->heurNormalementTravailler());
+        $pointage->setDiff($this->diff());
+        $pointage->setEmployer($user);
+        $this->manager->persist($pointage);
+        $this->manager->remove($dbf);
+        $this->manager->flush();
+    }
+
+
+
     public function setHoraireServiceHoraire()
     {
         $this->horaireService->setHoraire($this->pointage->getHoraire());

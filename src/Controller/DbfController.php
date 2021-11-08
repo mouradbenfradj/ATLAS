@@ -22,6 +22,7 @@ use App\Repository\AutorisationSortieRepository;
 use App\Repository\DbfRepository;
 use App\Service\AutorisationSortieService;
 use App\Service\CongerService;
+use App\Service\DbfService;
 use App\Service\HoraireService;
 use App\Service\PointageService;
 use App\Service\TimeService;
@@ -49,23 +50,24 @@ class DbfController extends AbstractController
     private $dateService;
     private $jourFerierService;
     private $pointageGeneratorService;
-    private $congerService;
     private $horaireService;
     private $pointageService;
-    private $flash;
-    private $autorisationSortieService;
-    /**
-     * timeService
-     *
-     * @var TimeService
-     */
-    private $timeService;
+
 
     /**
      * __construct
      *
      * @param AdminUrlGenerator $adminUrlGenerator
-     * @return void
+     * @param DateService $dateService
+     * @param JourFerierService $jourFerierService
+     * @param PointageGeneratorService $pointageGeneratorService
+     * @param HoraireService $horaireService
+     * @param PointageService $pointageService
+     * @param FlashBagInterface $flash
+     * @param TimeService $timeService
+     * @param CongerService $congerService
+     * @param AutorisationSortieService $autorisationSortieService
+     * @param DbfService $dbfService
      */
     public function __construct(
         AdminUrlGenerator $adminUrlGenerator,
@@ -77,7 +79,8 @@ class DbfController extends AbstractController
         FlashBagInterface $flash,
         TimeService $timeService,
         CongerService $congerService,
-        AutorisationSortieService $autorisationSortieService
+        AutorisationSortieService $autorisationSortieService,
+        DbfService $dbfService
     ) {
         $this->adminUrlGenerator = $adminUrlGenerator;
         $this->dateService = $dateService;
@@ -89,6 +92,7 @@ class DbfController extends AbstractController
         $this->timeService = $timeService;
         $this->autorisationSortieService = $autorisationSortieService;
         $this->flash = $flash;
+        $this->dbfService = $dbfService;
     }
 
     /**
@@ -112,7 +116,7 @@ class DbfController extends AbstractController
      * @param User $user
      * @return Response
      */
-    public function upload(Request $request, User $user, DbfRepository $dbfRepository): Response
+    public function upload(Request $request, DbfService $dbfService, User $user): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
@@ -120,51 +124,26 @@ class DbfController extends AbstractController
             $dbf = $form->get('upload')->getData();
             if ($dbf) {
                 $entityManager = $this->getDoctrine()->getManager();
-                $dateDbfInDb = array_map(
-                    fn ($date): string => $date->getAttdate()->format('Y-m-d'),
-                    $user->getDbfs()->toArray()
-                );
+                $dateDbfInDb = $dbfService->dateDbfInDb($user);
                 $dbfs = new TableReader($dbf);
                 $datePointageInDB = $this->pointageGeneratorService->dateInDB($user);
                 $inDb = array_merge($dateDbfInDb, $datePointageInDB);
-
                 //$inDB = $this->pointageGeneratorService->dateInDB($user);
                 while ($record = $dbfs->nextRecord()) {
                     //$dateDbf = $this->dateService->dateToStringY_m_d($record->attdate);
                     $dateDbf = $this->dateService->dateString_d_m_Y_ToDateTime($record->attdate);
                     $isJourFerier = $this->jourFerierService->isJourFerier($dateDbf->format("Y-m-d"));
                     if (!$isJourFerier and !in_array($dateDbf->format('Y-m-d'), $inDb)) {
-                        $dbf = new Dbf();
-                        $dbf->setUserid($record->userid);
-                        $dbf->setBadgenumbe(intval($record->badgenumbe));
-                        $dbf->setSsn($record->ssn);
-                        $dbf->setUsername($record->username);
-                        $dbf->setAutosch($record->autosch);
-                        $dbf->setAttdate($dateDbf);
-                        $dbf->setSchid($record->schid);
-                        $dbf->setClockintim($this->timeService->timeStringToDateTime($record->clockintim));
-                        $dbf->setClockoutti($this->timeService->timeStringToDateTime($record->clockoutti));
-                        $dbf->setStarttime($this->timeService->timeStringToDateTime($record->starttime));
-                        $dbf->setEndtime($this->timeService->timeStringToDateTime($record->endtime));
-                        $dbf->setWorkday($record->workday);
-                        $dbf->setRealworkda($record->realworkda);
-                        $dbf->setLate($this->timeService->timeStringToDateTime($record->late));
-                        $dbf->setEarly($this->timeService->timeStringToDateTime($record->early));
-                        $dbf->setAbsent($record->absent);
-                        $dbf->setOvertime($this->timeService->timeStringToDateTime($record->overtime));
-                        $dbf->setWorktime($this->timeService->timeStringToDateTime($record->worktime));
-                        $dbf->setExceptioni($record->exceptioni);
-                        $dbf->setMustin($record->mustin);
-                        $dbf->setMustout($record->mustout);
-                        $dbf->setDeptid($record->deptid);
-                        $dbf->setSspedaynor($record->sspedaynor);
-                        $dbf->setSspedaywee($record->sspedaywee);
-                        $dbf->setSspedayhol($record->sspedayhol);
-                        $dbf->setAtttime($this->timeService->timeStringToDateTime($record->atttime));;
-                        $dbf->setAttchktime(explode(" ", $record->attchktime));
-                        $dbf->setEmployer($user);
-                        $user->addDbf($dbf);
-                        $entityManager->persist($user);
+
+                        $dbf = $dbfService->construct($record->userid, $record->badgenumbe, $record->ssn, $record->username, $record->autosch, $record->attdate, $record->schid, $record->clockintim, $record->clockoutti, $record->starttime, $record->endtime, $record->workday, $record->realworkda, $record->late, $record->early, $record->absent, $record->overtime, $record->worktime, $record->exceptioni, $record->mustin, $record->mustout, $record->deptid, $record->sspedaynor, $record->sspedaywee, $record->sspedayhol, $record->atttime, $record->attchktime, $user);
+                        $dbf = $dbfService->createEntity($user);
+
+
+                        //if (!($dateDbf->format("w") == 0) and !($dateDbf->format("w") == 6) and !$dbf->getStarttime() and !$dbf->getEndtime()) {
+                        if (!in_array($dateDbf->format("w"), [0, 6]) and !$dbf->getStarttime() and !$dbf->getEndtime()) {
+                            $user->addDbf($dbf);
+                            $entityManager->persist($user);
+                        }
                     }
                 }
                 $entityManager->flush();
