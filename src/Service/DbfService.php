@@ -38,12 +38,23 @@ class DbfService
     private $attchktime;
     private $user;
 
+    /**
+     * dateService
+     *
+     * @var DateService
+     */
+    private $dateService;
 
+    /**
+     * timeService
+     *
+     * @var TimeService
+     */
+    private $timeService;
 
 
 
     private $adminUrlGenerator;
-    private $dateService;
     private $jourFerierService;
     private $pointageGeneratorService;
     private $congerService;
@@ -51,7 +62,6 @@ class DbfService
     private $pointageService;
     private $flash;
     private $autorisationSortieService;
-    private $timeService;
 
     /**
      * __construct
@@ -67,18 +77,8 @@ class DbfService
      * @param CongerService $congerService
      * @param AutorisationSortieService $autorisationSortieService
      */
-    public function __construct(
-        AdminUrlGenerator $adminUrlGenerator,
-        DateService $dateService,
-        JourFerierService $jourFerierService,
-        PointageGeneratorService $pointageGeneratorService,
-        HoraireService $horaireService,
-        PointageService $pointageService,
-        FlashBagInterface $flash,
-        TimeService $timeService,
-        CongerService $congerService,
-        AutorisationSortieService $autorisationSortieService
-    ) {
+    public function __construct(DateService $dateService, TimeService $timeService, AdminUrlGenerator $adminUrlGenerator,  JourFerierService $jourFerierService, PointageGeneratorService $pointageGeneratorService, HoraireService $horaireService, PointageService $pointageService, FlashBagInterface $flash, CongerService $congerService, AutorisationSortieService $autorisationSortieService)
+    {
         $this->adminUrlGenerator = $adminUrlGenerator;
         $this->dateService = $dateService;
         $this->jourFerierService = $jourFerierService;
@@ -91,74 +91,13 @@ class DbfService
         $this->flash = $flash;
     }
 
-
-
-
-    public function construct($userid, $badgenumbe, $ssn, $username, $autosch, $attdate, $schid, $clockintim, $clockoutti, $starttime, $endtime, $workday, $realworkda, $late, $early, $absent, $overtime, $worktime, $exceptioni, $mustin, $mustout, $deptid, $sspedaynor, $sspedaywee, $sspedayhol, $atttime, $attchktime, $user)
-    {
-        $this->userid = $userid;
-        $this->badgenumbe = $badgenumbe;
-        $this->ssn = $ssn;
-        $this->username = $username;
-        $this->autosch = $autosch;
-        $this->attdate = $attdate;
-        $this->schid = $schid;
-        $this->clockintim = $clockintim;
-        $this->clockoutti = $clockoutti;
-        $this->starttime = $starttime;
-        $this->endtime = $endtime;
-        $this->workday = $workday;
-        $this->realworkda = $realworkda;
-        $this->late = $late;
-        $this->early = $early;
-        $this->absent = $absent;
-        $this->overtime = $overtime;
-        $this->worktime = $worktime;
-        $this->exceptioni = $exceptioni;
-        $this->mustin = $mustin;
-        $this->mustout = $mustout;
-        $this->deptid = $deptid;
-        $this->sspedaynor = $sspedaynor;
-        $this->sspedaywee = $sspedaywee;
-        $this->sspedayhol = $sspedayhol;
-        $this->atttime = $atttime;
-        $this->attchktime = $attchktime;
-        $this->user = $user;
-    }
-    public function createEntity(User $user)
-    {
-        $dbf = new Dbf();
-        $dbf->setUserid($this->userid);
-        $dbf->setBadgenumbe(intval($this->badgenumbe));
-        $dbf->setSsn($this->ssn);
-        $dbf->setUsername($this->username);
-        $dbf->setAutosch($this->autosch);
-        $dbf->setAttdate($this->dateService->dateString_d_m_Y_ToDateTime($this->attdate));
-        $dbf->setSchid($this->schid);
-        $dbf->setClockintim($this->timeService->timeStringToDateTime($this->clockintim));
-        $dbf->setClockoutti($this->timeService->timeStringToDateTime($this->clockoutti));
-        $dbf->setStarttime($this->timeService->timeStringToDateTime($this->starttime));
-        $dbf->setEndtime($this->timeService->timeStringToDateTime($this->endtime));
-        $dbf->setWorkday($this->workday);
-        $dbf->setRealworkda($this->realworkda);
-        $dbf->setLate($this->timeService->timeStringToDateTime($this->late));
-        $dbf->setEarly($this->timeService->timeStringToDateTime($this->early));
-        $dbf->setAbsent($this->absent);
-        $dbf->setOvertime($this->timeService->timeStringToDateTime($this->overtime));
-        $dbf->setWorktime($this->timeService->timeStringToDateTime($this->worktime));
-        $dbf->setExceptioni($this->exceptioni);
-        $dbf->setMustin($this->mustin);
-        $dbf->setMustout($this->mustout);
-        $dbf->setDeptid($this->deptid);
-        $dbf->setSspedaynor($this->sspedaynor);
-        $dbf->setSspedaywee($this->sspedaywee);
-        $dbf->setSspedayhol($this->sspedayhol);
-        $dbf->setAtttime($this->timeService->timeStringToDateTime($this->atttime));;
-        $dbf->setAttchktime(explode(" ", $this->attchktime));
-        $dbf->setEmployer($user);
-        return $dbf;
-    }
-    public function dateDbfInDb(User $user)
+    /**
+     * dateDbfInDb
+     *
+     * @param User $user
+     * @return array
+     */
+    public function dateDbfInDb(User $user): array
     {
         return array_map(
             fn ($date): string => $date->getAttdate()->format('Y-m-d'),
@@ -166,6 +105,112 @@ class DbfService
         );
     }
 
+
+
+
+    /**
+     * construct
+     *
+     * @param float $userid
+     * @param integer $badgenumbe
+     * @param string $ssn
+     * @param string $username
+     * @param string|null $autosch
+     * @param string $attdate
+     * @param float|null $schid
+     * @param string|null $clockintim
+     * @param string|null $clockoutti
+     * @param string|null $starttime
+     * @param string|null $endtime
+     * @param float|null $workday
+     * @param float|null $realworkda
+     * @param string|null $late
+     * @param string|null $early
+     * @param float|null $absent
+     * @param string|null $overtime
+     * @param string|null $worktime
+     * @param string|null $exceptioni
+     * @param string|null $mustin
+     * @param string|null $mustout
+     * @param float|null $deptid
+     * @param float|null $sspedaynor
+     * @param float|null $sspedaywee
+     * @param float|null $sspedayhol
+     * @param string|null $atttime
+     * @param string|null $attchktime
+     * @param User|null $user
+     * @return void
+     */
+    public function construct(float $userid, int $badgenumbe, string $ssn, string $username, ?string $autosch, string $attdate, ?float $schid, ?string $clockintim, ?string $clockoutti, ?string $starttime, ?string $endtime, ?float $workday, ?float $realworkda, ?string $late, ?string $early, ?float $absent, ?string $overtime, ?string $worktime, ?string $exceptioni, ?string $mustin, ?string $mustout, ?float $deptid, ?float $sspedaynor, ?float $sspedaywee, ?float $sspedayhol, ?string $atttime, ?string $attchktime, ?User $user)
+    {
+        $this->userid = $userid;
+        $this->badgenumbe = $badgenumbe;
+        $this->ssn = $ssn;
+        $this->username = $username;
+        $this->autosch = $autosch;
+        $this->attdate = $this->dateService->dateString_d_m_Y_ToDateTime($attdate);
+        $this->schid = $schid;
+        $this->clockintim = $this->timeService->timeStringToDateTime($clockintim);
+        $this->clockoutti = $this->timeService->timeStringToDateTime($clockoutti);
+        $this->starttime = $this->timeService->timeStringToDateTime($starttime);
+        $this->endtime = $this->timeService->timeStringToDateTime($endtime);
+        $this->workday = $workday;
+        $this->realworkda = $realworkda;
+        $this->late = $this->timeService->timeStringToDateTime($late);
+        $this->early = $this->timeService->timeStringToDateTime($early);
+        $this->absent = $absent;
+        $this->overtime = $this->timeService->timeStringToDateTime($overtime);
+        $this->worktime = $this->timeService->timeStringToDateTime($worktime);
+        $this->exceptioni = $exceptioni;
+        $this->mustin = $mustin;
+        $this->mustout = $mustout;
+        $this->deptid = $deptid;
+        $this->sspedaynor = $sspedaynor;
+        $this->sspedaywee = $sspedaywee;
+        $this->sspedayhol = $sspedayhol;
+        $this->atttime = $this->timeService->timeStringToDateTime($atttime);
+        $this->attchktime = explode(" ", $attchktime);
+        $this->user = $user;
+    }
+
+    /**
+     * createEntity
+     *
+     * @return Dbf
+     */
+    public function createEntity(): Dbf
+    {
+        $dbf = new Dbf();
+        $dbf->setUserid($this->userid);
+        $dbf->setBadgenumbe(intval($this->badgenumbe));
+        $dbf->setSsn($this->ssn);
+        $dbf->setUsername($this->username);
+        $dbf->setAutosch($this->autosch);
+        $dbf->setAttdate($this->attdate);
+        $dbf->setSchid($this->schid);
+        $dbf->setClockintim($this->clockintim);
+        $dbf->setClockoutti($this->clockoutti);
+        $dbf->setStarttime($this->starttime);
+        $dbf->setEndtime($this->endtime);
+        $dbf->setWorkday($this->workday);
+        $dbf->setRealworkda($this->realworkda);
+        $dbf->setLate($this->late);
+        $dbf->setEarly($this->early);
+        $dbf->setAbsent($this->absent);
+        $dbf->setOvertime($this->overtime);
+        $dbf->setWorktime($this->worktime);
+        $dbf->setExceptioni($this->exceptioni);
+        $dbf->setMustin($this->mustin);
+        $dbf->setMustout($this->mustout);
+        $dbf->setDeptid($this->deptid);
+        $dbf->setSspedaynor($this->sspedaynor);
+        $dbf->setSspedaywee($this->sspedaywee);
+        $dbf->setSspedayhol($this->sspedayhol);
+        $dbf->setAtttime($this->atttime);;
+        $dbf->setAttchktime($this->attchktime);
+        $dbf->setEmployer($this->user);
+        return $dbf;
+    }
 
 
 

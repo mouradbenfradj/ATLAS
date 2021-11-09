@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\AutorisationSortie;
 use App\Entity\User;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
 class AutorisationSortieService
@@ -34,5 +35,17 @@ class AutorisationSortieService
     public function getIfAutorisationSortie(string $date, User $employer): ?AutorisationSortie
     {
         return $this->em->getRepository(AutorisationSortie::class)->findOneByEmployerAndDate($date, $employer);
+    }
+
+
+    public function getAutorisation(User $user, DateTime $date): ?AutorisationSortie
+    {
+        $autorisationSortie =  current(array_filter(array_map(
+            fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $date and $date <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
+            $user->getAutorisationSorties()->toArray()
+        )));
+        if ($autorisationSortie)
+            return $autorisationSortie;
+        return null;
     }
 }

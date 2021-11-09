@@ -16,10 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\Admin\PointageCrudController;
 use App\Entity\Abscence;
 use App\Entity\AutorisationSortie;
-use App\Entity\Conger;
-use App\Entity\Dbf;
-use App\Repository\AutorisationSortieRepository;
-use App\Repository\DbfRepository;
+use App\Service\AbscenceService;
 use App\Service\AutorisationSortieService;
 use App\Service\CongerService;
 use App\Service\DbfService;
@@ -52,6 +49,9 @@ class DbfController extends AbstractController
     private $pointageGeneratorService;
     private $horaireService;
     private $pointageService;
+    private $abscenceService;
+    private $autorisationSortieService;
+    private $congerService;
 
 
     /**
@@ -79,8 +79,9 @@ class DbfController extends AbstractController
         FlashBagInterface $flash,
         TimeService $timeService,
         CongerService $congerService,
-        AutorisationSortieService $autorisationSortieService,
-        DbfService $dbfService
+        DbfService $dbfService,
+        AbscenceService $abscenceService,
+        AutorisationSortieService $autorisationSortieService
     ) {
         $this->adminUrlGenerator = $adminUrlGenerator;
         $this->dateService = $dateService;
@@ -93,6 +94,7 @@ class DbfController extends AbstractController
         $this->autorisationSortieService = $autorisationSortieService;
         $this->flash = $flash;
         $this->dbfService = $dbfService;
+        $this->abscenceService = $abscenceService;
     }
 
     /**
@@ -107,12 +109,12 @@ class DbfController extends AbstractController
         ]);
     }
 
-
     /**
      * upload
      * @Route("/upload/{user}", name="dbf_upload", methods={"GET","POST"})
      *
      * @param Request $request
+     * @param DbfService $dbfService
      * @param User $user
      * @return Response
      */
@@ -123,82 +125,28 @@ class DbfController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $dbf = $form->get('upload')->getData();
             if ($dbf) {
-                $entityManager = $this->getDoctrine()->getManager();
                 $dateDbfInDb = $dbfService->dateDbfInDb($user);
-                $dbfs = new TableReader($dbf);
-                $datePointageInDB = $this->pointageGeneratorService->dateInDB($user);
+                $datePointageInDB = $this->pointageService->dateInDB($user);
                 $inDb = array_merge($dateDbfInDb, $datePointageInDB);
-                //$inDB = $this->pointageGeneratorService->dateInDB($user);
+                $jourFerier = $this->jourFerierService->jourFerier();
+                $ignoredDay = array_merge($inDb, $jourFerier);
+                $manager = $this->getDoctrine()->getManager();
+                $dbfs = new TableReader($dbf);
                 while ($record = $dbfs->nextRecord()) {
-                    //$dateDbf = $this->dateService->dateToStringY_m_d($record->attdate);
                     $dateDbf = $this->dateService->dateString_d_m_Y_ToDateTime($record->attdate);
-                    $isJourFerier = $this->jourFerierService->isJourFerier($dateDbf->format("Y-m-d"));
-                    if (!$isJourFerier and !in_array($dateDbf->format('Y-m-d'), $inDb)) {
-
-                        $dbf = $dbfService->construct($record->userid, $record->badgenumbe, $record->ssn, $record->username, $record->autosch, $record->attdate, $record->schid, $record->clockintim, $record->clockoutti, $record->starttime, $record->endtime, $record->workday, $record->realworkda, $record->late, $record->early, $record->absent, $record->overtime, $record->worktime, $record->exceptioni, $record->mustin, $record->mustout, $record->deptid, $record->sspedaynor, $record->sspedaywee, $record->sspedayhol, $record->atttime, $record->attchktime, $user);
-                        $dbf = $dbfService->createEntity($user);
-
-
-                        //if (!($dateDbf->format("w") == 0) and !($dateDbf->format("w") == 6) and !$dbf->getStarttime() and !$dbf->getEndtime()) {
-                        if (!in_array($dateDbf->format("w"), [0, 6]) and !$dbf->getStarttime() and !$dbf->getEndtime()) {
+                    if (!in_array($dateDbf->format('Y-m-d'), $ignoredDay)) {
+                        $dbfService->construct($record->userid, $record->badgenumbe, $record->ssn, $record->username, $record->autosch, $record->attdate, $record->schid, $record->clockintim, $record->clockoutti, $record->starttime, $record->endtime, $record->workday, $record->realworkda, $record->late, $record->early, $record->absent, $record->overtime, $record->worktime, $record->exceptioni, $record->mustin, $record->mustout, $record->deptid, $record->sspedaynor, $record->sspedaywee, $record->sspedayhol, $record->atttime, $record->attchktime, $user);
+                        $dbf = $dbfService->createEntity();
+                        if (!$this->dateService->isWeek($dateDbf) or ($dbf->getStarttime() or $dbf->getEndtime())) {
                             $user->addDbf($dbf);
-                            $entityManager->persist($user);
+                            $manager->persist($user);
                         }
                     }
                 }
-                $entityManager->flush();
-
+                $manager->flush();
                 foreach ($user->getDbfs() as $dbf) {
-                    $abscence = current(array_filter(array_map(
-                        fn ($abscence): ?Abscence => ($abscence->getDebut() <= $dbf->getAttDate() and $dbf->getAttDate() <= $abscence->getFin()) ? $abscence : null,
-                        $user->getAbscences()->toArray()
-                    )));
-                    $conger = current(array_filter(array_map(
-                        fn ($conger): ?Conger => ($conger->getDebut() <= $dbf->getAttDate() and $dbf->getAttDate() <= $conger->getFin()) ? $conger : null,
-                        $user->getCongers()->toArray()
-                    )));
-                    $autorisationSortie = current(array_filter(array_map(
-                        fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $dbf->getAttDate() and $dbf->getAttDate() <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
-                        $user->getAutorisationSorties()->toArray()
-                    )));
-                    $pointage = new Pointage();
-                    $pointage->setDate($dbf->getAttDate());
-                    $pointage->setHoraire($this->horaireService->getHoraireForDate($pointage->getDate()));
-                    if (!$dbf->getStarttime() and !$dbf->getEndtime() and !$conger and !$abscence) {
-                        $abscence = new Abscence();
-                        $abscence->setDebut($dbf->getAttDate());
-                        $abscence->setFin($dbf->getAttDate());
-                        $pointage->setAbscence($abscence);
-                        $this->pointageService->setPointage($pointage);
-                        $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());
-                        $pointage->setTotaleRetard($this->pointageService->totalRetard());
-                        $pointage->setHeurNormalementTravailler($this->pointageService->heurNormalementTravailler());
-                        $pointage->setDiff($this->pointageService->diff());
-                        //dd($pointage);
-                        $entityManager->remove($dbf);
-                        $user->addAbscence($abscence);
-                        $user->addPointage($pointage);
-                    } else if (!$dbf->getStarttime() and !$dbf->getEndtime() and $conger and !$conger->getDemiJourner()) {
-                        $pointage->setCongerPayer($conger ? $conger : null);
-                        dd($pointage);
-                        $entityManager->remove($dbf);
-                        $user->addPointage($pointage);
-                    } else if ($dbf->getStarttime() and $dbf->getEndtime() /* and !$conger and !$autorisationSortie */) {
-                        $pointage->setCongerPayer($conger ? $conger : null);
-                        $pointage->setAutorisationSortie($autorisationSortie ? $autorisationSortie : null);
-                        $pointage->setEntrer($dbf->getStarttime());
-                        $pointage->setSortie($dbf->getEndtime());
-                        $this->pointageService->setPointage($pointage);
-                        $pointage->setNbrHeurTravailler($this->pointageService->nbrHeurTravailler());
-                        $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());
-                        $pointage->setTotaleRetard($this->pointageService->totalRetard());
-                        $pointage->setHeurNormalementTravailler($this->pointageService->heurNormalementTravailler());
-                        $pointage->setDiff($this->pointageService->diff());
-                        /*$pointage->setDepartAnticiper(null);
-                        $pointage->setRetardMidi(null);*/
-                        $entityManager->remove($dbf);
-                        $user->addPointage($pointage);
-                    }
+                    $this->pointageService->constructFromDbf($dbf);
+                    $pointage = $$this->pointageService->createEntity();
                 }
 
                 //dd($user->getPointages()->toArray());
@@ -242,7 +190,7 @@ class DbfController extends AbstractController
                     $pointage->setDiff($this->pointageService->diff());
                     $user->addPointage($pointage); */
 
-                $entityManager->flush();
+                $manager->flush();
                 $this->addFlash('success', 'id.updated_successfully');
             }
             $url = $this->adminUrlGenerator

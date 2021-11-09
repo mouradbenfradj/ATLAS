@@ -16,6 +16,16 @@ class DateService
     {
         return DateTime::createFromFormat('d/m/Y', $dateString);
     }
+    /**
+     * isWeek
+     *
+     * @param DateTime $date
+     * @return boolean
+     */
+    public function isWeek(DateTime $date): bool
+    {
+        return in_array($date->format("w"), [0, 6]);
+    }
 
 
 

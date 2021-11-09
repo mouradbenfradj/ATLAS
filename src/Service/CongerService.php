@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Conger;
 use App\Entity\User;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CongerService
@@ -30,6 +31,27 @@ class CongerService
     {
         $this->em = $em;
     }
+    /**
+     * getConger
+     *
+     * @param User $user
+     * @param DateTime $date
+     * @return Conger|null
+     */
+    public function getConger(User $user, DateTime $date): ?Conger
+    {
+        $conger = current(array_filter(array_map(
+            fn ($conger): ?Conger => ($conger->getDebut() <= $date and $date <= $conger->getFin()) ? $conger : null,
+            $user->getCongers()->toArray()
+        )));
+        if ($conger)
+            return $conger;
+        return null;
+    }
+
+
+
+
     /**
      * getIfConger
      *
