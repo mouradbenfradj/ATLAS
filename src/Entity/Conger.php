@@ -28,7 +28,7 @@ class Conger
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="congers")
+     * @ORM\ManyToOne(targetEntity=User::class, fetch="EAGER", inversedBy="congers")
      */
     private $employer;
 

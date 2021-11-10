@@ -11,37 +11,53 @@ use App\Entity\Pointage;
 use App\Service\ConfigService;
 use App\Service\PointageService;
 use App\Repository\DbfRepository;
+use App\Service\AbscenceService;
+use App\Service\CongerService;
 use App\Service\HoraireService;
+use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityDeletedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityUpdatedEvent;
+use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityDeletedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityUpdatedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class EasyAdminSubscriber implements EventSubscriberInterface
 {
+    private $manager;
     private $passwordHasher;
     private $pointageService;
     private $configService;
     private $horaireService;
+    private $abscenceService;
+    private $congerService;
 
     /**
      * __construct
-     *
      * @param UserPasswordHasherInterface $passwordHasher
      * @param ConfigService $configService
      * @param PointageService $pointageService
+     * @param HoraireService $horaireService
+     * @param AbscenceService $abscenceService
+     * @param CongerService $congerService
      */
     public function __construct(
         UserPasswordHasherInterface $passwordHasher,
         ConfigService $configService,
         PointageService $pointageService,
-        HoraireService $horaireService
+        HoraireService $horaireService,
+        AbscenceService $abscenceService,
+        CongerService $congerService,
+        EntityManagerInterface $manager
     ) {
         $this->passwordHasher = $passwordHasher;
         $this->pointageService = $pointageService;
         $this->configService = $configService;
         $this->horaireService = $horaireService;
+        $this->abscenceService = $abscenceService;
+        $this->congerService = $congerService;
+        $this->manager = $manager;
     }
 
     /**
@@ -55,7 +71,27 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             BeforeEntityPersistedEvent::class => ['hashPassword'],
             BeforeEntityUpdatedEvent::class => ['totaleRetard',],
             AfterEntityUpdatedEvent::class => ['dbfUpdated'],
+            BeforeEntityDeletedEvent::class => ['abscenceDeleter'],
         ];
+    }
+
+    public function abscenceDeleter(BeforeEntityDeletedEvent $event)
+    {
+        $abscence = $event->getEntityInstance();
+        if (!($abscence instanceof Abscence)) {
+            return;
+        }
+        $this->congerService->constructFromAbscence($abscence);
+        $this->manager->persist($this->congerService->createEntity());
+        $this->manager->flush();
+        /*  if ($abscence->getStarttime() and $abscence->getEndtime() /* and !$conger and !$autorisationSortie ) {
+            $this->pointageService->constructFromDbf($abscence);
+            $this->pointageService->dbfUpdated($abscence);
+        } */
+        return;
+        /* 
+        $slug = $this->slugger->slugify($entity->getTitle());
+        $entity->setSlug($slug); */
     }
     public function dbfUpdated(AfterEntityUpdatedEvent $event)
     {
@@ -64,6 +100,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             return;
         }
         if ($dbf->getStarttime() and $dbf->getEndtime() /* and !$conger and !$autorisationSortie */) {
+            $this->pointageService->constructFromDbf($dbf);
             $this->pointageService->dbfUpdated($dbf);
         }
         return;

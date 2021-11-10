@@ -95,7 +95,7 @@ class Pointage
     private $workTime;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Abscence::class, inversedBy="pointages",cascade={"persist"},  fetch="EAGER"))
+     * @ORM\ManyToOne(targetEntity=Abscence::class, inversedBy="pointages",cascade={"persist"}))
      */
     private $abscence;
 

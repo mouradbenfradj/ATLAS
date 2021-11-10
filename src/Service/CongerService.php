@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Abscence;
 use App\Entity\Conger;
 use App\Entity\User;
 use DateTime;
@@ -9,18 +10,31 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class CongerService
 {
-    /**
-     * em
-     *
-     * @var EntityManagerInterface
-     */
-    private $em;
+
     /**
      * employer
      *
      * @var User
      */
     private $employer;
+    private $debut;
+    private $fin;
+    private $pointages;
+    private $type;
+    private $valider;
+    private $refuser;
+    private $demiJourner;
+
+
+
+
+
+    /**
+     * em
+     *
+     * @var EntityManagerInterface
+     */
+    private $em;
 
     /**
      * __construct
@@ -30,6 +44,32 @@ class CongerService
     public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
+    }
+
+    public function constructFromAbscence(Abscence $abscence): void
+    {
+        $this->employer = $abscence->getEmployer();
+        $this->debut = $abscence->getDebut();
+        $this->fin = $abscence->getFin();
+        $this->pointages = $abscence->getPointages()->toArray();
+        $this->type = "CP";
+        $this->valider = true;
+        $this->refuser = false;
+        $this->demiJourner = false;
+    }
+    public function createEntity(): Conger
+    {
+        $conger = new Conger();
+        $conger->setEmployer($this->employer);
+        $conger->setDebut($this->debut);
+        $conger->setFin($this->fin);
+        foreach ($this->pointages as $pointage)
+            $conger->addPointage($pointage);
+        $conger->setType($this->type);
+        $conger->setValider($this->valider);
+        $conger->setRefuser($this->refuser);
+        $conger->setDemiJourner($this->demiJourner);
+        return $conger;
     }
     /**
      * getConger

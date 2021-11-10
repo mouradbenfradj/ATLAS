@@ -345,6 +345,7 @@ class PointageService
             $abscence = new Abscence();
             $abscence->setDebut($this->date);
             $abscence->setFin($this->date);
+            $this->employer->addAbscence($abscence);
             /*  $this->pointage->setAbscence($abscence);
             $this->pointage->setRetardEnMinute($this->retardEnMinute);
             $this->pointage->setTotaleRetard($this->totalRetard());
@@ -353,7 +354,6 @@ class PointageService
             //dd($this->pointage);
             //$this->manager->remove($dbf);
             return $abscence;
-            //$this->employer->addAbscence($abscence);
         } else
             return $abscence;
     }
@@ -450,7 +450,8 @@ class PointageService
         $thisWeek = 0;
         $countWeek = 1;
         $collectSemaine = [];
-        foreach ($this->pointages as $this->pointage) {
+        foreach ($pointages as $this->pointage) {
+            $this->constructFromPointage($this->pointage);
             if ($thisWeek != $this->date->format('W')) {
                 if ($thisWeek) {
                     array_push($collectSemaine, $bilan);
@@ -471,7 +472,8 @@ class PointageService
         $thisYear = 0;
         $thisMonth = 0;
         $collectMensuel = [];
-        foreach ($this->pointages as $this->pointage) {
+        foreach ($pointages as $this->pointage) {
+            $this->constructFromPointage($this->pointage);
             if ($thisYear . '-' . $thisMonth != $this->date->format('Y-m')) {
                 if ($thisYear and $thisMonth)
                     array_push($collectMensuel, $bilan);
@@ -490,7 +492,8 @@ class PointageService
         $bilan = $this->initBilan;
         $thisYear = 0;
         $collectAnnuel = [];
-        foreach ($this->pointages as $this->pointage) {
+        foreach ($pointages as $this->pointage) {
+            $this->constructFromPointage($this->pointage);
             if ($thisYear != $this->date->format('Y')) {
                 if ($thisYear)
                     array_push($collectAnnuel, $bilan);
@@ -516,6 +519,10 @@ class PointageService
         usort($this->pointages, fn ($a, $b) => $a->getDate() > $b->getDate());
         $collectGeneral = [];
         $bilanWeek = $this->initBilan;
+        $bilanMonth = $this->initBilan;
+        $bilanYear = $this->initBilan;
+        $thisMonth = 0;
+        $thisYear = 0;
         $countWeek = 1;
         $nextWeek = new DateTime("0000-00-00");
         foreach ($this->pointages as $index => $this->pointage) {
@@ -531,8 +538,26 @@ class PointageService
                 $bilanWeek = $this->initBilan;
                 $countWeek++;
             }
-            $bilanWeek = $this->calculateurBilan($this->pointage, $bilanWeek);
+            if ($thisYear . '-' . $thisMonth != $this->pointageDate->format('Y-m') and $index) {
+                $bilanMonth["date"] =   $thisYear . '-' . $thisMonth;
+                $bilanMonth["background"] = "DodgerBlue";
+                $bilanMonth["colspan"] = 4;
+                if ($thisYear and  $thisMonth)
+                    array_push($collectGeneral,  $bilanMonth);
+                $bilanMonth = $this->initBilan;
+            }
+            if ($thisYear != $this->pointageDate->format('Y') and $index) {
+                $bilanYear["date"] =     $thisYear;
+                $bilanYear["background"] = "MediumSeaGreen";
+                $bilanMonth["colspan"] = 4;
+                if ($thisYear)
+                    array_push($collectGeneral, $bilanYear);
+                $bilanYear = $this->initBilan;
+            }
 
+            $bilanWeek = $this->calculateurBilan($this->pointage, $bilanWeek);
+            $bilanMonth = $this->calculateurBilan($this->pointage, $bilanMonth);
+            $bilanYear = $this->calculateurBilan($this->pointage, $bilanYear);
             //if (!($this->pointageDate->format("W") == 0) and  !($this->pointageDate->format("W") == 6))
             array_push($collectGeneral, [
                 "colspan" => 1,
@@ -551,8 +576,11 @@ class PointageService
                 "heurNormalementTravailler" => $this->heurNormalementTravailler() ? $this->heurNormalementTravailler()->format('H:i:s') : "",
                 "diff" => $this->diff ? $this->diff->format('H:i:s') : "",
             ]);
+            $thisMonth =  $this->date->format('m');
+            $thisYear =  $this->date->format('Y');
             $nextWeek = $this->date->setISODate($this->date->format('o'), $this->date->format('W') + 1);
         }
+
         /*
         $bilanMonth = $this->initBilan;
         $bilanYear = $this->initBilan;

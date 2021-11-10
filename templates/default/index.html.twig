@@ -25,7 +25,9 @@
 	{{ hours }}{{ minutes}}{{ seconds }}
 
 {% endmacro %}
-{% block titleheader %} Bilan General {% endblock %}
+{% block titleheader %}
+	Bilan General
+{% endblock %}
 {% block body_title %}bilan General
 {% endblock %}
 {% block body %}
@@ -51,71 +53,85 @@
 		<tbody>
 			{% for pointage in bilan %}
 				{% if pointage.background is defined  %}
-					<tr  style="background-color:{{ pointage.background }}">
+					<tr style="background-color:{{ pointage.background }}">
+					{% else %}
+						<tr>
+						{% endif %}
+						<td colspan="{{pointage.colspan }}">{{ pointage.date }}</td>
+						{% if pointage.colspan == 1 %}
+							<td>{{ pointage.horaire }}</td>
+							<td>{{ pointage.entrer }}</td>
+							<td>{{ pointage.sortie }}</td>
+						{% endif %}
+						<td>
+							{% if pointage.colspan == 1 %}
+								{{ pointage.nbrHeurTravailler }}
+							{% else %}
+								{{ _self.secondsToMinutes(pointage.nbrHeurTravailler)  }}
+							{% endif %}
+						</td>
+						<td>
+							{% if pointage.colspan == 1 %}
+								{{ pointage.retardEnMinute }}
+							{% else %}
+								{{ _self.secondsToMinutes(pointage.retardEnMinute)  }}
+							{% endif %}
+						</td>
+						<td>
+							{% if pointage.colspan == 1 %}
+								{{ pointage.departAnticiper }}
+							{% else %}
+								{{ _self.secondsToMinutes(pointage.departAnticiper) }}
+							{% endif %}
+						</td>
+						<td>
+							{% if pointage.colspan == 1 %}
+								{{ pointage.retardMidi }}
+							{% else %}
+								{{ _self.secondsToMinutes( pointage.retardMidi)  }}
+							{% endif %}
+						</td>
+						<td>
+							{% if pointage.colspan == 1 %}
+								{{ pointage.totalRetard }}
+							{% else %}
+								{{ _self.secondsToMinutes(pointage.totalRetard)  }}
+							{% endif %}
+						</td>
+						<td>
+							{% if pointage.colspan == 1 %}
+								{{ pointage.autorisationSortie }}
+							{% else %}
+								{{ _self.secondsToMinutes(pointage.autorisationSortie)  }}
+							{% endif %}
+						</td>
+						<td>{{ pointage.congerPayer }}</td>
+						<td>{{ pointage.abscence }}</td>
+						<td>
+							{% if pointage.colspan == 1 %}
+								{{ pointage.heurNormalementTravailler }}
+							{% else %}
+								{{ _self.secondsToMinutes(pointage.heurNormalementTravailler) }}
+							{% endif %}
+						</td>
+						<td>
+							{% if pointage.colspan == 1 %}
+								{{ pointage.diff }}
+							{% else %}
+								{{ _self.secondsToMinutes(pointage.diff)}}
+							{% endif %}<td/>
+						</td>
+					</tr>
 				{% else %}
-					<tr >
-				{% endif %}
-					<td colspan="{{pointage.colspan }}">{{ pointage.date }}</td>
- 					{% if pointage.colspan == 1 %}
-						<td>{{ pointage.horaire }}</td>
-						<td>{{ pointage.entrer }}</td>
-						<td>{{ pointage.sortie }}</td>	
-					{% endif %}
-					{% if pointage.colspan == 1 %}
-						<td>{{ pointage.nbrHeurTravailler }}</td>
-					{% else %}
-						<td>{{ _self.secondsToMinutes(pointage.nbrHeurTravailler)  }}</td>
-					{% endif %}
-					{% if pointage.colspan == 1 %}
-						<td>{{ pointage.retardEnMinute }}</td>
-					{% else %}
-						<td>{{ _self.secondsToMinutes(pointage.retardEnMinute)  }}</td>
-					{% endif %}
-					{% if pointage.colspan == 1 %}
-						<td>{{ pointage.departAnticiper }}</td>
-					{% else %}
-						<td>{{ _self.secondsToMinutes(pointage.departAnticiper) }}</td>
-					{% endif %}
-					{% if pointage.colspan == 1 %}
-						<td>{{ pointage.retardMidi }}</td>
-					{% else %}
-						<td>{{ _self.secondsToMinutes( pointage.retardMidi)  }}</td>
-					{% endif %}
-					{% if pointage.colspan == 1 %}
-						<td>{{ pointage.totaleRetard }}</td>
-					{% else %}
-						<td>{{ _self.secondsToMinutes(pointage.totaleRetard)  }}</td>
-					{% endif %}
-
-					{% if pointage.colspan == 1 %}
-						<td>{{ pointage.autorisationSortie }}</td>
-					{% else %}
-						<td>{{ _self.secondsToMinutes(pointage.autorisationSortie)  }}</td>
-					{% endif %}
-					<td>{{ pointage.congerPayer }}</td>
-					<td>{{ pointage.abscence }}</td>
-					
-					{% if pointage.colspan == 1 %}
-						<td>{{ pointage.heurNormalementTravailler }}</td>
-					{% else %}
-						<td>{{ _self.secondsToMinutes(pointage.heurNormalementTravailler) }}</td>
-					{% endif %}
-					
-					{% if pointage.colspan == 1 %}
-						<td>{{ pointage.diff }}</td>
-					{% else %}
-						<td>{{ _self.secondsToMinutes(pointage.diff)}}</td>
-					{% endif %}
-				</tr>
-			{% else %}
-				<tr>
-					<td colspan="15">no records found</td>
-				</tr>
-			{% endfor %}
+					<tr>
+						<td colspan="15">no records found</td>
+					</tr>
+				{% endfor %}
+			</tbody>
 		</tbody>
 		<tfoot>
 			<tr>
-				
+
 				<th>Date</th>
 				<th>Horaire</th>
 				<th>Entrer</th>
