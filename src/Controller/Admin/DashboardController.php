@@ -45,6 +45,7 @@ class DashboardController extends AbstractDashboardController
         else
             $user = $this->getUser();
         //usort($user->getPointages(), fn ($a, $b) => $a['date'] > $b['date'])
+
         $collectGeneral = $this->pointageService->getBilanGeneral($user->getPointages());
         return $this->render('admin/dashboard.html.twig', [
             'users' => $this->getDoctrine()->getRepository(User::class)->findAll(),

@@ -14,8 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\Admin\PointageCrudController;
-use App\Entity\Abscence;
-use App\Entity\AutorisationSortie;
+use App\Repository\DbfRepository;
 use App\Service\AbscenceService;
 use App\Service\AutorisationSortieService;
 use App\Service\CongerService;
@@ -46,12 +45,7 @@ class DbfController extends AbstractController
      */
     private $dateService;
     private $jourFerierService;
-    private $pointageGeneratorService;
-    private $horaireService;
     private $pointageService;
-    private $abscenceService;
-    private $autorisationSortieService;
-    private $congerService;
 
 
     /**
@@ -118,7 +112,7 @@ class DbfController extends AbstractController
      * @param User $user
      * @return Response
      */
-    public function upload(Request $request, DbfService $dbfService, User $user): Response
+    public function upload(Request $request, DbfRepository $dbfRepository, DbfService $dbfService, User $user): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
@@ -146,7 +140,15 @@ class DbfController extends AbstractController
                 $manager->flush();
                 foreach ($user->getDbfs() as $dbf) {
                     $this->pointageService->constructFromDbf($dbf);
-                    $pointage = $$this->pointageService->createEntity();
+                    $pointage = $this->pointageService->createEntity();
+                    if ($pointage) {
+                        $manager->remove($dbf);
+                        $user->addPointage($pointage);
+                        $manager->persist($user);
+
+                        $manager->flush();
+                    } else
+                        dd($pointage);
                 }
 
                 //dd($user->getPointages()->toArray());

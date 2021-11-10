@@ -23,7 +23,8 @@ class AutorisationSortieCrudController extends AbstractCrudController
             IdField::new('id')->onlyOnIndex(),
             AssociationField::new('employer'),
             DateField::new('dateAutorisation'),
-            TimeField::new('time'),
+            TimeField::new('de'),
+            TimeField::new('a'),
         ];
     }
 }

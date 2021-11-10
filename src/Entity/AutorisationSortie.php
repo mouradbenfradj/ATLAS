@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\AutorisationSortieRepository;
+use App\Service\TimeService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -12,10 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class AutorisationSortie
 {
-    public function __toString()
-    {
-        return $this->time->format("H:i:s");
-    }
+
 
     /**
      * @ORM\Id
@@ -35,11 +33,6 @@ class AutorisationSortie
     private $dateAutorisation;
 
     /**
-     * @ORM\Column(type="time")
-     */
-    private $time;
-
-    /**
      * @ORM\OneToMany(targetEntity=Pointage::class, mappedBy="autorisationSortie")
      */
     private $pointages;
@@ -53,6 +46,17 @@ class AutorisationSortie
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $refuser;
+
+    /**
+     * @ORM\Column(type="time")
+     */
+    private $de;
+
+    /**
+     * @ORM\Column(type="time")
+     */
+    private $a;
+
 
     public function __construct()
     {
@@ -84,18 +88,6 @@ class AutorisationSortie
     public function setDateAutorisation(\DateTimeInterface $dateAutorisation): self
     {
         $this->dateAutorisation = $dateAutorisation;
-
-        return $this;
-    }
-
-    public function getTime(): ?\DateTimeInterface
-    {
-        return $this->time;
-    }
-
-    public function setTime(\DateTimeInterface $time): self
-    {
-        $this->time = $time;
 
         return $this;
     }
@@ -150,6 +142,30 @@ class AutorisationSortie
     public function setRefuser(?bool $refuser): self
     {
         $this->refuser = $refuser;
+
+        return $this;
+    }
+
+    public function getDe(): ?\DateTimeInterface
+    {
+        return $this->de;
+    }
+
+    public function setDe(\DateTimeInterface $de): self
+    {
+        $this->de = $de;
+
+        return $this;
+    }
+
+    public function getA(): ?\DateTimeInterface
+    {
+        return $this->a;
+    }
+
+    public function setA(\DateTimeInterface $a): self
+    {
+        $this->a = $a;
 
         return $this;
     }

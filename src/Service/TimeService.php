@@ -85,9 +85,12 @@ class TimeService
      * 
      * @return DateInterval
      */
-    public function diffTime(DateTime $timeMax, DateTime $timeMix): DateInterval
+    public function diffTime(DateTime $timeMax, DateTime $timeMin): DateInterval
     {
-        $diff =  date_diff($timeMax, $timeMix);
+        $timeMax = new DateTime(date('H:i:s', strtotime($timeMax->format("H:i:s"))));
+        $timeMin = new DateTime(date('H:i:s', strtotime($timeMin->format("H:i:s"))));
+
+        $diff =  date_diff($timeMax, $timeMin);
         return new DateInterval('PT' . $diff->h . 'H' . $diff->i . 'M' . $diff->s . 'S');
     }
 
