@@ -88,6 +88,11 @@ class Horaire
      */
     private $workTimes;
 
+    /**
+     * @ORM\Column(type="time")
+     */
+    private $margeDuRetard;
+
     public function __construct()
     {
         $this->pointages = new ArrayCollection();
@@ -288,6 +293,18 @@ class Horaire
                 $workTime->setHoraire(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getMargeDuRetard(): ?\DateTimeInterface
+    {
+        return $this->margeDuRetard;
+    }
+
+    public function setMargeDuRetard(\DateTimeInterface $margeDuRetard): self
+    {
+        $this->margeDuRetard = $margeDuRetard;
 
         return $this;
     }

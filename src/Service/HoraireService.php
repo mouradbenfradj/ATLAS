@@ -55,6 +55,25 @@ class HoraireService
     private $security;
 
     /**
+     * HeursJournerDeTravaille
+     *
+     * @var DateTime
+     */
+    private $HeursJournerDeTravaille;
+    /**
+     * HeursDemiJournerDeTravaille
+     *
+     * @var DateTime
+     */
+    private $HeursDemiJournerDeTravaille;
+    /**
+     * HeursQuardJournerDeTravaille
+     *
+     * @var DateTime
+     */
+    private $HeursQuardJournerDeTravaille;
+
+    /**
      * __construct
      *
      * @param EntityManagerInterface $em
@@ -128,7 +147,17 @@ class HoraireService
                 }
             } while ($workTime = next($this->workTime) and !$trouve);
         }
-        return   $this->horaire;
+        if ($this->horaire) {
+            $this->HeursJournerDeTravaille = new DateTime($this->horaire->getHeurFinTravaille()->format("H:i:s"));
+            $heurDebutTravaille = $this->horaire->getHeurDebutTravaille();
+            $e = $this->sumPause();
+            $this->HeursJournerDeTravaille->sub($this->timeService->dateTimeToDateInterval($e));
+            $this->HeursJournerDeTravaille = $this->timeService->diffTime($this->HeursJournerDeTravaille, $heurDebutTravaille);
+            $this->HeursJournerDeTravaille = $this->timeService->dateIntervalToDateTime($this->HeursJournerDeTravaille);
+            $this->HeursDemiJournerDeTravaille = new DateTime(intdiv($this->HeursJournerDeTravaille->format('H'), 2) . ':' . intdiv($this->HeursJournerDeTravaille->format('i'), 2) . ':' . intdiv($this->HeursJournerDeTravaille->format('s'), 2));
+            $this->HeursQuardJournerDeTravaille = new DateTime(intdiv($this->HeursJournerDeTravaille->format('H'), 4) . ':' . intdiv($this->HeursJournerDeTravaille->format('i'), 4) . ':' . intdiv($this->HeursJournerDeTravaille->format('s'), 4));
+        }
+        return $this->horaire;
     }
 
 
@@ -195,5 +224,35 @@ class HoraireService
         $this->horaire = $horaire;
 
         return $this;
+    }
+
+    /**
+     * Get heursJournerDeTravaille
+     *
+     * @return  DateTime
+     */
+    public function getHeursJournerDeTravaille()
+    {
+        return $this->HeursJournerDeTravaille;
+    }
+
+    /**
+     * Get heursDemiJournerDeTravaille
+     *
+     * @return  DateTime
+     */
+    public function getHeursDemiJournerDeTravaille()
+    {
+        return $this->HeursDemiJournerDeTravaille;
+    }
+
+    /**
+     * Get heursQuardJournerDeTravaille
+     *
+     * @return  DateTime
+     */
+    public function getHeursQuardJournerDeTravaille()
+    {
+        return $this->HeursQuardJournerDeTravaille;
     }
 }
