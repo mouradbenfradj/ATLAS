@@ -114,19 +114,26 @@
 								{{ _self.secondsToMinutes(pointage.heurNormalementTravailler) }}
 							{% endif %}
 						</td>
-						<td>
-							{% if pointage.colspan == 1 %}
-								{{ pointage.diff }}
+
+						{% if pointage.nbrHeurTravailler <= pointage.heurNormalementTravailler  %}
+							<td bgcolor="red">
 							{% else %}
-								{{ _self.secondsToMinutes(pointage.diff)}}
-							{% endif %}<td/>
-						</td>
-					</tr>
-				{% else %}
-					<tr>
-						<td colspan="15">no records found</td>
-					</tr>
-				{% endfor %}
+								<td bgcolor="green">
+								{% endif %}
+
+								{% if pointage.colspan == 1 %}
+									{{ pointage.diff }}
+								{% else %}
+									{{ _self.secondsToMinutes(pointage.diff)}}
+								{% endif %}<td/>
+							</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="15">no records found</td>
+						</tr>
+					{% endfor %}
+				</tbody>
 			</tbody>
 		</tbody>
 		<tfoot>

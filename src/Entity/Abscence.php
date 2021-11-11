@@ -39,7 +39,7 @@ class Abscence
     private $fin;
 
     /**
-     * @ORM\OneToMany(targetEntity=Pointage::class,cascade={"remove"}, mappedBy="abscence")
+     * @ORM\OneToMany(targetEntity=Pointage::class, mappedBy="abscence")
      */
     private $pointages;
 

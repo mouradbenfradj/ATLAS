@@ -81,7 +81,13 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         if (!($abscence instanceof Abscence)) {
             return;
         }
+        $pointage = current(array_filter(array_map(
+            fn ($pointage): ?Pointage => ($abscence->getDebut() <= $pointage->getDate() and $pointage->getDate() <= $abscence->getFin()) ? $pointage : null,
+            $abscence->getPointages()->toArray()
+        )));
+        $pointage->setAbscence(null);
         $this->congerService->constructFromAbscence($abscence);
+        //$this->manager->persist($pointage);
         $this->manager->persist($this->congerService->createEntity());
         $this->manager->flush();
         /*  if ($abscence->getStarttime() and $abscence->getEndtime() /* and !$conger and !$autorisationSortie ) {
