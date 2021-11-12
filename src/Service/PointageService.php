@@ -247,7 +247,17 @@ class PointageService
         $this->entrer = $dbf->getStarttime();
         $this->sortie = $dbf->getEndtime();
         $this->nbrHeurTravailler = $this->nbrHeurTravailler(); // $dbf->getWorktime();
+        if ($dbf->getAtttime()) {
+            $entrer =  $this->entrer;
+            $sortie = $this->sortie;
+            $time = new DateTime($sortie->format("H:i:s"));
+            $time->sub($this->timeService->dateTimeToDateInterval($this->horaireService->sumPause()));
+            $time = $this->timeService->diffTime($time,  $entrer);
+            dump($dbf);
+            dd($this->timeService->dateIntervalToDateTime($time));
+        }
         $this->retardEnMinute = $this->retardEnMinute(); //$dbf->getLate();
+        dd($dbf);
         if ($dbf->getLate()) {
             $late = new DateTime($dbf->getLate()->format('H:i:s'));
             $late->sub($this->timeService->dateTimeToDateInterval($this->horaire->getMargeDuRetard()));
