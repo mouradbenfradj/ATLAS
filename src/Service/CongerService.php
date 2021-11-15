@@ -2,10 +2,12 @@
 
 namespace App\Service;
 
-use App\Entity\Abscence;
-use App\Entity\Conger;
-use App\Entity\User;
 use DateTime;
+use App\Entity\User;
+use App\Entity\Conger;
+use App\Entity\Abscence;
+use App\Service\AbscenceService;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CongerService
@@ -29,23 +31,68 @@ class CongerService
 
 
 
+
+    //private $em;
     /**
-     * em
+     * abscenceService
      *
-     * @var EntityManagerInterface
+     * @var AbscenceService
      */
-    private $em;
+    private $abscenceService;
 
     /**
      * __construct
      *
      * @param EntityManagerInterface $em
      */
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(AbscenceService $abscenceService)
     {
-        $this->em = $em;
+        //EntityManagerInterface $em,
+        //$this->em = $em;
+        $this->abscenceService = $abscenceService;
+    }
+    public function partielConstruct(
+        ?User $employer = null,
+        ?DateTime $debut = null,
+        ?DateTime $fin = null,
+        ?string $type = null,
+        ?bool $valider = null,
+        ?bool $refuser = null,
+        ?bool $demiJourner = null,
+        ?array $pointages = null
+    ) {
+        $this->employer = $employer;
+        $this->debut = $debut;
+        $this->fin = $fin;
+        $this->pointages = $pointages;
+        $this->type = $type;
+        $this->valider = $valider;
+        $this->refuser = $refuser;
+        $this->demiJourner = $demiJourner;
     }
 
+    public function ConstructEntity(): Conger
+    {
+        $conger = new Conger();
+        $conger->setDebut($this->debut);
+        $conger->setFin($this->fin);
+        $conger->setType($this->type);
+        $conger->setValider($this->valider);
+        $conger->setRefuser($this->refuser);
+        $conger->setDemiJourner($this->demiJourner);
+        $conger->setEmployer($this->employer);
+        return $conger;
+    }
+    public function estUnConger(DateTime $date): ?Conger
+    {
+        $conger = current(array_filter(array_map(
+            fn ($conger): ?Conger => ($conger->getDebut() <= $date and $date <= $conger->getFin()) ? $conger : null,
+            $this->employer->getCongers()->toArray()
+        )));
+        if ($conger)
+            return $conger;
+        return null;
+    }
     public function constructFromAbscence(Abscence $abscence): void
     {
         $this->employer = $abscence->getEmployer();

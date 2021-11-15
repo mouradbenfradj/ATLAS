@@ -10,12 +10,72 @@ use DateTime;
 
 class AbscenceService
 {
+
+    /**
+     * employer
+     *
+     * @var User
+     */
+    private $employer;
+
+    /**
+     * debut
+     *
+     * @var DateTime
+     */
+    private $debut;
+
+    /**
+     * fin
+     *
+     * @var DateTime
+     */
+    private $fin;
+
+    /**
+     * pointages
+     *
+     * @var array
+     */
+    private $pointages;
+
+
+
+
+
+
+    /**
+     * abscenceDays
+     *
+     * @var array
+     */
     private $abscenceDays;
+
     public function __construct()
     {
         $this->abscenceDays = [];
     }
 
+
+    public function partielConstruct(
+        ?User $employer = null,
+        ?DateTime $debut = null,
+        ?DateTime $fin = null,
+        array $pointages = []
+    ) {
+        $this->employer = $employer;
+        $this->debut = $debut;
+        $this->fin = $fin;
+        $this->pointages = $pointages;
+    }
+    public function ConstructEntity(): Abscence
+    {
+        $abscence = new Abscence();
+        $abscence->setDebut($this->debut);
+        $abscence->setFin($this->fin);
+        $abscence->setEmployer($this->employer);
+        return $abscence;
+    }
     /**
      * abscenceEmployer
      *
@@ -39,11 +99,11 @@ class AbscenceService
      * @param DateTime $date
      * @return Abscence|null
      */
-    public function getAbscence(User $user, DateTime $date): ?Abscence
+    public function estAbscent(DateTime $date): ?Abscence
     {
         $abscence =  current(array_filter(array_map(
             fn ($abscence): ?Abscence => ($abscence->getDebut() <= $date and $date <= $abscence->getFin()) ? $abscence : null,
-            $user->getAbscences()->toArray()
+            $this->employer->getAbscences()->toArray()
         )));
         if ($abscence)
             return  $abscence;

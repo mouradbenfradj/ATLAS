@@ -231,9 +231,13 @@ class PointageService
             "diff" => 0,
         ];
     }
-
-
-    public function constructFromDbf(Dbf $dbf)
+    /**
+     * constructFromDbf
+     *
+     * @param Dbf $dbf
+     * @return void
+     */
+    public function constructFromDbf(Dbf $dbf): void
     {
         /*
         $abscence =  $this->abscenceService->getAbscence($this->employer, $this->date);
@@ -242,72 +246,102 @@ class PointageService
         $this->date = $dbf->getAttdate();
         $this->employer = $dbf->getEmployer();
         $this->horaire = $this->horaireService->getHoraireForDate($this->date);
-        $this->congerPayer = $this->estUnConger();
-        $this->abscence = $this->estAbscent();
+
         $this->entrer = $dbf->getStarttime();
         $this->sortie = $dbf->getEndtime();
-        $this->nbrHeurTravailler = $this->nbrHeurTravailler(); // $dbf->getWorktime();
-        if ($dbf->getAtttime()) {
-            $entrer =  $this->entrer;
-            $sortie = $this->sortie;
-            $time = new DateTime($sortie->format("H:i:s"));
-            $time->sub($this->timeService->dateTimeToDateInterval($this->horaireService->sumPause()));
-            $time = $this->timeService->diffTime($time,  $entrer);
-            dump($dbf);
-            dd($this->timeService->dateIntervalToDateTime($time));
-        }
-        $this->retardEnMinute = $this->retardEnMinute(); //$dbf->getLate();
-        dd($dbf);
-        if ($dbf->getLate()) {
-            $late = new DateTime($dbf->getLate()->format('H:i:s'));
-            $late->sub($this->timeService->dateTimeToDateInterval($this->horaire->getMargeDuRetard()));
 
-            if ($this->retardEnMinute()->format('H:i:s') != $late->format('H:i:s')) {
-                dump($dbf);
-                dump($this->retardEnMinute());
-                dump($late);
-                $debutHeurDeTravaille = new DateTime($this->horaire->getHeurDebutTravaille()->format("H:i:s"));
-                dump($debutHeurDeTravaille);
-                if (!$this->congerPayer and $this->autorisationSortie)
-                    dd($this->autorisationSortie);
+        $this->congerService->partielConstruct($this->employer);
+        $this->congerPayer = $this->congerService->estUnConger($this->date);
 
-                if ($this->entrer)
-                    $entrer = $this->entrer;
-                else
-                    $entrer = $debutHeurDeTravaille;
+        $this->abscenceService->partielConstruct($this->employer);
+        $this->abscence = $this->abscenceService->estAbscent($this->date);
+        if ($this->entrer or $this->sortie) {
+            switch (count($dbf->getAttchktime())) {
+                case 1:
+                    $atttime = new DateTime($dbf->getAttchktime()[0]);
+                    if (
+                        !$this->congerPayer
+                        and (
+                            ($this->timeService->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s')) <= $atttime and $atttime <= $this->timeService->generateTime($this->horaire->getFinPauseDejeuner()->format('H:i:s')))
+                            or ($this->timeService->generateTime($this->horaire->getDebutPauseDejeuner()->format('H:i:s')) <= $atttime and $atttime <= $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format('H:i:s'))))
+                        and $this->horaire->getFinPauseDejeuner() <= $this->horaire->getHeurFinTravaille()
+                    ) {
+                        $this->congerService->partielConstruct($this->employer, $this->date, $this->date, "CP", true, false, true);
+                        $this->congerPayer = $this->congerService->ConstructEntity();
+                        $this->employer->addConger($this->congerPayer);
+                        $this->heurNormalementTravailler = $this->horaireService->getHeursDemiJournerDeTravaille();
+                    }
 
-                if ($this->congerPayer and $this->congerPayer->getDemiJourner()) {
-                    dump('CP');
-                    dump($entrer);
-                    dd($debutHeurDeTravaille);
+                    break;
+                case 2:
+                    $atttime = new DateTime($dbf->getAttchktime()[0]);
+                    $atttims = new DateTime($dbf->getAttchktime()[1]);
+                    if (
+                        !$this->congerPayer
+                        and (
+                            ($this->timeService->generateTime(
+                                $this->horaire->getHeurDebutTravaille()->format('H:i:s')
+                            ) <= $atttime
+                                and
+                                $atttime <= $this->timeService->generateTime(
+                                    $this->horaire->getFinPauseDejeuner()->format('H:i:s')
+                                ))
+                            or
+                            ($this->timeService->generateTime(
+                                $this->horaire->getDebutPauseDejeuner()->format('H:i:s')
+                            ) <= $atttime
+                                and
+                                $atttime <= $this->timeService->generateTime(
+                                    $this->horaire->getHeurFinTravaille()->format('H:i:s')
+                                )))
+                        and $this->horaire->getFinPauseDejeuner() <= $this->horaire->getHeurFinTravaille()
+                    ) {
+                        $this->congerService->partielConstruct($this->employer, $this->date, $this->date, "CP", true, false, true);
+                        $this->congerPayer = $this->congerService->ConstructEntity();
+                        $this->employer->addConger($this->congerPayer);
+                        $this->heurNormalementTravailler = $this->horaireService->getHeursDemiJournerDeTravaille();
+                    }
+                    dump($this->congerService);
+                    // $this->horaire->getFinPauseDejeuner();
+                    dd($dbf);
+                    break;
+                case 3:
+                    dd($dbf);
+                    break;
+                default:
+                    $this->heurNormalementTravailler = $this->heurNormalementTravailler();
+                    $this->retardEnMinute = $this->retardEnMinute(); //$dbf->getLate();
+                    $this->departAnticiper = $this->departAnticiper(); //$dbf->getEarly();
+                    $this->retardMidi = null;
+                    $this->workTime = null;
+                    break;
+            }
+        } else {
+            if ($this->congerPayer) {
+                dump(count($dbf->getAttchktime()));
+                dd($dbf);
+                $this->heurNormalementTravailler = $this->heurNormalementTravailler();
+                $this->autorisationSortie = $this->hasAutorisationSortie();
+            } else {
+                if (!$this->abscence) {
+                    $this->abscenceService->partielConstruct($this->employer, $this->date, $this->date);
+                    $this->abscence = $this->abscenceService->constructEntity();
                 }
-
-                $debutHeurDeTravaille->add($this->timeService->dateTimeToDateInterval($this->horaire->getMargeDuRetard()));
-                if ($debutHeurDeTravaille >= $entrer)
-                    dump($debutHeurDeTravaille);
-                else                dump($debutHeurDeTravaille);
-
-                $debutHeurDeTravaille = $this->timeService->diffTime($debutHeurDeTravaille, $entrer);
-                dd($this->timeService->dateIntervalToDateTime($debutHeurDeTravaille));
+                $this->heurNormalementTravailler = $this->heurNormalementTravailler();
+                $this->employer->addAbscence($this->abscence);
             }
         }
-        $this->departAnticiper = $this->departAnticiper(); //$dbf->getEarly();
-        $this->retardMidi = null;
+        $this->nbrHeurTravailler = $this->nbrHeurTravailler(); // $dbf->getWorktime();
         $this->totalRetard = $this->totalRetard();
-        $this->heurNormalementTravailler = $this->heurNormalementTravailler();
-        if ($dbf->getWorktime()) {
-
-            if ($this->heurNormalementTravailler()->format('H:i:s') != $dbf->getWorktime()->format('H:i:s')) {
-                dump($dbf);
-                dump($this->heurNormalementTravailler());
-                dd($dbf->getWorktime());
-            }
-        }
         $this->diff = $this->diff();
-        $this->workTime = null;
     }
-
-    public function constructFromPointage(Pointage $pointage)
+    /**
+     * constructFromPointage
+     *
+     * @param Pointage $pointage
+     * @return void
+     */
+    public function constructFromPointage(Pointage $pointage): void
     {
         /*
         $abscence =  $this->abscenceService->getAbscence($this->employer, $this->date);
@@ -331,7 +365,11 @@ class PointageService
         $this->diff = $pointage->getDiff();
         $this->workTime = $pointage->getWorkTime();
     }
-
+    /**
+     * createEntity
+     *
+     * @return Pointage
+     */
     public function createEntity(): Pointage
     {
         $this->pointage = new Pointage();
@@ -377,39 +415,11 @@ class PointageService
     }
 
 
-    public function estAbscent()
+    public function hasAutorisationSortie()
     {
-        $abscence =  $this->abscenceService->getAbscence($this->employer, $this->date);
-        $conger = $this->congerService->getConger($this->employer, $this->date);
-        if (!$this->entrer and !$this->sortie and !$conger and !$abscence) {
-            $abscence = new Abscence();
-            $abscence->setDebut($this->date);
-            $abscence->setFin($this->date);
-            $this->employer->addAbscence($abscence);
-            /*  $this->pointage->setAbscence($abscence);
-            $this->pointage->setRetardEnMinute($this->retardEnMinute);
-            $this->pointage->setTotaleRetard($this->totalRetard());
-            $this->pointage->setHeurNormalementTravailler($this->heurNormalementTravailler());
-            $this->pointage->setDiff($this->diff()); */
-            //dd($this->pointage);
-            //$this->manager->remove($dbf);
-            return $abscence;
-        } else
-            return $abscence;
+        return null;
     }
-    public function estUnConger()
-    {
-        $abscence =  $this->abscenceService->getAbscence($this->employer, $this->date);
-        $conger = $this->congerService->getConger($this->employer, $this->date);
-        if (!$this->entrer and !$this->sortie and !$abscence and $conger and !$conger->getDemiJourner()) {
-            dd($conger);
-            $this->pointage->setCongerPayer($conger ? $conger : null);
-            dd($this->pointage);
-        } else if ((!$this->entrer or !$this->sortie) and !$abscence and $conger and $conger->getDemiJourner()) {
-            dd($this->pointage);
-        } else
-            return $conger;
-    }
+
 
     public function dbfUpdated(Dbf $dbf)
     {
