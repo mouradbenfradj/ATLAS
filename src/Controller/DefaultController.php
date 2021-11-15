@@ -15,12 +15,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class DefaultController extends AbstractController
 {
     /**
+     * index
      * @Route("/", name="default")
+     *
+     * @param Security $security
+     * @param PointageService $pointageService
+     * @return Response
      */
-    public function index(PointageRepository $pointageRepository, Security $security, PointageService $pointageService): Response
+    public function index(Security $security, PointageService $pointageService): Response
     {
         return $this->render('default/index.html.twig', [
-            'bilan' => $pointageService->getBilanGeneral($security->getUser()->getPointages())
+            'bilan' => $pointageService->getBilanGeneral($security->getUser()->getPointages()->toArray())
         ]);
     }
 }

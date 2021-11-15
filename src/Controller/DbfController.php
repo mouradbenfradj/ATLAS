@@ -141,8 +141,7 @@ class DbfController extends AbstractController
                 foreach ($user->getDbfs() as $dbf) {
                     $this->pointageService->constructFromDbf($dbf);
                     $pointage = $this->pointageService->createEntity();
-                    if (($pointage->getEntrer() and $pointage->getSortie()) or $pointage->getCongerPayer() or $pointage->getAbscence()) {
-
+                    if (($pointage->getEntrer() and $pointage->getSortie()) or $pointage->getAbscence()) {
                         $user->addPointage($pointage);
                         $manager->persist($user);
                         $manager->remove($dbf);

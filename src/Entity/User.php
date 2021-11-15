@@ -89,12 +89,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $pointages;
 
     /**
-     * @ORM\OneToMany(targetEntity=Conger::class, mappedBy="employer", orphanRemoval=true, fetch="EAGER")
+     * @ORM\OneToMany(targetEntity=Conger::class, mappedBy="employer", cascade={"persist"}, orphanRemoval=true, fetch="EAGER")
      */
     private $congers;
 
     /**
-     * @ORM\OneToMany(targetEntity=AutorisationSortie::class, mappedBy="employer", orphanRemoval=true, fetch="EAGER")
+     * @ORM\OneToMany(targetEntity=AutorisationSortie::class, mappedBy="employer",cascade={"persist"}, orphanRemoval=true, fetch="EAGER")
      */
     private $autorisationSorties;
 
@@ -391,22 +391,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->autorisationSorties;
     }
 
-    public function addAutorisationSorty(AutorisationSortie $autorisationSorty): self
+    public function addAutorisationSorties(AutorisationSortie $autorisationSorties): self
     {
-        if (!$this->autorisationSorties->contains($autorisationSorty)) {
-            $this->autorisationSorties[] = $autorisationSorty;
-            $autorisationSorty->setEmployer($this);
+        if (!$this->autorisationSorties->contains($autorisationSorties)) {
+            $this->autorisationSorties[] = $autorisationSorties;
+            $autorisationSorties->setEmployer($this);
         }
 
         return $this;
     }
 
-    public function removeAutorisationSorty(AutorisationSortie $autorisationSorty): self
+    public function removeAutorisationSorties(AutorisationSortie $autorisationSorties): self
     {
-        if ($this->autorisationSorties->removeElement($autorisationSorty)) {
+        if ($this->autorisationSorties->removeElement($autorisationSorties)) {
             // set the owning side to null (unless already changed)
-            if ($autorisationSorty->getEmployer() === $this) {
-                $autorisationSorty->setEmployer(null);
+            if ($autorisationSorties->getEmployer() === $this) {
+                $autorisationSorties->setEmployer(null);
             }
         }
 

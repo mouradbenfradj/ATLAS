@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\AutorisationSortieRepository;
 use App\Service\TimeService;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -61,6 +62,13 @@ class AutorisationSortie
     public function __construct()
     {
         $this->pointages = new ArrayCollection();
+    }
+    public function __toString()
+    {
+        $timeMax = new DateTime(date('H:i:s', strtotime($this->de->format("H:i:s"))));
+        $timeMin = new DateTime(date('H:i:s', strtotime($this->a->format("H:i:s"))));
+        $diff =  date_diff($timeMax, $timeMin);
+        return  $diff->h . ":" . $diff->i . ":" . $diff->s;
     }
 
     public function getId(): ?int

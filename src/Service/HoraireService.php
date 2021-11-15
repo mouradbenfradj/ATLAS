@@ -227,11 +227,11 @@ class HoraireService
     }
 
     /**
-     * Get heursJournerDeTravaille
-     *
-     * @return  DateTime
+     * getHeursJournerDeTravaille
+     
+     * @return DateTime
      */
-    public function getHeursJournerDeTravaille()
+    public function getHeursJournerDeTravaille(): DateTime
     {
         return $this->HeursJournerDeTravaille;
     }

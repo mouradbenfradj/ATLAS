@@ -99,6 +99,12 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         $slug = $this->slugger->slugify($entity->getTitle());
         $entity->setSlug($slug); */
     }
+    /**
+     * dbfUpdated
+     *
+     * @param AfterEntityUpdatedEvent $event
+     * @return void
+     */
     public function dbfUpdated(AfterEntityUpdatedEvent $event)
     {
         $dbf = $event->getEntityInstance();
@@ -107,12 +113,9 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         }
         if ($dbf->getStarttime() and $dbf->getEndtime() /* and !$conger and !$autorisationSortie */) {
             $this->pointageService->constructFromDbf($dbf);
-            $this->pointageService->dbfUpdated($dbf);
+            $this->pointageService->createEntity();
         }
         return;
-        /* 
-        $slug = $this->slugger->slugify($entity->getTitle());
-        $entity->setSlug($slug); */
     }
 
     /**
