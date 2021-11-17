@@ -24,8 +24,12 @@ class DefaultController extends AbstractController
      */
     public function index(Security $security, PointageService $pointageService): Response
     {
+        /**
+         * @var User $employer
+         */
+        $employer = $security->getUser();
         return $this->render('default/index.html.twig', [
-            'bilan' => $pointageService->getBilanGeneral($security->getUser()->getPointages()->toArray())
+            'bilan' => $pointageService->getBilanGeneral($employer->getPointages()->toArray())
         ]);
     }
 }

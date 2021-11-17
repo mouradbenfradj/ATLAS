@@ -743,7 +743,7 @@ class PointageService
         if ($this->departAnticiper)
             $bilan["departAnticiper"] = $this->bilan($this->departAnticiper, $bilan["departAnticiper"]);
         if ($this->retardMidi)
-            $bilan["retardMidi"] = $this->bilan($this->getRetardMidi, $bilan["retardMidi"]);
+            $bilan["retardMidi"] = $this->bilan($this->retardMidi, $bilan["retardMidi"]);
         $bilan["totalRetard"] = $this->bilan($this->totalRetard, $bilan["totalRetard"]);
         if ($this->autorisationSortie)
             $bilan["autorisationSortie"] = $this->bilan($this->autorisationSortie->getTime(), $bilan["autorisationSortie"]);
