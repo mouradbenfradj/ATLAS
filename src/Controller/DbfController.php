@@ -19,6 +19,7 @@ use App\Service\AbscenceService;
 use App\Service\AutorisationSortieService;
 use App\Service\CongerService;
 use App\Service\DbfService;
+use App\Service\EmployerService;
 use App\Service\HoraireService;
 use App\Service\PointageService;
 use App\Service\TimeService;
@@ -46,23 +47,10 @@ class DbfController extends AbstractController
     private $dateService;
     private $jourFerierService;
     private $pointageService;
+    private $timeService;
+    private $employerService;
 
 
-    /**
-     * __construct
-     *
-     * @param AdminUrlGenerator $adminUrlGenerator
-     * @param DateService $dateService
-     * @param JourFerierService $jourFerierService
-     * @param PointageGeneratorService $pointageGeneratorService
-     * @param HoraireService $horaireService
-     * @param PointageService $pointageService
-     * @param FlashBagInterface $flash
-     * @param TimeService $timeService
-     * @param CongerService $congerService
-     * @param AutorisationSortieService $autorisationSortieService
-     * @param DbfService $dbfService
-     */
     public function __construct(
         AdminUrlGenerator $adminUrlGenerator,
         DateService $dateService,
@@ -75,7 +63,8 @@ class DbfController extends AbstractController
         CongerService $congerService,
         DbfService $dbfService,
         AbscenceService $abscenceService,
-        AutorisationSortieService $autorisationSortieService
+        AutorisationSortieService $autorisationSortieService,
+        EmployerService $employerService
     ) {
         $this->adminUrlGenerator = $adminUrlGenerator;
         $this->dateService = $dateService;
@@ -88,6 +77,7 @@ class DbfController extends AbstractController
         $this->autorisationSortieService = $autorisationSortieService;
         $this->flash = $flash;
         $this->dbfService = $dbfService;
+        $this->employerService = $employerService;
         $this->abscenceService = $abscenceService;
     }
 
@@ -141,13 +131,22 @@ class DbfController extends AbstractController
                 foreach ($user->getDbfs() as $dbf) {
                     $this->pointageService->constructFromDbf($dbf);
                     $pointage = $this->pointageService->createEntity();
-                    if (($pointage->getEntrer() and $pointage->getSortie()) or $pointage->getAbscence()) {
+                    if (($pointage->getEntrer() and $pointage->getSortie())
+                        or ($pointage->getCongerPayer()
+                            and
+                            $pointage->getCongerPayer()->getValider())
+                        or $pointage->getAbscence()
+                    ) {
                         $user->addPointage($pointage);
-                        $manager->persist($user);
                         $manager->remove($dbf);
-                        $manager->flush();
                     }
                 }
+                $user->setSoldConger($this->employerService->calculerSoldConger($user));
+                $user->setSoldAutorisationSortie($this->employerService->calculerAS($user));
+
+                $manager->persist($user);
+                $manager->flush();
+
 
                 //dd($user->getPointages()->toArray());
 

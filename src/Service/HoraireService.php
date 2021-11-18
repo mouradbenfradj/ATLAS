@@ -241,7 +241,7 @@ class HoraireService
      *
      * @return  DateTime
      */
-    public function getHeursDemiJournerDeTravaille()
+    public function getHeursDemiJournerDeTravaille(): DateTime
     {
         return $this->HeursDemiJournerDeTravaille;
     }

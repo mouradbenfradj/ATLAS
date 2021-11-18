@@ -83,16 +83,7 @@ class CongerService
         $conger->setEmployer($this->employer);
         return $conger;
     }
-    public function estUnConger(DateTime $date): ?Conger
-    {
-        $conger = current(array_filter(array_map(
-            fn ($conger): ?Conger => ($conger->getDebut() <= $date and $date <= $conger->getFin()) ? $conger : null,
-            $this->employer->getCongers()->toArray()
-        )));
-        if ($conger)
-            return $conger;
-        return null;
-    }
+
     public function constructFromAbscence(Abscence $abscence): void
     {
         $this->employer = $abscence->getEmployer();
@@ -118,6 +109,57 @@ class CongerService
         $conger->setDemiJourner($this->demiJourner);
         return $conger;
     }
+
+
+    public function findOrCreate(?DateTime $entrer, ?DateTime $sortie): Conger
+    {
+        $conger = current(array_filter(array_map(
+            fn ($conger): ?Conger => ($conger->getDebut() <= $this->debut and $this->fin <= $conger->getFin()) ? $conger : null,
+            $this->employer->getCongers()->toArray()
+        )));
+        if ($conger) {
+            return $conger;
+        }
+        if (!$entrer and !$sortie) {
+            $this->partielConstruct($this->employer, $this->debut, $this->fin, "CP", true, false, false);
+            return  $this->ConstructEntity();
+        } elseif (!$entrer or !$sortie) {
+            dd($entrer);
+        }            /* elseif (
+            (
+                ($this->timeService->generateTime($this->horaire->getDebutPauseDejeuner()->format('H:i:s')) <= $atttime
+                    and
+                    $atttime <= $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format('H:i:s')))
+                or
+                (($this->timeService->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s')) <= $atttime
+                    and
+                    $atttime <= $this->timeService->generateTime($this->horaire->getFinPauseDejeuner()->format('H:i:s')))
+                    and
+                    $this->horaire->getFinPauseDejeuner() <= $this->horaire->getHeurFinTravaille()))
+            and $this->horaire->getFinPauseDejeuner() <= $this->horaire->getHeurFinTravaille()
+        ) {
+            $this->congerService->partielConstruct($this->employer, $this->date, $this->date, "CP", true, false, true);
+            $this->congerPayer = $this->congerService->ConstructEntity();
+            $this->employer->addConger($this->congerPayer);
+        }  */ else {
+            dump($entrer);
+            dd($sortie);
+            return null;
+        }
+    }
+
+
+    public function estUnConger(): ?Conger
+    {
+        $conger = current(array_filter(array_map(
+            fn ($conger): ?Conger => ($conger->getDebut() <= $this->debut and $this->fin  <= $conger->getFin()) ? $conger : null,
+            $this->employer->getCongers()->toArray()
+        )));
+        if ($conger)
+            return $conger;
+        return null;
+    }
+
     /**
      * getConger
      *
@@ -156,10 +198,5 @@ class CongerService
             $this->employer->setSoldConger($this->employer->getSoldConger() - 0.5);
         }
         return $conger;
-    }
-
-    public function getemployer()
-    {
-        return $this->employer;
     }
 }

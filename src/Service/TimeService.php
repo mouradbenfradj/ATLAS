@@ -49,7 +49,7 @@ class TimeService
      */
     public function generateTime(string $timeString): DateTime
     {
-        if ($timeString != "" and (DateTime::createFromFormat('H:i', $timeString) !== false or DateTime::createFromFormat('H:i:s', $timeString) !== false))
+        if ($timeString != "" and (DateTime::createFromFormat('H:i:s', $timeString) !== false or DateTime::createFromFormat('H:i', $timeString) !== false))
             return new DateTime($timeString);
         else
             return new DateTime("00:00:00");

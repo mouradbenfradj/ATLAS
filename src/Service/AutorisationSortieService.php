@@ -122,10 +122,10 @@ class AutorisationSortieService
     }
 
 
-    public function getAutorisation(DateTime $date): ?AutorisationSortie
+    public function getAutorisation(): ?AutorisationSortie
     {
         $autorisationSortie =  current(array_filter(array_map(
-            fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $date and $date <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
+            fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $this->dateAutorisation and $this->dateAutorisation <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
             $this->employer->getAutorisationSorties()->toArray()
         )));
         if ($autorisationSortie)

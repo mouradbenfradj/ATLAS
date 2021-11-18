@@ -68,6 +68,7 @@ class AbscenceService
         $this->fin = $fin;
         $this->pointages = $pointages;
     }
+
     public function ConstructEntity(): Abscence
     {
         $abscence = new Abscence();
@@ -76,6 +77,25 @@ class AbscenceService
         $abscence->setEmployer($this->employer);
         return $abscence;
     }
+
+    public function findOrCreate(?DateTime $entrer, ?DateTime $sortie): ?Abscence
+    {
+        $abscence =  current(array_filter(array_map(
+            fn ($abscence): ?Abscence => ($abscence->getDebut() <= $this->debut and $this->fin <= $abscence->getFin()) ? $abscence : null,
+            $this->employer->getAbscences()->toArray()
+        )));
+        if ($abscence)
+            return  $abscence;
+        if (!$entrer and !$sortie)
+            return  $this->ConstructEntity();
+        return null;
+    }
+
+
+
+
+
+
     /**
      * abscenceEmployer
      *
