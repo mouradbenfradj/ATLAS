@@ -107,19 +107,11 @@ class AutorisationSortieService
         return $autorisationSortie;
     }
 
-
-
-    /**
-     * getIfAutorisationSortie
-     *
-     * @param string $date
-     * @param User $employer
-     * @return AutorisationSortie|null
-     */
-    public function getIfAutorisationSortie(string $date, User $employer): ?AutorisationSortie
-    {
-        return $this->em->getRepository(AutorisationSortie::class)->findOneByEmployerAndDate($date, $employer);
-    }
+    /*
+        public function getIfAutorisationSortie(string $date, User $employer): ?AutorisationSortie
+        {
+            return $this->em->getRepository(AutorisationSortie::class)->findOneByEmployerAndDate($date, $employer);
+        } */
 
 
     public function getAutorisation(): ?AutorisationSortie
@@ -128,8 +120,9 @@ class AutorisationSortieService
             fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $this->dateAutorisation and $this->dateAutorisation <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
             $this->employer->getAutorisationSorties()->toArray()
         )));
-        if ($autorisationSortie)
+        if ($autorisationSortie) {
             return $autorisationSortie;
+        }
         return null;
     }
 }

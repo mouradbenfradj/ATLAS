@@ -264,130 +264,138 @@ class PointageService
         $this->horaire = $this->horaireService->getHoraireForDate($this->date);
         $this->entrer = $dbf->getStarttime() ? $dbf->getStarttime() : $this->entrer($dbf->getAttchktime());
         $this->sortie = $dbf->getEndtime() ? $dbf->getEndtime() : $this->sortie($dbf->getAttchktime());
-        $this->congerService->partielConstruct($this->employer, $this->date, $this->date);
-        $this->congerPayer = $this->congerService->findOrCreate($this->entrer, $this->sortie);
-        //$this->congerPayer = $this->congerService->estUnConger();
-        if (!$this->congerPayer) {
-            $this->abscenceService->partielConstruct($this->employer, $this->date, $this->date);
-            $this->abscence = $this->abscenceService->findOrCreate($this->entrer, $this->sortie);
-            //$this->abscence = $this->abscenceService->estAbscent($this->date);
-        }
-        if (!$this->abscence and  $this->congerPayer and  !$this->congerPayer->getDemiJourner()) {
-            $this->estUnCongerOuAbscence();
-        } else {
-            dd("b");
-            $this->autorisationSortieService->partielConstruct($this->employer, $this->date);
-            $this->autorisationSortie = $this->autorisationSortieService->getAutorisation();
-
-            $heurDebutTravaille = $this->timeService->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s'));
-            $debutPauseMatinal = $this->timeService->generateTime($this->horaire->getDebutPauseMatinal()->format('H:i:s'));
-            $finPauseMatinal = $this->timeService->generateTime($this->horaire->getFinPauseMatinal()->format('H:i:s'));
-            $debutPauseDejeuner = $this->timeService->generateTime($this->horaire->getDebutPauseDejeuner()->format('H:i:s'));
-            $finPauseDejeuner = $this->timeService->generateTime($this->horaire->getFinPauseDejeuner()->format('H:i:s'));
-            $finPauseDejeuner->add($this->timeService->dateTimeToDateInterval($this->horaire->getMargeDuRetard()));
-            $debutPauseMidi = $this->timeService->generateTime($this->horaire->getDebutPauseMidi()->format('H:i:s'));
-            $finPauseMidi = $this->timeService->generateTime($this->horaire->getFinPauseMidi()->format('H:i:s'));
-            $heurFinTravaille = $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format('H:i:s'));
-
-
-
-            if ($this->entrer or $this->sortie) {
-                switch (count($dbf->getAttchktime())) {
-                    case 1:
-                        if (!$this->congerPayer) {
-                            $atttime = new DateTime($dbf->getAttchktime()[0]);
-                            if (!$this->congerPayer and (($this->timeService->generateTime($this->horaire->getDebutPauseDejeuner()->format('H:i:s')) <= $atttime and $atttime <= $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format('H:i:s'))) or (($this->timeService->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s')) <= $atttime and $atttime <= $this->timeService->generateTime($this->horaire->getFinPauseDejeuner()->format('H:i:s'))) and $this->horaire->getFinPauseDejeuner() <= $this->horaire->getHeurFinTravaille())) and $this->horaire->getFinPauseDejeuner() <= $this->horaire->getHeurFinTravaille()) {
-                                $this->congerService->partielConstruct($this->employer, $this->date, $this->date, "CP", true, false, true);
-                                $this->congerPayer = $this->congerService->ConstructEntity();
-                                $this->employer->addConger($this->congerPayer);
-                            }
-                        }
-                        break;
-                    case 2:
-                        if (!$this->congerPayer) {
-                            $atttime = new DateTime($dbf->getAttchktime()[0]);
-                            $atttims = new DateTime($dbf->getAttchktime()[1]);
-
-                            if (
-                                !$this->congerPayer
-                                and (
-                                    ($heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner)
-                                    or
-                                    ($debutPauseMatinal <= $atttime and $atttime <= $finPauseDejeuner and $debutPauseDejeuner <= $atttims and $atttims <= $finPauseMidi)
-                                    or
-                                    ($debutPauseDejeuner <= $atttime and $atttime <= $finPauseMidi and $debutPauseMidi <= $atttims and $atttims <= $heurFinTravaille))
-                                and $finPauseDejeuner <= $heurFinTravaille
-                            ) {
-                                $this->congerService->partielConstruct($this->employer, $this->date, $this->date, "CP", true, false, true);
-                                $this->congerPayer = $this->congerService->ConstructEntity();
-                                $this->employer->addConger($this->congerPayer);
-                            }
-                        }
-                        break;
-                    case 3:
-                        if (!$this->autorisationSortie) {
-                            $atttime = new DateTime($dbf->getAttchktime()[0]);
-                            $atttims = new DateTime($dbf->getAttchktime()[1]);
-                            $atttim3 = new DateTime($dbf->getAttchktime()[2]);
-
-                            if (!$this->autorisationSortie and $debutPauseMatinal <= $atttime and $atttime <= $finPauseDejeuner and $debutPauseDejeuner <= $atttims and $atttims <= $finPauseMidi and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
-                                $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $heurDebutTravaille, $debutPauseMatinal, true, false);
-                                $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
-                                $this->employer->addAutorisationSorties($this->autorisationSortie);
-                            } elseif (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseDejeuner <= $atttims and $atttims <= $finPauseMidi and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
-                                $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $debutPauseMatinal, $debutPauseDejeuner, true, false);
-                                $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
-                                $this->employer->addAutorisationSorties($this->autorisationSortie);
-                            } elseif (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
-                                $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $finPauseDejeuner, $debutPauseMidi, true, false);
-                                $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
-                                $this->employer->addAutorisationSorties($this->autorisationSortie);
-                            } elseif (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseDejeuner <= $atttim3 and $atttim3 <= $finPauseMidi) {
-                                $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $debutPauseMidi, $heurFinTravaille, true, false);
-                                $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
-                                $this->employer->addAutorisationSorties($this->autorisationSortie);
-                            }
-                            //$this->retardMidi = $this->retardMidi($dbf->getAttchktime());
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            } else {
-                if ($this->congerPayer) {
-                    dump($this->entrer);
-                    dump($this->sortie);
-                    dump($this->autorisationSortie);
-                    dd($dbf);
-                    //$this->autorisationSortie = $this->autorisationSortieService->getAutorisation();
-                } else {
-                    if (!$this->abscence) {
-                        $this->abscenceService->partielConstruct($this->employer, $this->date, $this->date);
-                        $this->abscence = $this->abscenceService->constructEntity();
-                    }
-                    $this->employer->addAbscence($this->abscence);
-                }
+        $this->abscenceService->partielConstruct($this->employer, $this->date, $this->date);
+        $this->abscence = $this->abscenceService->findOrCreate($this->entrer, $this->sortie);
+       
+        //$this->abscence = $this->abscenceService->estAbscent($this->date);
+        
+        if (!$this->abscence) {
+            $this->congerService->partielConstruct($this->employer, $this->date, $this->date);
+            $this->congerPayer = $this->congerService->findOrCreate($this->entrer, $this->sortie);
+            if (!$this->congerPayer) {
+                $this->autorisationSortieService->partielConstruct($this->employer, $this->date);
+                $this->autorisationSortie = $this->autorisationSortieService->getAutorisation();
             }
-            $this->retardMidi = $this->retardMidi($dbf->getAttchktime());
+        }
+           
+        //$this->congerPayer = $this->congerService->estUnConger();
+      
+       
 
-            $this->retardEnMinute = $this->retardEnMinute(); //$dbf->getLate();
-            $this->departAnticiper = $this->departAnticiper(); //$dbf->getEarly();
-            $this->workTime = null;
-            $this->heurNormalementTravailler = $this->heurNormalementTravailler();
-            $this->nbrHeurTravailler = $this->nbrHeurTravailler(); // $dbf->getWorktime();
-            $this->totalRetard = $this->totalRetard();
-            $this->diff = $this->diff();
+        /*  $heurDebutTravaille = $this->timeService->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s'));
+         $debutPauseMatinal = $this->timeService->generateTime($this->horaire->getDebutPauseMatinal()->format('H:i:s'));
+         $finPauseMatinal = $this->timeService->generateTime($this->horaire->getFinPauseMatinal()->format('H:i:s'));
+         $debutPauseDejeuner = $this->timeService->generateTime($this->horaire->getDebutPauseDejeuner()->format('H:i:s'));
+         $finPauseDejeuner = $this->timeService->generateTime($this->horaire->getFinPauseDejeuner()->format('H:i:s'));
+         $finPauseDejeuner->add($this->timeService->dateTimeToDateInterval($this->horaire->getMargeDuRetard()));
+         $debutPauseMidi = $this->timeService->generateTime($this->horaire->getDebutPauseMidi()->format('H:i:s'));
+         $finPauseMidi = $this->timeService->generateTime($this->horaire->getFinPauseMidi()->format('H:i:s'));
+         $heurFinTravaille = $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format('H:i:s'));
+
+
+
+         if ($this->entrer or $this->sortie) {
+             switch (count($dbf->getAttchktime())) {
+                     case 1:
+                         if (!$this->congerPayer) {
+                             $atttime = new DateTime($dbf->getAttchktime()[0]);
+                             if (!$this->congerPayer and (($this->timeService->generateTime($this->horaire->getDebutPauseDejeuner()->format('H:i:s')) <= $atttime and $atttime <= $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format('H:i:s'))) or (($this->timeService->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s')) <= $atttime and $atttime <= $this->timeService->generateTime($this->horaire->getFinPauseDejeuner()->format('H:i:s'))) and $this->horaire->getFinPauseDejeuner() <= $this->horaire->getHeurFinTravaille())) and $this->horaire->getFinPauseDejeuner() <= $this->horaire->getHeurFinTravaille()) {
+                                 $this->congerService->partielConstruct($this->employer, $this->date, $this->date, "CP", true, false, true);
+                                 $this->congerPayer = $this->congerService->ConstructEntity();
+                                 $this->employer->addConger($this->congerPayer);
+                             }
+                         }
+                         break;
+                     case 2:
+                         if (!$this->congerPayer) {
+                             $atttime = new DateTime($dbf->getAttchktime()[0]);
+                             $atttims = new DateTime($dbf->getAttchktime()[1]);
+
+                             if (
+                                 !$this->congerPayer
+                                 and (
+                                     ($heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner)
+                                     or
+                                     ($debutPauseMatinal <= $atttime and $atttime <= $finPauseDejeuner and $debutPauseDejeuner <= $atttims and $atttims <= $finPauseMidi)
+                                     or
+                                     ($debutPauseDejeuner <= $atttime and $atttime <= $finPauseMidi and $debutPauseMidi <= $atttims and $atttims <= $heurFinTravaille))
+                                 and $finPauseDejeuner <= $heurFinTravaille
+                             ) {
+                                 $this->congerService->partielConstruct($this->employer, $this->date, $this->date, "CP", true, false, true);
+                                 $this->congerPayer = $this->congerService->ConstructEntity();
+                                 $this->employer->addConger($this->congerPayer);
+                             }
+                         }
+                         break;
+                     case 3:
+                         if (!$this->autorisationSortie) {
+                             $atttime = new DateTime($dbf->getAttchktime()[0]);
+                             $atttims = new DateTime($dbf->getAttchktime()[1]);
+                             $atttim3 = new DateTime($dbf->getAttchktime()[2]);
+
+                             if (!$this->autorisationSortie and $debutPauseMatinal <= $atttime and $atttime <= $finPauseDejeuner and $debutPauseDejeuner <= $atttims and $atttims <= $finPauseMidi and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
+                                 $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $heurDebutTravaille, $debutPauseMatinal, true, false);
+                                 $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
+                                 $this->employer->addAutorisationSorties($this->autorisationSortie);
+                             } elseif (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseDejeuner <= $atttims and $atttims <= $finPauseMidi and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
+                                 $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $debutPauseMatinal, $debutPauseDejeuner, true, false);
+                                 $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
+                                 $this->employer->addAutorisationSorties($this->autorisationSortie);
+                             } elseif (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
+                                 $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $finPauseDejeuner, $debutPauseMidi, true, false);
+                                 $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
+                                 $this->employer->addAutorisationSorties($this->autorisationSortie);
+                             } elseif (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseDejeuner <= $atttim3 and $atttim3 <= $finPauseMidi) {
+                                 $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $debutPauseMidi, $heurFinTravaille, true, false);
+                                 $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
+                                 $this->employer->addAutorisationSorties($this->autorisationSortie);
+                             }
+                             //$this->retardMidi = $this->retardMidi($dbf->getAttchktime());
+                         }
+                         break;
+                     default:
+                         break;
+                 }
+         } else {
+             if ($this->congerPayer) {
+                 dump($this->entrer);
+                 dump($this->sortie);
+                 dump($this->autorisationSortie);
+                 dd($dbf);
+             //$this->autorisationSortie = $this->autorisationSortieService->getAutorisation();
+             } else {
+                 if (!$this->abscence) {
+                     $this->abscenceService->partielConstruct($this->employer, $this->date, $this->date);
+                     $this->abscence = $this->abscenceService->constructEntity();
+                 }
+                 $this->employer->addAbscence($this->abscence);
+             }
+         } */
+        $this->retardMidi = $this->retardMidi($dbf->getAttchktime());
+       
+        $this->retardEnMinute = $this->retardEnMinute(); //$dbf->getLate();
+        $this->departAnticiper = $this->departAnticiper(); //$dbf->getEarly();
+        $this->workTime = null;
+        $this->heurNormalementTravailler = $this->heurNormalementTravailler();
+        $this->nbrHeurTravailler = $this->nbrHeurTravailler(); // $dbf->getWorktime();
+        $this->totalRetard = $this->totalRetard();
+        $this->diff = $this->diff();
+        if (!$this->abscence) {
+            dump($this->entrer);
+            dump($this->sortie);
+            dump($this->abscence);
+            dump($this->congerPayer);
+            dump($this->autorisationSortie);
+            dump($this->retardMidi);
+            dump($this->departAnticiper);
+            dump($this->workTime);
+            dump($this->heurNormalementTravailler);
+            dump($this->nbrHeurTravailler);
+            dump($this->totalRetard);
+            dd($this->diff);
         }
     }
 
-
-    public function estUnCongerOuAbscence()
-    {
-        $this->nbrHeurTravailler = new DateTime('00:00:00');
-        $this->totalRetard = new DateTime('00:00:00');
-        $this->heurNormalementTravailler = new DateTime('00:00:00');
-        $this->diff = new DateTime('00:00:00');
-    }
     /**
      * constructFromPointage
      *
@@ -408,7 +416,8 @@ class PointageService
         $this->nbrHeurTravailler = $pointage->getNbrHeurTravailler();
         $this->retardEnMinute = $pointage->getRetardEnMinute();
         $this->departAnticiper = $pointage->getDepartAnticiper();
-        $this->retardMidi = $pointage->getRetardMidi();;
+        $this->retardMidi = $pointage->getRetardMidi();
+        ;
         $this->totalRetard = $pointage->getTotaleRetard();
         $this->heurNormalementTravailler = $pointage->getHeurNormalementTravailler();
         $this->diff = $pointage->getDiff();
@@ -480,7 +489,6 @@ class PointageService
      */
     public function entrer(array $attchktime)
     {
-
         $heurDebutTravaille = $this->timeService->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s'));
         $debutPauseMatinal = $this->timeService->generateTime($this->horaire->getDebutPauseMatinal()->format('H:i:s'));
         $finPauseMatinal = $this->timeService->generateTime($this->horaire->getFinPauseMatinal()->format('H:i:s'));
@@ -489,7 +497,7 @@ class PointageService
         $debutPauseMidi = $this->timeService->generateTime($this->horaire->getDebutPauseMidi()->format('H:i:s'));
         $finPauseMidi = $this->timeService->generateTime($this->horaire->getFinPauseMidi()->format('H:i:s'));
         $heurFinTravaille = $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format('H:i:s'));
-        if ($attchktime[0] != "")
+        if ($attchktime[0] != "") {
             switch (count($attchktime)) {
                 case 1:
                     $atttime = $this->timeService->generateTime($attchktime[0]);
@@ -567,15 +575,15 @@ class PointageService
                             $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $heurDebutTravaille, $debutPauseMatinal, true, false);
                             $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
                             $this->employer->addAutorisationSorties($this->autorisationSortie);
-                        } else if (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseDejeuner <= $atttims and $atttims <= $finPauseMidi and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
+                        } elseif (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseDejeuner <= $atttims and $atttims <= $finPauseMidi and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
                             $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $debutPauseMatinal, $debutPauseDejeuner, true, false);
                             $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
                             $this->employer->addAutorisationSorties($this->autorisationSortie);
-                        } else if (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
+                        } elseif (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
                             $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $finPauseDejeuner, $debutPauseMidi, true, false);
                             $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
                             $this->employer->addAutorisationSorties($this->autorisationSortie);
-                        } else if (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseDejeuner <= $atttim3 and $atttim3 <= $finPauseMidi) {
+                        } elseif (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseDejeuner <= $atttim3 and $atttim3 <= $finPauseMidi) {
                             $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $debutPauseMidi, $heurFinTravaille, true, false);
                             $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
                             $this->employer->addAutorisationSorties($this->autorisationSortie);
@@ -602,8 +610,9 @@ class PointageService
                     dd($d);
                     break;
             }
-        else
+        } else {
             return null;
+        }
     }
     /**
      * sortie
@@ -622,7 +631,7 @@ class PointageService
         $finPauseMidi = $this->timeService->generateTime($this->horaire->getFinPauseMidi()->format('H:i:s'));
         $heurFinTravaille = $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format('H:i:s'));
 
-        if ($attchktime[0] != "")
+        if ($attchktime[0] != "") {
             switch (count($attchktime)) {
                 case 1:
                     $atttime = $this->timeService->generateTime($attchktime[0]);
@@ -630,8 +639,8 @@ class PointageService
                         dd($atttime);
                         return $atttime;
                     }
-                    dd($atttime);
-                    return null;
+                    $atttime->add($this->timeService->dateTimeToDateInterval($this->horaireService->getHeursDemiJournerDeTravaille()));
+                    return $atttime;
                     break;
                 case 2:
                     if (!$this->congerPayer) {
@@ -678,15 +687,15 @@ class PointageService
                             $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $heurDebutTravaille, $debutPauseMatinal, true, false);
                             $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
                             $this->employer->addAutorisationSorties($this->autorisationSortie);
-                        } else if (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseDejeuner <= $atttims and $atttims <= $finPauseMidi and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
+                        } elseif (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseDejeuner <= $atttims and $atttims <= $finPauseMidi and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
                             $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $debutPauseMatinal, $debutPauseDejeuner, true, false);
                             $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
                             $this->employer->addAutorisationSorties($this->autorisationSortie);
-                        } else if (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
+                        } elseif (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
                             $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $finPauseDejeuner, $debutPauseMidi, true, false);
                             $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
                             $this->employer->addAutorisationSorties($this->autorisationSortie);
-                        } else if (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseDejeuner <= $atttim3 and $atttim3 <= $finPauseMidi) {
+                        } elseif (!$this->autorisationSortie and $heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseDejeuner <= $atttim3 and $atttim3 <= $finPauseMidi) {
                             $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $debutPauseMidi, $heurFinTravaille, true, false);
                             $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
                             $this->employer->addAutorisationSorties($this->autorisationSortie);
@@ -708,7 +717,9 @@ class PointageService
                     dd($d);
                     break;
             }
-        else return null;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -734,19 +745,34 @@ class PointageService
     {
         $entrer = $this->entrer;
         $sortie = $this->sortie;
-        if (!$entrer or !$sortie)
+        if (!$entrer or !$sortie) {
             return new DateTime("00:00:00");
+        }
         $time = new DateTime($sortie->format("H:i:s"));
-        $time->sub($this->timeService->dateTimeToDateInterval($this->horaireService->sumPause()));
-        $time = $this->timeService->diffTime($time,  $entrer);
+        if ($this->congerPayer and $this->congerPayer->getDemiJourner()) {
+            if ($this->horaire->getDebutPauseMidi() > $entrer) {
+                $time->sub($this->timeService->diffTime(
+                    $this->horaire->getDebutPauseMatinal(),
+                    $this->horaire->getfinPauseMatinal()
+                ));
+            } else {
+                $time->sub($this->timeService->diffTime(
+                    $this->horaire->getDebutPauseMidi(),
+                    $this->horaire->getFinPauseMidi()
+                ));
+            }
+        } else {
+            $time->sub($this->timeService->dateTimeToDateInterval($this->horaireService->sumPause()));
+        }
+        $time = $this->timeService->diffTime($time, $entrer);
         return $this->timeService->dateIntervalToDateTime($time);
     }
 
     public function retardMidi(array $attchktime): ?DateTime
     {
-
-        if (count($attchktime) < 3)
+        if (count($attchktime) < 3) {
             return null;
+        }
         $heurDebutTravaille = $this->timeService->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s'));
         $debutPauseMatinal = $this->timeService->generateTime($this->horaire->getDebutPauseMatinal()->format('H:i:s'));
         $finPauseMatinal = $this->timeService->generateTime($this->horaire->getFinPauseMatinal()->format('H:i:s'));
@@ -769,35 +795,37 @@ class PointageService
         }
         if ($debutPauseMatinal <= $atttime and $atttime <= $finPauseDejeuner and $debutPauseDejeuner <= $atttims and $atttims <= $finPauseMidi and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
             $diff = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($atttime, $atttims));
-            if ($diffSR < $diff)
+            if ($diffSR < $diff) {
                 return  $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($diff, $diffSR));
+            }
             return null;
-            //new DateInterval('PT' . $diff->h . 'H' . $diff->i . 'M' . $diff->s . 'S');   
+        //new DateInterval('PT' . $diff->h . 'H' . $diff->i . 'M' . $diff->s . 'S');
             /*     $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $heurDebutTravaille, $debutPauseMatinal, false, false);
                     $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
                     $this->employer->addAutorisationSorties($this->autorisationSortie);
                 */
-        } else if ($heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseDejeuner <= $atttims and $atttims <= $finPauseMidi and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
+        } elseif ($heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseDejeuner <= $atttims and $atttims <= $finPauseMidi and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
             dd($attchktime);
-            /*      $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $debutPauseMatinal, $debutPauseDejeuner, false, false);
-                    $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
-                    $this->employer->addAutorisationSorties($this->autorisationSortie);
-                */
-        } else if ($heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
+        /*      $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $debutPauseMatinal, $debutPauseDejeuner, false, false);
+                $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
+                $this->employer->addAutorisationSorties($this->autorisationSortie);
+            */
+        } elseif ($heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseMidi <= $atttim3 and ($atttim3 <= $heurFinTravaille or $atttim3 >= $heurFinTravaille)) {
             dd($attchktime);
-            /*        $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $finPauseDejeuner, $debutPauseMidi, false, false);
-                    $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
-                    $this->employer->addAutorisationSorties($this->autorisationSortie);
-              */
-        } else if ($heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseDejeuner <= $atttim3 and $atttim3 <= $finPauseMidi) {
+        /*        $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $finPauseDejeuner, $debutPauseMidi, false, false);
+                $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
+                $this->employer->addAutorisationSorties($this->autorisationSortie);
+          */
+        } elseif ($heurDebutTravaille <= $atttime and $atttime <= $finPauseMatinal and $debutPauseMatinal <= $atttims and $atttims <= $finPauseDejeuner and $debutPauseDejeuner <= $atttim3 and $atttim3 <= $finPauseMidi) {
             /*      $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $debutPauseMidi, $heurFinTravaille, false, false);
                     $this->autorisationSortie = $this->autorisationSortieService->ConstructEntity();
                     $this->employer->addAutorisationSorties($this->autorisationSortie);
                */
         } else {
             $diff = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($atttim3, $atttims));
-            if ($diffSR < $diff)
+            if ($diffSR < $diff) {
                 return  $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($diff, $diffSR));
+            }
             return null;
         }
 
@@ -805,10 +833,11 @@ class PointageService
 
 
 
-        if ($this->sortie)
+        if ($this->sortie) {
             $sortie = $this->timeService->generateTime($this->sortie->format("H:i:s"));
-        else
+        } else {
             $sortie = $heurFinTravaille;
+        }
         if ($this->congerPayer and $this->congerPayer->getValider() and $this->congerPayer->getDemiJourner()) {
             dump('CP');
             dump($sortie);
@@ -837,43 +866,28 @@ class PointageService
      */
     public function departAnticiper(): ?DateTime
     {
-
-        if (!$this->sortie)
-            return null;
+        $heurDebutTravaille = $this->timeService->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s'));
         $finPauseDejeuner = $this->timeService->generateTime($this->horaire->getFinPauseDejeuner()->format('H:i:s'));
         $heurFinTravaille = $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format('H:i:s'));
         $debutPauseDejeuner = $this->timeService->generateTime($this->horaire->getDebutPauseDejeuner()->format('H:i:s'));
-        if ($this->entrer) {
-            $entrer = $this->timeService->generateTime($this->entrer->format("H:i:s"));
-            if (!$this->sortie) {
-                $sortie = $entrer;
-                $sortie->add($this->timeService->dateTimeToDateInterval($this->horaireService->getHeursDemiJournerDeTravaille()));
-            } else {
-                $sortie = $this->timeService->generateTime($this->sortie->format("H:i:s"));
-                dd($sortie);
-            }
-        } else  if ($this->sortie) {
-            $sortie = $this->timeService->generateTime($this->sortie->format("H:i:s"));
-            dd($sortie);
-            $sortie->sub($this->timeService->dateTimeToDateInterval($this->horaireService->getHeursDemiJournerDeTravaille()));
-        } else {
-            $entrer = $heurFinTravaille;
-            $sortie = $heurFinTravaille;
+        $entrer= $this->entrer;
+        $sortie= $this->sortie;
+        if (!$entrer and !$sortie) {
+            return null;
         }
         if ($this->congerPayer and $this->congerPayer->getValider() and $this->congerPayer->getDemiJourner()) {
             if (($entrer and ($entrer < $debutPauseDejeuner)) and ($sortie and ($sortie < $finPauseDejeuner))) {
-                $sortie = $debutPauseDejeuner;
-                $sortie->add($this->timeService->dateTimeToDateInterval($this->horaire->getMargeDuRetard()));
-                dump('CP');
-                dump($this->departAnticiper);
-                dump($entrer);
-
-                dump($sortie);
-                dd($heurFinTravaille);
+                //$sortie->add($this->timeService->dateTimeToDateInterval($this->horaire->getMargeDuRetard()));
                 $heurFinTravaille = $debutPauseDejeuner;
                 $heurFinTravaille->add($this->timeService->dateTimeToDateInterval($this->horaire->getMargeDuRetard()));
                 if ($heurFinTravaille > $sortie) {
                     $heurFinTravaille = $this->timeService->diffTime($heurFinTravaille, $sortie);
+                    dump('CP');
+                    dump($this->congerPayer);
+                    dump($entrer);
+    
+                    dump($sortie);
+                    dd($heurFinTravaille);
                     return $this->timeService->dateIntervalToDateTime($heurFinTravaille);
                 }
                 return null;
@@ -891,7 +905,6 @@ class PointageService
             $sortie->add($this->timeService->dateTimeToDateInterval($this->horaire->getMargeDuRetard()));
             dd($sortie);
             if ($heurFinTravaille > $sortie) {
-
                 $heurFinTravaille = $this->timeService->diffTime($heurFinTravaille, $sortie);
                 dd($heurFinTravaille);
                 return $this->timeService->dateIntervalToDateTime($heurFinTravaille);
@@ -917,7 +930,7 @@ class PointageService
             } else {
                 $sortie = $this->timeService->generateTime($this->sortie->format("H:i:s"));
             }
-        } else  if ($this->sortie) {
+        } elseif ($this->sortie) {
             $sortie = $this->timeService->generateTime($this->sortie->format("H:i:s"));
             $entrer = $sortie;
         } else {
@@ -926,8 +939,9 @@ class PointageService
         }
 
 
-        if (!$this->congerPayer and $this->autorisationSortie and $this->autorisationSortie->getValider())
+        if (!$this->congerPayer and $this->autorisationSortie and $this->autorisationSortie->getValider()) {
             dd($this->autorisationSortie);
+        }
 
         if ($this->congerPayer and $this->congerPayer->getValider() and $this->congerPayer->getDemiJourner()) {
             if (($entrer and ($entrer > $debutPauseDejeuner)) and ($sortie and ($sortie > $finPauseDejeuner))) {
@@ -943,8 +957,9 @@ class PointageService
         }
 
         $heurDebutTravaille->add($this->timeService->dateTimeToDateInterval($this->horaire->getMargeDuRetard()));
-        if ($heurDebutTravaille >= $entrer)
+        if ($heurDebutTravaille >= $entrer) {
             return new DateTime("00:00:00");
+        }
         $heurDebutTravaille = $this->timeService->diffTime($heurDebutTravaille, $entrer);
         return $this->timeService->dateIntervalToDateTime($heurDebutTravaille);
     }
@@ -977,31 +992,33 @@ class PointageService
      */
     public function heurNormalementTravailler(): DateTime
     {
-        if ($this->congerPayer and !$this->congerPayer->getDemiJourner())
+        if ($this->congerPayer and !$this->congerPayer->getDemiJourner()) {
             return new DateTime('00:00:00');
-        else if ($this->congerPayer and $this->congerPayer->getDemiJourner())
+        } elseif ($this->congerPayer and $this->congerPayer->getDemiJourner()) {
             return $this->horaireService->getHeursDemiJournerDeTravaille();
-        else if (!$this->congerPayer and $this->autorisationSortie) {
+        } elseif (!$this->congerPayer and $this->autorisationSortie) {
             $heursJournerDeTravaille = $this->horaireService->getHeursJournerDeTravaille();
-            if ($heursJournerDeTravaille)
+            if ($heursJournerDeTravaille) {
                 $heursJournerDeTravaille->sub($this->timeService->diffTime($this->autorisationSortie->getDe(), $this->autorisationSortie->getA()));
+            }
             return $heursJournerDeTravaille;
-        } else
+        } else {
             return $this->horaireService->getHeursJournerDeTravaille();
+        }
     }
 
     public function diff(): DateTime
     {
-        if ($this->nbrHeurTravailler)
-
+        if ($this->nbrHeurTravailler) {
             return $this->timeService->dateIntervalToDateTime(
                 $this->timeService->diffTime(
                     $this->nbrHeurTravailler,
                     $this->heurNormalementTravailler()
                 )
             );
-        else
+        } else {
             return $this->heurNormalementTravailler();
+        }
     }
 
     /**
@@ -1041,8 +1058,9 @@ class PointageService
     }
     public function bilan(?DateTimeInterface $time, int $total)
     {
-        if (!$time)
+        if (!$time) {
             return $total;
+        }
         $total += $time->format('H') * 3600; // Convert the hours to seconds and add to our total
         $total += $time->format('i') * 60;  // Convert the minutes to seconds and add to our total
         $total += $time->format('s'); // Add the seconds to our total
@@ -1052,20 +1070,25 @@ class PointageService
     public function calculateurBilan(Pointage $pointage, array $bilan)
     {
         $bilan["nbrHeurTravailler"] = $this->bilan($this->nbrHeurTravailler, $bilan["nbrHeurTravailler"]);
-        if ($this->retardEnMinute)
+        if ($this->retardEnMinute) {
             $bilan["retardEnMinute"] = $this->bilan($this->retardEnMinute, $bilan["retardEnMinute"]);
-        if ($this->departAnticiper)
+        }
+        if ($this->departAnticiper) {
             $bilan["departAnticiper"] = $this->bilan($this->departAnticiper, $bilan["departAnticiper"]);
-        if ($this->retardMidi)
+        }
+        if ($this->retardMidi) {
             $bilan["retardMidi"] = $this->bilan($this->retardMidi, $bilan["retardMidi"]);
+        }
         $bilan["totalRetard"] = $this->bilan($this->totalRetard, $bilan["totalRetard"]);
-        if ($this->autorisationSortie)
+        if ($this->autorisationSortie) {
             $bilan["autorisationSortie"] = $this->bilan($this->autorisationSortie->getTime(), $bilan["autorisationSortie"]);
+        }
         if ($this->congerPayer) {
-            if ($this->congerPayer->getDemiJourner())
+            if ($this->congerPayer->getDemiJourner()) {
                 $bilan["congerPayer"] += 0.5;
-            else
+            } else {
                 $bilan["congerPayer"] += 1;
+            }
         }
         $bilan["abscence"] = $this->abscence ? $bilan["abscence"] + 1 : $bilan["abscence"];
         $bilan["heurNormalementTravailler"] = $this->bilan($this->heurNormalementTravailler(), $bilan["heurNormalementTravailler"]);
@@ -1104,8 +1127,9 @@ class PointageService
         foreach ($pointages as $this->pointage) {
             $this->constructFromPointage($this->pointage);
             if ($thisYear . '-' . $thisMonth != $this->date->format('Y-m')) {
-                if ($thisYear and $thisMonth)
+                if ($thisYear and $thisMonth) {
                     array_push($collectMensuel, $bilan);
+                }
                 $thisYear =  $this->date->format('Y');
                 $thisMonth =  $this->date->format('m');
                 $bilan = $this->initBilan;
@@ -1124,8 +1148,9 @@ class PointageService
         foreach ($pointages as $this->pointage) {
             $this->constructFromPointage($this->pointage);
             if ($thisYear != $this->date->format('Y')) {
-                if ($thisYear)
+                if ($thisYear) {
                     array_push($collectAnnuel, $bilan);
+                }
                 $thisYear =  $this->date->format('Y');
                 $bilan = $this->initBilan;
                 $bilan["date"] =  $this->date->format('Y');
@@ -1171,16 +1196,18 @@ class PointageService
                 $bilanMonth["date"] =   $thisYear . '-' . $thisMonth;
                 $bilanMonth["background"] = "DodgerBlue";
                 $bilanMonth["colspan"] = 4;
-                if ($thisYear and  $thisMonth)
-                    array_push($collectGeneral,  $bilanMonth);
+                if ($thisYear and  $thisMonth) {
+                    array_push($collectGeneral, $bilanMonth);
+                }
                 $bilanMonth = $this->initBilan;
             }
             if ($thisYear != $this->pointageDate->format('Y') and $index) {
                 $bilanYear["date"] =     $thisYear;
                 $bilanYear["background"] = "MediumSeaGreen";
                 $bilanMonth["colspan"] = 4;
-                if ($thisYear)
+                if ($thisYear) {
                     array_push($collectGeneral, $bilanYear);
+                }
                 $bilanYear = $this->initBilan;
             }
 

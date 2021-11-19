@@ -114,7 +114,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $isVerified = false;
 
     /**
-     * @ORM\OneToMany(targetEntity=WorkTime::class, mappedBy="employer", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=WorkTime::class, mappedBy="employer", orphanRemoval=true, fetch="EAGER")
      */
     private $workTimes;
 

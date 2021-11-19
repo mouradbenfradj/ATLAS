@@ -39,11 +39,13 @@ class AbscenceService
      */
     private $pointages;
 
-
-
-
-
-
+    /**
+     * congerService
+     *
+     * @var CongerService
+     */
+    private $congerService;
+    
     /**
      * abscenceDays
      *
@@ -51,9 +53,10 @@ class AbscenceService
      */
     private $abscenceDays;
 
-    public function __construct()
+    public function __construct(CongerService $congerService)
     {
         $this->abscenceDays = [];
+        $this->congerService = $congerService;
     }
 
 
@@ -80,14 +83,17 @@ class AbscenceService
 
     public function findOrCreate(?DateTime $entrer, ?DateTime $sortie): ?Abscence
     {
+        $this->congerService->partielConstruct($this->employer, $this->debut, $this->fin);
         $abscence =  current(array_filter(array_map(
             fn ($abscence): ?Abscence => ($abscence->getDebut() <= $this->debut and $this->fin <= $abscence->getFin()) ? $abscence : null,
             $this->employer->getAbscences()->toArray()
         )));
-        if ($abscence)
+        if ($abscence) {
             return  $abscence;
-        if (!$entrer and !$sortie)
+        }
+        if (!$entrer and !$sortie and !$this->congerService->estUnConger()) {
             return  $this->ConstructEntity();
+        }
         return null;
     }
 
@@ -106,7 +112,7 @@ class AbscenceService
     {
         foreach ($user->getAbscences() as $abscence) {
             do {
-                array_push($this->abscenceDays,  $abscence->getDebut()->format("Y-m-d"));
+                array_push($this->abscenceDays, $abscence->getDebut()->format("Y-m-d"));
                 $abscence->getDebut()->add(new DateInterval('P1D'));
             } while ($abscence->getDebut() <= $abscence->getFin());
         }
@@ -125,8 +131,9 @@ class AbscenceService
             fn ($abscence): ?Abscence => ($abscence->getDebut() <= $date and $date <= $abscence->getFin()) ? $abscence : null,
             $this->employer->getAbscences()->toArray()
         )));
-        if ($abscence)
+        if ($abscence) {
             return  $abscence;
+        }
         return null;
     }
 }

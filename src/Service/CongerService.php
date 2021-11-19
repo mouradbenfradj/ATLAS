@@ -6,9 +6,8 @@ use DateTime;
 use App\Entity\User;
 use App\Entity\Conger;
 use App\Entity\Abscence;
-use App\Service\AbscenceService;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\Integer;
 
 class CongerService
 {
@@ -29,27 +28,30 @@ class CongerService
 
 
 
-
-
-
-    //private $em;
     /**
-     * abscenceService
+     * timeService
      *
-     * @var AbscenceService
+     * @var TimeService
      */
-    private $abscenceService;
+    private $timeService;
+    /**
+     * horaireService
+     *
+     * @var HoraireService
+     */
+    private $horaireService;
 
     /**
      * __construct
      *
      * @param EntityManagerInterface $em
      */
-    public function __construct(AbscenceService $abscenceService)
+    public function __construct(TimeService $timeService, HoraireService $horaireService)
     {
         //EntityManagerInterface $em,
         //$this->em = $em;
-        $this->abscenceService = $abscenceService;
+        $this->timeService = $timeService;
+        $this->horaireService = $horaireService;
     }
     public function partielConstruct(
         ?User $employer = null,
@@ -101,8 +103,9 @@ class CongerService
         $conger->setEmployer($this->employer);
         $conger->setDebut($this->debut);
         $conger->setFin($this->fin);
-        foreach ($this->pointages as $pointage)
+        foreach ($this->pointages as $pointage) {
             $conger->addPointage($pointage);
+        }
         $conger->setType($this->type);
         $conger->setValider($this->valider);
         $conger->setRefuser($this->refuser);
@@ -113,6 +116,12 @@ class CongerService
 
     public function findOrCreate(?DateTime $entrer, ?DateTime $sortie): Conger
     {
+        $quardJourner = $this->timeService->generateTime($this->horaireService->getHeursQuardJournerDeTravaille()->format('H:i:s'));
+        $maxDemiJourner = $this->timeService->generateTime($this->horaireService->getHeursQuardJournerDeTravaille()->format('H:i:s'));
+        $demiJourner = $this->timeService->generateTime($this->horaireService->getHeursDemiJournerDeTravaille()->format('H:i:s'));
+        $maxDemiJourner->add($this->timeService->dateTimeToDateInterval($demiJourner));
+        $diff =$this->timeService->dateIntervalToDateTime($this->timeService->diffTime($entrer, $sortie));
+
         $conger = current(array_filter(array_map(
             fn ($conger): ?Conger => ($conger->getDebut() <= $this->debut and $this->fin <= $conger->getFin()) ? $conger : null,
             $this->employer->getCongers()->toArray()
@@ -123,29 +132,14 @@ class CongerService
         if (!$entrer and !$sortie) {
             $this->partielConstruct($this->employer, $this->debut, $this->fin, "CP", true, false, false);
             return  $this->ConstructEntity();
-        } elseif (!$entrer or !$sortie) {
-            dd($entrer);
-        }            /* elseif (
-            (
-                ($this->timeService->generateTime($this->horaire->getDebutPauseDejeuner()->format('H:i:s')) <= $atttime
-                    and
-                    $atttime <= $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format('H:i:s')))
-                or
-                (($this->timeService->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s')) <= $atttime
-                    and
-                    $atttime <= $this->timeService->generateTime($this->horaire->getFinPauseDejeuner()->format('H:i:s')))
-                    and
-                    $this->horaire->getFinPauseDejeuner() <= $this->horaire->getHeurFinTravaille()))
-            and $this->horaire->getFinPauseDejeuner() <= $this->horaire->getHeurFinTravaille()
-        ) {
-            $this->congerService->partielConstruct($this->employer, $this->date, $this->date, "CP", true, false, true);
-            $this->congerPayer = $this->congerService->ConstructEntity();
-            $this->employer->addConger($this->congerPayer);
-        }  */ else {
-            dump($entrer);
-            dd($sortie);
-            return null;
+        } elseif ($diff >$quardJourner and $diff < $maxDemiJourner) {
+            $this->partielConstruct($this->employer, $this->debut, $this->fin, "CP", true, false, true);
+            return  $this->ConstructEntity();
+            //$this->employer->addConger();
         }
+        dump($entrer);
+        dd($sortie);
+        return null;
     }
 
 
@@ -155,8 +149,9 @@ class CongerService
             fn ($conger): ?Conger => ($conger->getDebut() <= $this->debut and $this->fin  <= $conger->getFin()) ? $conger : null,
             $this->employer->getCongers()->toArray()
         )));
-        if ($conger)
+        if ($conger) {
             return $conger;
+        }
         return null;
     }
 
@@ -173,8 +168,9 @@ class CongerService
             fn ($conger): ?Conger => ($conger->getDebut() <= $date and $date <= $conger->getFin()) ? $conger : null,
             $user->getCongers()->toArray()
         )));
-        if ($conger)
+        if ($conger) {
             return $conger;
+        }
         return null;
     }
 
@@ -194,7 +190,7 @@ class CongerService
         $conger =  $this->em->getRepository(Conger::class)->findOneByEmployerAndDate($date, $this->employer);
         if ($conger and !$conger->getDemiJourner() and $conger->getValider()) {
             $this->employer->setSoldConger($this->employer->getSoldConger() - 1);
-        } else if ($conger and $conger->getDemiJourner() and $conger->getValider()) {
+        } elseif ($conger and $conger->getDemiJourner() and $conger->getValider()) {
             $this->employer->setSoldConger($this->employer->getSoldConger() - 0.5);
         }
         return $conger;
