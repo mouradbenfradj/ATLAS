@@ -94,7 +94,7 @@ class DbfController extends AbstractController
     }
 
     /**
-     * upload
+     * upload function
      * @Route("/upload/{user}", name="dbf_upload", methods={"GET","POST"})
      *
      * @param Request $request
@@ -102,18 +102,14 @@ class DbfController extends AbstractController
      * @param User $user
      * @return Response
      */
-    public function upload(Request $request, DbfRepository $dbfRepository, DbfService $dbfService, User $user): Response
+    public function upload(Request $request, DbfService $dbfService, User $user): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $dbf = $form->get('upload')->getData();
             if ($dbf) {
-                $dateDbfInDb = $dbfService->dateDbfInDb($user);
-                $datePointageInDB = $this->pointageService->dateInDB($user);
-                $inDb = array_merge($dateDbfInDb, $datePointageInDB);
-                $jourFerier = $this->jourFerierService->jourFerier();
-                $ignoredDay = array_merge($inDb, $jourFerier);
+                $ignoredDay = array_merge($dbfService->dateDbfInDb($user), $this->pointageService->dateInDB($user), $this->jourFerierService->jourFerier());
                 $manager = $this->getDoctrine()->getManager();
                 $dbfs = new TableReader($dbf);
                 while ($record = $dbfs->nextRecord()) {
@@ -122,27 +118,23 @@ class DbfController extends AbstractController
                         $dbfService->construct($record->userid, $record->badgenumbe, $record->ssn, $record->username, $record->autosch, $record->attdate, $record->schid, $record->clockintim, $record->clockoutti, $record->starttime, $record->endtime, $record->workday, $record->realworkda, $record->late, $record->early, $record->absent, $record->overtime, $record->worktime, $record->exceptioni, $record->mustin, $record->mustout, $record->deptid, $record->sspedaynor, $record->sspedaywee, $record->sspedayhol, $record->atttime, $record->attchktime, $user);
                         $dbf = $dbfService->createEntity();
                         if (!$this->dateService->isWeek($dateDbf) or ($dbf->getStarttime() or $dbf->getEndtime())) {
-                            $user->addDbf($dbf);
-                            $manager->persist($user);
-                        }
-                    }
-                }
-                $manager->flush();
-                foreach ($user->getDbfs() as $dbf) {
-                    $this->pointageService->constructFromDbf($dbf);
-                    $pointage = $this->pointageService->createEntity();
-                    $accespted = ($pointage->getEntrer() and $pointage->getSortie())
-                    or ($pointage->getCongerPayer() and $pointage->getCongerPayer()->getValider())
-                    or $pointage->getAbscence();
+                            $this->pointageService->constructFromDbf($dbf);
+                            $pointage = $this->pointageService->createEntity();
+                            $accespted = ($pointage->getEntrer() and $pointage->getSortie())
+                                or ($pointage->getCongerPayer() and $pointage->getCongerPayer()->getValider())
+                                or $pointage->getAbscence();
 
-                    if ($accespted) {
-                        $user->addPointage($pointage);
-                        $manager->remove($dbf);
+                            if ($accespted) {
+                                $user->addPointage($pointage);
+                            } else {
+                                $user->addDbf($dbf);
+                            }
+                        }
                     }
                 }
                 $user->setSoldConger($this->employerService->calculerSoldConger($user));
                 $user->setSoldAutorisationSortie($this->employerService->calculerAS($user));
-
+                dd($user);
                 $manager->persist($user);
                 $manager->flush();
 

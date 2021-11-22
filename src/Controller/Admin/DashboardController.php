@@ -14,7 +14,7 @@ use App\Entity\Config;
 use App\Entity\Dbf;
 use App\Entity\WorkTime;
 use App\Repository\UserRepository;
-use App\Repository\PointageRepository;
+use App\Service\BilanService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -28,12 +28,14 @@ class DashboardController extends AbstractDashboardController
 {
 
     private $adminContextProvider;
-    private $pointageService;
+    private $bilanService;
+    private $userRepository;
 
-    public function __construct(AdminContextProvider $adminContextProvider, PointageService $pointageService)
+    public function __construct(AdminContextProvider $adminContextProvider, BilanService $bilanService, UserRepository $userRepository)
     {
         $this->adminContextProvider = $adminContextProvider;
-        $this->pointageService = $pointageService;
+        $this->userRepository = $userRepository;
+        $this->bilanService = $bilanService;
     }
     /**
      * @Route("/admin", name="admin_dashboard")
@@ -46,11 +48,11 @@ class DashboardController extends AbstractDashboardController
             $user = $this->getUser();
         //usort($user->getPointages(), fn ($a, $b) => $a['date'] > $b['date'])
 
-        $collectGeneral = $this->pointageService->getBilanGeneral($user->getPointages()->toArray());
         return $this->render('admin/dashboard.html.twig', [
-            'users' => $this->getDoctrine()->getRepository(User::class)->findAll(),
+            //'users' => $this->getDoctrine()->getRepository(User::class)->findAll(),
+            'users' => $this->userRepository->findAll(),
             'userBilan' =>  $user,
-            'bilan' => $collectGeneral
+            'bilan' =>  $this->bilanService->getBilanGeneral($user->getPointages()->toArray())
         ]);
     }
 

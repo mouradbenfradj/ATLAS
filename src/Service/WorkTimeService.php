@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-class EmptyService
+class WorkTimeService
 {
     public function __construct()
     {

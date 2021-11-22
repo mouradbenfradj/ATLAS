@@ -114,32 +114,33 @@ class CongerService
     }
 
 
-    public function findOrCreate(?DateTime $entrer, ?DateTime $sortie): Conger
+    public function findOrCreate(?DateTime $entrer, ?DateTime $sortie): ?Conger
     {
-        $quardJourner = $this->timeService->generateTime($this->horaireService->getHeursQuardJournerDeTravaille()->format('H:i:s'));
-        $maxDemiJourner = $this->timeService->generateTime($this->horaireService->getHeursQuardJournerDeTravaille()->format('H:i:s'));
-        $demiJourner = $this->timeService->generateTime($this->horaireService->getHeursDemiJournerDeTravaille()->format('H:i:s'));
+        $quardJourner = $this->horaireService->getHeursQuardJournerDeTravaille();
+        $maxDemiJourner = $this->horaireService->getHeursQuardJournerDeTravaille();
+        $demiJourner = $this->horaireService->getHeursDemiJournerDeTravaille();
         $maxDemiJourner->add($this->timeService->dateTimeToDateInterval($demiJourner));
-        $diff =$this->timeService->dateIntervalToDateTime($this->timeService->diffTime($entrer, $sortie));
+        $diff = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($entrer, $sortie));
 
         $conger = current(array_filter(array_map(
             fn ($conger): ?Conger => ($conger->getDebut() <= $this->debut and $this->fin <= $conger->getFin()) ? $conger : null,
             $this->employer->getCongers()->toArray()
         )));
-        if ($conger) {
-            return $conger;
-        }
         if (!$entrer and !$sortie) {
             $this->partielConstruct($this->employer, $this->debut, $this->fin, "CP", true, false, false);
+
+            dump($entrer);
+            dd($sortie);
             return  $this->ConstructEntity();
-        } elseif ($diff >$quardJourner and $diff < $maxDemiJourner) {
+        } elseif ($diff > $quardJourner and $diff < $maxDemiJourner) {
             $this->partielConstruct($this->employer, $this->debut, $this->fin, "CP", true, false, true);
+
+            dump($entrer);
+            dd($sortie);
             return  $this->ConstructEntity();
             //$this->employer->addConger();
         }
-        dump($entrer);
-        dd($sortie);
-        return null;
+        return  $conger ?  $conger : null;
     }
 
 
