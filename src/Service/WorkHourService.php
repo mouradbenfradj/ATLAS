@@ -32,14 +32,14 @@ class WorkHourService
     /**
      * entrer variable
      *
-     * @var DateTime
+     * @var DateTime|null
      */
     private $entrer;
 
     /**
      * sortie variable
      *
-     * @var DateTime
+     * @var DateTime|null
      */
     private $sortie;
 
@@ -190,55 +190,6 @@ class WorkHourService
     }
 
     /**
-     * Get entrer variable
-     *
-     * @return  DateTime
-     */
-    public function getEntrer()
-    {
-        return $this->entrer;
-    }
-
-    /**
-     * Set entrer variable
-     *
-     * @param  DateTime  $entrer  entrer variable
-     *
-     * @return  self
-     */
-    public function setEntrer(DateTime $entrer)
-    {
-        $this->entrer = $entrer;
-
-        return $this;
-    }
-
-    /**
-     * Get sortie variable
-     *
-     * @return  DateTime
-     */
-    public function getSortie()
-    {
-        return $this->sortie;
-    }
-
-    /**
-     * Set sortie variable
-     *
-     * @param  DateTime  $sortie  sortie variable
-     *
-     * @return  self
-     */
-    public function setSortie(DateTime $sortie)
-    {
-        $this->sortie = $sortie;
-
-        return $this;
-    }
-
-
-    /**
      * Get horaire variable
      *
      * @return  Horaire
@@ -259,6 +210,34 @@ class WorkHourService
     {
         $this->horaire = $horaire;
         $this->horaireService->setHoraire($this->horaire);
+        return $this;
+    }
+
+    /**
+     * Set sortie variable
+     *
+     * @param  DateTime|null  $sortie  sortie variable
+     *
+     * @return  self
+     */
+    public function setSortie($sortie)
+    {
+        $this->sortie = $sortie;
+
+        return $this;
+    }
+
+    /**
+     * Set entrer variable
+     *
+     * @param  DateTime|null  $entrer  entrer variable
+     *
+     * @return  self
+     */
+    public function setEntrer($entrer)
+    {
+        $this->entrer = $entrer;
+
         return $this;
     }
 }

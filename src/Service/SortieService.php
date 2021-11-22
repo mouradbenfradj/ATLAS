@@ -3,6 +3,8 @@
 namespace App\Service;
 
 use App\Entity\Horaire;
+use App\Entity\User;
+use DateTime;
 
 class SortieService
 {
@@ -13,12 +15,28 @@ class SortieService
      * @var TimeService
      */
     private $timeService;
+    
+    /**
+     * horaireService variable
+     *
+     * @var HoraireService
+     */
+    private $horaireService;
 
-    public function __construct(TimeService $timeService)
+    /**
+     * congerService variable
+     *
+     * @var CongerService
+     */
+    private $congerService;
+
+    public function __construct(TimeService $timeService, HoraireService $horaireService, CongerService $congerService)
     {
         $this->timeService = $timeService;
+        $this->horaireService = $horaireService;
+        $this->congerService = $congerService;
     }
-    public function getSortieFromArray(array $attchktime, Horaire $horaire)
+    public function getSortieFromArray(array $attchktime, Horaire $horaire, User $employer, DateTime $date)
     {
         $heurDebutTravaille = $this->timeService->generateTime($horaire->getHeurDebutTravaille()->format('H:i:s'));
         $debutPauseMatinal = $this->timeService->generateTime($horaire->getDebutPauseMatinal()->format('H:i:s'));
@@ -29,29 +47,41 @@ class SortieService
         $finPauseMidi = $this->timeService->generateTime($horaire->getFinPauseMidi()->format('H:i:s'));
         $heurFinTravaille = $this->timeService->generateTime($horaire->getHeurFinTravaille()->format('H:i:s'));
 
-        if ($attchktime[0] != "") {
-            switch (count($attchktime)) {
+        if ($attchktime[0] == "") {
+            return null;
+        }
+        $timePos0 = $this->timeService->generateTime($attchktime[0]);
+        
+        $atttime = $this->timeService->generateTime($attchktime[0]);
+
+        switch (count($attchktime)) {
                 case 1:
-                    $atttime = $this->timeService->generateTime($attchktime[0]);
-                    if (($attchktime >= $finPauseMatinal and $attchktime < $finPauseDejeuner) or $attchktime >= $debutPauseMidi) {
-                        dd($atttime);
-                        return $atttime;
+                    if (($timePos0 >= $finPauseMatinal and $timePos0 < $finPauseDejeuner) or $timePos0 >= $debutPauseMidi) {
+                        dd($timePos0);
+                        return $timePos0;
                     }
-                    $atttime->add($this->timeService->dateTimeToDateInterval($horaireService->getHeursDemiJournerDeTravaille()));
-                    return $atttime;
+                    $timePos0->add($this->timeService->dateTimeToDateInterval($this->horaireService->getHeursDemiJournerDeTravaille()));
+                    dump($attchktime);
+                    dd($timePos0);
+                    return $timePos0;
                     break;
                 case 2:
-                    if (!$this->congerPayer) {
-                        $atttime = $this->timeService->generateTime($attchktime[0]);
-                        $atttims = $this->timeService->generateTime($attchktime[1]);
-                        $a = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($atttime, $heurDebutTravaille));
-                        $b = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($atttime, $debutPauseDejeuner));
-                        $c = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($atttime, $finPauseDejeuner));
-                        $d = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($atttime, $heurFinTravaille));
-                        dump($a);
-                        dump($b);
-                        dump($c);
-                        dd($d);
+                    if (!$this->congerService->getConger($employer, $date)) {
+                        $timePos1 = $this->timeService->generateTime($attchktime[1]);
+                        if ($timePos0 < $debutPauseDejeuner and $debutPauseDejeuner <= $timePos1 and $timePos1 < $finPauseDejeuner) {
+                            return $timePos1;
+                        } else {
+                            dump($timePos0);
+                            dump($timePos1);
+                            dump($attchktime);
+                            dump($debutPauseDejeuner);
+                            dd($finPauseDejeuner);
+                            return $timePos0;
+                        }
+                        //   if($debutPauseDejeuner <= $timePos1 and $timePos1 < $finPauseDejeuner   )
+                      
+                       
+                        // dd($d);
                         if (
                             !$this->congerPayer
                             and (
@@ -70,13 +100,13 @@ class SortieService
                     break;
                 case 3:
                     if (!$this->autorisationSortie) {
-                        $atttime = new DateTime($attchktime[0]);
                         $atttims = new DateTime($attchktime[1]);
                         $atttim3 = new DateTime($attchktime[2]);
                         $a = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($atttime, $heurDebutTravaille));
                         $b = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($atttime, $debutPauseDejeuner));
                         $c = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($atttime, $finPauseDejeuner));
                         $d = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($atttime, $heurFinTravaille));
+                        dump($attchktime);
                         dump($a);
                         dump($b);
                         dump($c);
@@ -102,7 +132,6 @@ class SortieService
                     }
                     break;
                 default:
-                    $atttime = new DateTime($attchktime[0]);
                     $atttims = new DateTime($attchktime[1]);
                     $atttim3 = new DateTime($attchktime[2]);
                     $a = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($atttime, $heurDebutTravaille));
@@ -115,8 +144,5 @@ class SortieService
                     dd($d);
                     break;
             }
-        } else {
-            return null;
-        }
     }
 }

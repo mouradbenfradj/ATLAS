@@ -116,16 +116,16 @@ class CongerService
 
     public function findOrCreate(?DateTime $entrer, ?DateTime $sortie): ?Conger
     {
+        $conger = current(array_filter(array_map(
+            fn ($conger): ?Conger => ($conger->getDebut() <= $this->debut and $this->fin <= $conger->getFin()) ? $conger : null,
+            $this->employer->getCongers()->toArray()
+        )));
         $quardJourner = $this->horaireService->getHeursQuardJournerDeTravaille();
         $maxDemiJourner = $this->horaireService->getHeursQuardJournerDeTravaille();
         $demiJourner = $this->horaireService->getHeursDemiJournerDeTravaille();
         $maxDemiJourner->add($this->timeService->dateTimeToDateInterval($demiJourner));
         $diff = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($entrer, $sortie));
 
-        $conger = current(array_filter(array_map(
-            fn ($conger): ?Conger => ($conger->getDebut() <= $this->debut and $this->fin <= $conger->getFin()) ? $conger : null,
-            $this->employer->getCongers()->toArray()
-        )));
         if (!$entrer and !$sortie) {
             $this->partielConstruct($this->employer, $this->debut, $this->fin, "CP", true, false, false);
 
@@ -134,11 +134,7 @@ class CongerService
             return  $this->ConstructEntity();
         } elseif ($diff > $quardJourner and $diff < $maxDemiJourner) {
             $this->partielConstruct($this->employer, $this->debut, $this->fin, "CP", true, false, true);
-
-            dump($entrer);
-            dd($sortie);
-            return  $this->ConstructEntity();
-            //$this->employer->addConger();
+            $conger = $this->ConstructEntity();
         }
         return  $conger ?  $conger : null;
     }
@@ -173,27 +169,5 @@ class CongerService
             return $conger;
         }
         return null;
-    }
-
-
-
-
-    /**
-     * getIfConger
-     *
-     * @param string $date
-     * @param User $employer
-     * @return Conger|null
-     */
-    public function getIfConger(string $date, User $employer): ?Conger
-    {
-        $this->employer = $employer;
-        $conger =  $this->em->getRepository(Conger::class)->findOneByEmployerAndDate($date, $this->employer);
-        if ($conger and !$conger->getDemiJourner() and $conger->getValider()) {
-            $this->employer->setSoldConger($this->employer->getSoldConger() - 1);
-        } elseif ($conger and $conger->getDemiJourner() and $conger->getValider()) {
-            $this->employer->setSoldConger($this->employer->getSoldConger() - 0.5);
-        }
-        return $conger;
     }
 }

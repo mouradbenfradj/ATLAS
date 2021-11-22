@@ -3,6 +3,8 @@
 namespace App\Service;
 
 use App\Entity\Horaire;
+use App\Entity\User;
+use DateTime;
 
 class EntrerService
 {
@@ -18,9 +20,8 @@ class EntrerService
     {
         $this->timeService = $timeService;
     }
-    public function getEntrerFromArray(array $attchktime, Horaire $horaire)
+    public function getEntrerFromArray(array $attchktime, Horaire $horaire, User $employer, DateTime $date)
     {
-
         $heurDebutTravaille = $this->timeService->generateTime($horaire->getHeurDebutTravaille()->format('H:i:s'));
         $debutPauseMatinal = $this->timeService->generateTime($horaire->getDebutPauseMatinal()->format('H:i:s'));
         $finPauseMatinal = $this->timeService->generateTime($horaire->getFinPauseMatinal()->format('H:i:s'));
@@ -29,8 +30,11 @@ class EntrerService
         $debutPauseMidi = $this->timeService->generateTime($horaire->getDebutPauseMidi()->format('H:i:s'));
         $finPauseMidi = $this->timeService->generateTime($horaire->getFinPauseMidi()->format('H:i:s'));
         $heurFinTravaille = $this->timeService->generateTime($horaire->getHeurFinTravaille()->format('H:i:s'));
-        if ($attchktime[0] != "") {
-            switch (count($attchktime)) {
+
+        if ($attchktime[0] == "") {
+            return null;
+        }
+        switch (count($attchktime)) {
                 case 1:
                     $atttime = $this->timeService->generateTime($attchktime[0]);
                     if ($attchktime < $finPauseMatinal or ($attchktime >= $debutPauseMidi and $attchktime < $finPauseMidi)) {
@@ -142,8 +146,5 @@ class EntrerService
                     dd($d);
                     break;
             }
-        } else {
-            return null;
-        }
     }
 }

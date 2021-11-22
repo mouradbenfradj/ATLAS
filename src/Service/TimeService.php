@@ -16,10 +16,11 @@ class TimeService
     public function timeStringToDateTime(string $timeString): ?DateTime
     {
         $time = null;
-        if (DateTime::createFromFormat('H:i', $timeString))
+        if (DateTime::createFromFormat('H:i', $timeString)) {
             $time = DateTime::createFromFormat('H:i', $timeString);
-        elseif (DateTime::createFromFormat('H:i:', $timeString))
+        } elseif (DateTime::createFromFormat('H:i:', $timeString)) {
             $time = DateTime::createFromFormat('H:i:', $timeString);
+        }
         return $time;
     }
 
@@ -42,17 +43,18 @@ class TimeService
 
     /**
      * generateTime
-     * 
+     *
      * @param string $time
-     * 
+     *
      * @return DateTime
      */
     public function generateTime(string $timeString): DateTime
     {
-        if ($timeString != "" and (DateTime::createFromFormat('H:i:s', $timeString) !== false or DateTime::createFromFormat('H:i', $timeString) !== false))
+        if ($timeString != "" and (DateTime::createFromFormat('H:i:s', $timeString) !== false or DateTime::createFromFormat('H:i', $timeString) !== false)) {
             return new DateTime($timeString);
-        else
+        } else {
             return new DateTime("00:00:00");
+        }
     }
 
     /**
@@ -79,10 +81,10 @@ class TimeService
 
     /**
      * diffTime
-     * 
+     *
      * @param DateTime $timeMax
      * @param DateTime $timeMix
-     * 
+     *
      * @return DateInterval
      */
     public function diffTime(DateTime $timeMax, DateTime $timeMin): DateInterval
@@ -96,7 +98,7 @@ class TimeService
 
     /**
      * margeDuRetard
-     * 
+     *
      * @return DateInterval
      */
     public function margeDuRetard(): DateInterval
