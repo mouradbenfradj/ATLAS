@@ -132,18 +132,6 @@ class PointageService
     private $abscence;
 
     /**
-     * entrerService
-     *
-     * @var EntrerService
-     */
-    private $entrerService;
-    /**
-     * sortieService
-     *
-     * @var SortieService
-     */
-    private $sortieService;
-    /**
      * horaireService
      *
      * @var HoraireService
@@ -210,8 +198,6 @@ class PointageService
      */
     private $flash;
     public function __construct(
-        EntrerService $entrerService,
-        SortieService $sortieService,
         FlashBagInterface $flash,
         HoraireService $horaireService,
         TimeService $timeService,
@@ -225,16 +211,38 @@ class PointageService
     ) {
         $this->horaireService = $horaireService;
         $this->timeService = $timeService;
-        $this->sortieService = $sortieService;
         $this->flash = $flash;
         $this->configService = $configService;
         $this->manager = $manager;
         $this->abscenceService = $abscenceService;
         $this->congerService = $congerService;
         $this->autorisationSortieService = $autorisationSortieService;
-        $this->entrerService = $entrerService;
         $this->retardService = $retardService;
         $this->workHourService = $workHourService;
+    }
+    /**
+     * initAttribute function
+     *
+     * @return void
+     */
+    public function initAttribute(): void
+    {
+        $this->date =null;
+        $this->entrer =null;
+        $this->sortie =null;
+        $this->nbrHeurTravailler =null;
+        $this->retardEnMinute =null;
+        $this->departAnticiper =null;
+        $this->retardMidi =null;
+        $this->totaleRetard =null;
+        $this->heurNormalementTravailler =null;
+        $this->diff =null;
+        $this->employer =null;
+        $this->horaire =null;
+        $this->congerPayer =null;
+        $this->autorisationSortie =null;
+        $this->workTime =null;
+        $this->abscence =null;
     }
 
     /**
@@ -245,23 +253,18 @@ class PointageService
      */
     public function constructFromDbf(Dbf $dbf): void
     {
+        $this->initAttribute();
+        $attchktime = ($dbf->getAttchktime()[0] =="")?[]:$dbf->getAttchktime();
         $this->date = $dbf->getAttdate();
         $this->employer = $dbf->getEmployer();
+        $this->horaireService->setWorkTime($this->employer->getWorkTimes()->toArray());
         $this->horaire = $this->horaireService->getHoraireForDate($this->date, $this->employer);
-        $this->workHourService->setHoraire($this->horaire);
-        $this->workTime = null;
-
-        //$this->entrer = $dbf->getStarttime();
-        $this->entrer = $dbf->getStarttime() ? $dbf->getStarttime() : $this->entrerService->getEntrerFromArray($dbf->getAttchktime(), $this->horaire, $this->employer, $this->date);
-        //dd($this->entrer);
-        $this->sortie = $dbf->getEndtime() ? $dbf->getEndtime() : $this->sortieService->getSortieFromArray($dbf->getAttchktime(), $this->horaire, $this->employer, $this->date);
-        //$this->sortie = $dbf->getEndtime();
-        $this->retardService->setAttchktime($dbf->getAttchktime());
-        $this->retardService->setHoraire($this->horaire);
-        $this->retardService->setEntrer($this->entrer);
-        $this->retardService->setSortie($this->sortie);
-        $this->workHourService->setEntrer($this->entrer);
-        $this->workHourService->setSortie($this->sortie);
+        //$this->workTime = null;
+        $this->workHourService->requirement($attchktime, $this->horaire, $this->employer, $this->date, $dbf->getStarttime(), $dbf->getEndtime());
+        $this->entrer = $this->workHourService->getEntrerFromArray();
+        //$this->entrer = $dbf->getStarttime() ? $dbf->getStarttime() : $this->entrerService->getEntrerFromArray($attchktime, $this->horaire, $this->employer, $this->date);
+        $this->sortie = $this->workHourService->getSortieFromArray();
+        //$this->sortie = $dbf->getEndtime() ? $dbf->getEndtime() : $this->sortieService->getSortieFromArray($attchktime, $this->horaire, $this->employer, $this->date);
         $this->abscenceService->partielConstruct($this->employer, $this->date, $this->date);
         $this->abscence = $this->abscenceService->findOrCreate($this->entrer, $this->sortie);
         //$this->abscence = $this->abscenceService->estAbscent($this->date);
@@ -271,55 +274,22 @@ class PointageService
             if (!$this->congerPayer) {
                 $this->autorisationSortieService->partielConstruct($this->employer, $this->date);
                 $this->autorisationSortie = $this->autorisationSortieService->getAutorisation();
+                if (count($attchktime)<4) {
+                    $this->autorisationSortieService->requirement($attchktime, $this->horaire, $this->entrer, $this->sortie);
+                    $this->autorisationSortie = $this->autorisationSortie?$this->autorisationSortie:$this->autorisationSortieService->ConstructEntity();
+                    dd($this->autorisationSortie);
+                }
             }
         }
-        $this->workHourService->setCongerPayer($this->congerPayer);
-        $this->workHourService->setAutorisationSortie($this->autorisationSortie);
-
-        //$this->retardMidi = null;
-        $this->retardMidi = $this->retardService->retardMidi();
-        $this->retardEnMinute = $this->retardService->retardEnMinute(); //$dbf->getLate();
-        $this->departAnticiper = $this->retardService->departAnticiper(); //$dbf->getEarly();
         $this->heurNormalementTravailler = $this->workHourService->heurNormalementTravailler();
+        $this->retardService->requirement($attchktime, $this->horaire, $this->entrer, $this->sortie, $this->congerPayer, $this->autorisationSortie);
+        $this->retardEnMinute = $this->retardService->retardEnMinute(); //$dbf->getLate();
+        $this->retardMidi = $this->retardService->retardMidi();
+        $this->departAnticiper = $this->retardService->departAnticiper(); //$dbf->getEarly();
         $this->nbrHeurTravailler = $this->workHourService->nbrHeurTravailler(); // $dbf->getWorktime();
+        dd($this->nbrHeurTravailler);
         $this->totalRetard = $this->retardService->totalRetard();
         $this->diff = $this->workHourService->diff();
-        if (!$this->abscence) {
-            dump($this->entrer);
-            dump($this->sortie);
-            dump($this->abscence);
-            if ($this->congerPayer) {
-                dump($this->congerPayer);
-            }
-            if ($this->autorisationSortie) {
-                dump($this->autorisationSortie);
-            }
-            dump($this->retardMidi);
-            dump($this->departAnticiper);
-            dump($this->workTime);
-            dump($this->heurNormalementTravailler);
-            dump($this->nbrHeurTravailler);
-            dump($this->totalRetard);
-            dump($this->diff);
-        } else {
-            dump($this->entrer);
-            dump($this->sortie);
-            dump($this->abscence);
-            if ($this->congerPayer) {
-                dump($this->congerPayer);
-            }
-            if ($this->autorisationSortie) {
-                dump($this->autorisationSortie);
-            }
-            dump($this->retardMidi);
-            dump($this->departAnticiper);
-            dump($this->workTime);
-            dump($this->heurNormalementTravailler);
-            dump($this->nbrHeurTravailler);
-            dump($this->totalRetard);
-            dump($this->diff);
-            dd($this->abscence);
-        }
     }
 
     /**

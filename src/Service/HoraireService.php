@@ -68,7 +68,6 @@ class HoraireService
     public function __construct(EntityManagerInterface $manager, TimeService $timeService)
     {
         $this->horaires = $manager->getRepository(Horaire::class)->findAll();
-        $this->workTime = $manager->getRepository(WorkTime::class)->findAll();
         $this->timeService = $timeService;
     }
 
@@ -85,8 +84,9 @@ class HoraireService
         $resultat = current($this->horaires);
         $trouve = false;
         while ($horaire = next($this->horaires) and !$trouve) {
-            if (!$horaire->getDateFin())
+            if (!$horaire->getDateFin()) {
                 $horaire->setDateFin(new DateTime());
+            }
             if ($dateTime >= $horaire->getDateDebut() and $dateTime <= $horaire->getDateFin()) {
                 $resultat = $horaire;
                 $trouve = true;
@@ -97,8 +97,9 @@ class HoraireService
         $workTime  = reset($this->workTime);
         $workTime = current($this->workTime);
         if ($workTime) {
-            if (!$workTime->getDateFin())
+            if (!$workTime->getDateFin()) {
                 $workTime->setDateFin(new DateTime());
+            }
             do {
                 if (
                     $dateTime >= $workTime->getDateDebut()
@@ -263,16 +264,6 @@ class HoraireService
     }
 
     /**
-     * Get horaire
-     *
-     * @return  Horaire
-     */
-    public function getHoraire()
-    {
-        return $this->horaire;
-    }
-
-    /**
      * Set horaire
      *
      * @param  Horaire  $horaire  horaire
@@ -282,6 +273,20 @@ class HoraireService
     public function setHoraire(Horaire $horaire)
     {
         $this->horaire = $horaire;
+
+        return $this;
+    }
+
+    /**
+     * Set workTime
+     *
+     * @param  WorkTime[]  $workTime  workTime
+     *
+     * @return  self
+     */
+    public function setWorkTime(array $workTime)
+    {
+        $this->workTime = $workTime;
 
         return $this;
     }
