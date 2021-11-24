@@ -271,12 +271,14 @@ class PointageService
         if (!$this->abscence) {
             $this->congerService->partielConstruct($this->employer, $this->date, $this->date);
             $this->congerPayer = $this->congerService->findOrCreate($this->entrer, $this->sortie);
+            $this->workHourService->setCongerPayer($this->congerPayer);
             if (!$this->congerPayer) {
                 $this->autorisationSortieService->partielConstruct($this->employer, $this->date);
                 $this->autorisationSortie = $this->autorisationSortieService->getAutorisation();
                 if (count($attchktime)<4) {
                     $this->autorisationSortieService->requirement($attchktime, $this->horaire, $this->entrer, $this->sortie);
                     $this->autorisationSortie = $this->autorisationSortie?$this->autorisationSortie:$this->autorisationSortieService->ConstructEntity();
+                    $this->workHourService->setAutorisationSortie($this->autorisationSortie);
                     dd($this->autorisationSortie);
                 }
             }
@@ -287,7 +289,6 @@ class PointageService
         $this->retardMidi = $this->retardService->retardMidi();
         $this->departAnticiper = $this->retardService->departAnticiper(); //$dbf->getEarly();
         $this->nbrHeurTravailler = $this->workHourService->nbrHeurTravailler(); // $dbf->getWorktime();
-        dd($this->nbrHeurTravailler);
         $this->totalRetard = $this->retardService->totalRetard();
         $this->diff = $this->workHourService->diff();
     }
