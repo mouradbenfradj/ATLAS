@@ -273,14 +273,14 @@ class PointageService
             $this->congerPayer = $this->congerService->findOrCreate($this->entrer, $this->sortie);
             $this->workHourService->setCongerPayer($this->congerPayer);
             if (!$this->congerPayer) {
+                $this->autorisationSortieService->requirement($attchktime, $this->horaire, $this->entrer, $this->sortie);
                 $this->autorisationSortieService->partielConstruct($this->employer, $this->date);
                 $this->autorisationSortie = $this->autorisationSortieService->getAutorisation();
-                if (count($attchktime)<4) {
-                    $this->autorisationSortieService->requirement($attchktime, $this->horaire, $this->entrer, $this->sortie);
+                if (!$this->autorisationSortie and count($attchktime)<4) {
+                    $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $this->autorisationSortieService->de(), $this->autorisationSortieService->a(), true);
                     $this->autorisationSortie = $this->autorisationSortie?$this->autorisationSortie:$this->autorisationSortieService->ConstructEntity();
-                    $this->workHourService->setAutorisationSortie($this->autorisationSortie);
-                    dd($this->autorisationSortie);
                 }
+                $this->workHourService->setAutorisationSortie($this->autorisationSortie);
             }
         }
         $this->heurNormalementTravailler = $this->workHourService->heurNormalementTravailler();
