@@ -157,7 +157,7 @@ class RetardService
         $heurFinTravaille = $this->heurFinTravaille;
         switch (count($this->attchktime)) {
             case 4:
-                if ($this->entrer1 >= $debutPauseDejeuner and $this->entrer1 <= $finPauseDejeuner) {
+                if ($this->entrer1 < $finPauseDejeuner) {
                     $diffSR =$this->timeService->diffTime($debutPauseDejeuner, $this->entrer1);
                     $debutPauseDejeuner->add($diffSR);
                     $finPauseDejeuner->add($diffSR);
@@ -165,51 +165,18 @@ class RetardService
                         $this->retardMidi = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($this->entrer2, $finPauseDejeuner));
                     }
                 } else {
-                    $debutPauseDejeuner->add(new DateInterval('PT1H'));
-                    $finPauseDejeuner->add(new DateInterval('PT1H'));
-                    if ($this->entrer1 >= $debutPauseDejeuner and $this->entrer1 <= $finPauseDejeuner) {
+                    $diffpauseDej =$this->timeService->diffTime($debutPauseDejeuner, $finPauseDejeuner);
+                    $debutPauseDejeuner->add($diffpauseDej);
+                    $finPauseDejeuner->add($diffpauseDej);
+                    if ($this->entrer1 < $finPauseDejeuner) {
                         $diffSR =$this->timeService->diffTime($debutPauseDejeuner, $this->entrer1);
                         $debutPauseDejeuner->add($diffSR);
                         $finPauseDejeuner->add($diffSR);
                         if ($this->entrer2 > $finPauseDejeuner) {
-                            $this->retardMidi = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($this->entrer1, $finPauseDejeuner));
-                            dump($this->attchktime);
-                            dump($this->entrer1);
-                            dump($this->entrer2);
-                            dump($debutPauseDejeuner);
-                            dump($finPauseDejeuner);
-                            dd($this->retardMidi);
+                            $this->retardMidi = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($this->entrer2, $finPauseDejeuner));
                         }
                     } else {
-                        dump($this->attchktime);
-                        dump($this->horaire);
-                        dump($this->entrer);
-                        dump($this->entrer1);
-                        dump($this->entrer2);
-                        dump($this->sortie);
-                        dump($heurDebutTravaille);
-                        dump($debutPauseMatinal);
-                        dump($finPauseMatinal);
-                        dump($debutPauseDejeuner);
-                        dump($finPauseDejeuner);
-                        dump($debutPauseMidi);
-                        dump($finPauseMidi);
-                        dump($heurFinTravaille);
-                        dd($this->retardMidi);
-                        $debutPauseDejeuner->add(new DateInterval('PT1H'));
-                        $finPauseDejeuner->add(new DateInterval('PT1H'));
-                        $diffSR =$this->timeService->diffTime($debutPauseDejeuner, $this->entrer1);
-                        $debutPauseDejeuner->add($diffSR);
-                        $finPauseDejeuner->add($diffSR);
-                        if ($this->entrer2 > $finPauseDejeuner) {
-                            $retardMidi = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($this->entrer2, $finPauseDejeuner));
-                        }
-                        dump($this->attchktime);
-                        dump($this->entrer1);
-                        dump($debutPauseDejeuner);
-                        dump($this->entrer2);
-                        dump($finPauseDejeuner);
-                        dd("retardServidce2");
+                        dd("fff");
                     }
                 }
             break;
@@ -396,11 +363,34 @@ class RetardService
                 break;
             case 2:
                 if ($heurDebutTravaille < $this->entrer and $this->entrer < $this->finPauseDejeuner) {
+                    dump($this->attchktime);
+                    dump($this->horaire);
+                    dump($this->margeDuRetard);
+                    dump($heurDebutTravaille);
+                    dump($this->finPauseDejeuner);
+                    dump($this->entrer);
+                    dump($this->sortie);
+                    dump($this->conger);
+                    dump($this->autorisationSortie);
+                    dd($this->retardEnMinute);
                     $this->retardEnMinute = $this->timeService->diffTime($heurDebutTravaille, $this->entrer);
                 } else {
-                    $heurDebutTravaille->add($this->timeService->dateTimeToDateInterval($this->horaireService->getHeursDemiJournerDeTravaille()));
-                    if ($heurDebutTravaille < $this->entrer and $this->entrer < $this->finPauseDejeuner) {
+                    $diffPauseDejeuner =  $this->timeService->diffTime($this->debutPauseDejeuner, $this->finPauseDejeuner);
+                    //$heurDebutTravaille->add($this->timeService->dateTimeToDateInterval($this->horaireService->getHeursDemiJournerDeTravaille()));
+                    $heurDebutTravaille = $this->finPauseDejeuner;
+                    //$heurDebutTravaille->add($this->timeService->dateTimeToDateInterval($this->horaireService->getHeursDemiJournerDeTravaille()));
+                    $heurDebutTravaille->add($diffPauseDejeuner);
+                    if ($heurDebutTravaille < $this->entrer and $this->entrer < $this->heurFinTravaille) {
                         $this->retardEnMinute = $this->timeService->diffTime($heurDebutTravaille, $this->entrer);
+                        dump($this->attchktime);
+                        dump($this->horaire);
+                        dump($this->margeDuRetard);
+                        dump($heurDebutTravaille);
+                        dump($this->finPauseDejeuner);
+                        dump($this->entrer);
+                        dump($this->sortie);
+                        dump($this->conger);
+                        dump($this->autorisationSortie);
                         dd($this->retardEnMinute);
                     } else {
                         $this->retardEnMinute = $this->timeService->diffTime($heurDebutTravaille, $this->entrer);
@@ -530,21 +520,21 @@ class RetardService
                     $heurFinTravaille = $debutPauseDejeuner;
                     $heurFinTravaille->add($this->retardEnMinute);
                 } else {
-                    dump($this->attchktime);
-                    dump($heurFinTravaille);
-                    dd($this->retardEnMinute);
-                    dump($this->entrer);
-                    dump($this->entrer1);
-                    dump($this->entrer2);
-                    dump($this->sortie);
-                    dump($heurDebutTravaille);
-                    dump($debutPauseMatinal);
-                    dump($finPauseMatinal);
-                    dump($debutPauseDejeuner);
-                    dump($finPauseDejeuner);
-                    dump($debutPauseMidi);
-                    dump($finPauseMidi);
-                    dump($heurFinTravaille);
+                    if ($heurFinTravaille < $this->sortie) {
+                        return null ;
+                    } else {
+                        dump($this->attchktime);
+                        dump($heurFinTravaille);
+                        dump($this->entrer);
+                        dump($this->entrer1);
+                        dump($this->entrer2);
+                        dump($this->sortie);
+                        dump($debutPauseDejeuner);
+                        dump($finPauseDejeuner);
+                        dump($debutPauseMidi);
+                        dump($finPauseMidi);
+                        dd($heurFinTravaille);
+                    }
                 }
                 if ($heurFinTravaille > $this->sortie) {
                     dump($this->attchktime);

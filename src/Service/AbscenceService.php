@@ -105,12 +105,11 @@ class AbscenceService
     /**
      * abscenceEmployer
      *
-     * @param User $user
      * @return array
      */
-    public function abscenceEmployer(User $user): array
+    public function abscenceEmployer(): array
     {
-        foreach ($user->getAbscences() as $abscence) {
+        foreach ($this->employer->getAbscences() as $abscence) {
             do {
                 array_push($this->abscenceDays, $abscence->getDebut()->format("Y-m-d"));
                 $abscence->getDebut()->add(new DateInterval('P1D'));
@@ -125,10 +124,10 @@ class AbscenceService
      * @param DateTime $date
      * @return Abscence|null
      */
-    public function estAbscent(DateTime $date): ?Abscence
+    public function estAbscent(): ?Abscence
     {
         $abscence =  current(array_filter(array_map(
-            fn ($abscence): ?Abscence => ($abscence->getDebut() <= $date and $date <= $abscence->getFin()) ? $abscence : null,
+            fn ($abscence): ?Abscence => ($abscence->getDebut() <= $this->date and $this->date <= $abscence->getFin()) ? $abscence : null,
             $this->employer->getAbscences()->toArray()
         )));
         if ($abscence) {

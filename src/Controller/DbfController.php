@@ -2,19 +2,15 @@
 
 namespace App\Controller;
 
-use DateTime;
 use App\Entity\User;
 use XBase\TableReader;
-use App\Entity\Pointage;
 use App\Form\UploadType;
 use App\Service\DateService;
 use App\Service\JourFerierService;
-use App\Service\PointageGeneratorService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\Admin\PointageCrudController;
-use App\Repository\DbfRepository;
 use App\Service\AbscenceService;
 use App\Service\AutorisationSortieService;
 use App\Service\CongerService;
@@ -22,7 +18,6 @@ use App\Service\DbfService;
 use App\Service\EmployerService;
 use App\Service\HoraireService;
 use App\Service\PointageService;
-use App\Service\TimeService;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -45,40 +40,73 @@ class DbfController extends AbstractController
      * @var DateService
      */
     private $dateService;
+    /**
+     * jourFerierService variable
+     *
+     * @var JourFerierService
+     */
     private $jourFerierService;
+    /**
+     * pointageService variable
+     *
+     * @var PointageService
+     */
     private $pointageService;
-    private $timeService;
+    /**
+     * employerService variable
+     *
+     * @var EmployerService
+     */
     private $employerService;
+    /**
+     * dbfService variable
+     *
+     * @var DbfService
+     */
+    private $dbfService;
+    /**
+     * abscenceService variable
+     *
+     * @var AbscenceService
+     */
+    private $abscenceService;
+    /**
+     * congerService variable
+     *
+     * @var CongerService
+     */
+    private $congerService;/**
+     * autorisationSortieService variable
+     *
+     * @var AutorisationSortieService
+     */
+    private $autorisationSortieService;
 
 
     public function __construct(
+        FlashBagInterface $flash,
         AdminUrlGenerator $adminUrlGenerator,
         DateService $dateService,
         JourFerierService $jourFerierService,
-        PointageGeneratorService $pointageGeneratorService,
-        HoraireService $horaireService,
         PointageService $pointageService,
-        FlashBagInterface $flash,
-        TimeService $timeService,
-        CongerService $congerService,
+        EmployerService $employerService,
+        //HoraireService $horaireService,
         DbfService $dbfService,
         AbscenceService $abscenceService,
-        AutorisationSortieService $autorisationSortieService,
-        EmployerService $employerService
+        CongerService $congerService,
+        AutorisationSortieService $autorisationSortieService
     ) {
+        $this->flash = $flash;
         $this->adminUrlGenerator = $adminUrlGenerator;
         $this->dateService = $dateService;
         $this->jourFerierService = $jourFerierService;
-        $this->pointageGeneratorService = $pointageGeneratorService;
-        $this->congerService = $congerService;
-        $this->horaireService = $horaireService;
+        //$this->horaireService = $horaireService;
         $this->pointageService = $pointageService;
-        $this->timeService = $timeService;
-        $this->autorisationSortieService = $autorisationSortieService;
-        $this->flash = $flash;
-        $this->dbfService = $dbfService;
         $this->employerService = $employerService;
+        $this->dbfService = $dbfService;
         $this->abscenceService = $abscenceService;
+        $this->congerService = $congerService;
+        $this->autorisationSortieService = $autorisationSortieService;
     }
 
     /**
@@ -98,91 +126,100 @@ class DbfController extends AbstractController
      * @Route("/upload/{user}", name="dbf_upload", methods={"GET","POST"})
      *
      * @param Request $request
-     * @param DbfService $dbfService
      * @param User $user
      * @return Response
      */
-    public function upload(Request $request, DbfService $dbfService, User $user): Response
+    public function upload(Request $request, User $user): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $dbf = $form->get('upload')->getData();
             if ($dbf) {
-                $ignoredDay = array_merge($dbfService->dateDbfInDb($user), $this->pointageService->dateInDB($user), $this->jourFerierService->jourFerier());
+                $ignoredDay = array_merge($this->dbfService->dateDbfInDb($user), $this->pointageService->dateInDB($user), $this->jourFerierService->jourFerier());
                 $manager = $this->getDoctrine()->getManager();
                 $dbfs = new TableReader($dbf);
                 while ($record = $dbfs->nextRecord()) {
                     $dateDbf = $this->dateService->dateString_d_m_Y_ToDateTime($record->attdate);
                     if (!in_array($dateDbf->format('Y-m-d'), $ignoredDay)) {
-                        $dbfService->construct($record->userid, $record->badgenumbe, $record->ssn, $record->username, $record->autosch, $record->attdate, $record->schid, $record->clockintim, $record->clockoutti, $record->starttime, $record->endtime, $record->workday, $record->realworkda, $record->late, $record->early, $record->absent, $record->overtime, $record->worktime, $record->exceptioni, $record->mustin, $record->mustout, $record->deptid, $record->sspedaynor, $record->sspedaywee, $record->sspedayhol, $record->atttime, $record->attchktime, $user);
-                        $dbf = $dbfService->createEntity();
-                        if (!$this->dateService->isWeek($dateDbf) or ($dbf->getStarttime() or $dbf->getEndtime())) {
+                        $this->dbfService->construct($record->userid, $record->badgenumbe, $record->ssn, $record->username, $record->autosch, $record->attdate, $record->schid, $record->clockintim, $record->clockoutti, $record->starttime, $record->endtime, $record->workday, $record->realworkda, $record->late, $record->early, $record->absent, $record->overtime, $record->worktime, $record->exceptioni, $record->mustin, $record->mustout, $record->deptid, $record->sspedaynor, $record->sspedaywee, $record->sspedayhol, $record->atttime, $record->attchktime, $user);
+                        $dbf = $this->dbfService->createEntity();
+                        $this->abscenceService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
+                        $this->congerService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
+                        $this->autorisationSortieService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
+                        if (
+                            !$this->dateService->isWeek($dateDbf)
+                        and (
+                            ($dbf->getStarttime() and $dbf->getEndtime())
+                            or $this->abscenceService->estAbscent()
+                            or $this->congerService->estUnConger()
+                            or $this->autorisationSortieService->getAutorisation()
+                            )
+                        ) {
                             $this->pointageService->constructFromDbf($dbf);
                             $pointage = $this->pointageService->createEntity();
-                            $accespted = ($pointage->getEntrer() and $pointage->getSortie())
-                                or ($pointage->getCongerPayer() and $pointage->getCongerPayer()->getValider())
-                                or $pointage->getAbscence();
+                            /*  $accespted = ($pointage->getEntrer() and $pointage->getSortie())
+                                 or ($pointage->getCongerPayer() and $pointage->getCongerPayer()->getValider())
+                                 or $pointage->getAbscence();
 
-                            if ($accespted) {
-                                $user->addPointage($pointage);
-                            } else {
-                                $user->addDbf($dbf);
-                            }
+                             if ($accespted) { */
+                            $user->addPointage($pointage);
+                        } else {
+                            $user->addDbf($dbf);
                         }
                     }
                 }
-                $user->setSoldConger($this->employerService->calculerSoldConger($user));
-                $user->setSoldAutorisationSortie($this->employerService->calculerAS($user));
-                dd($user);
-                $manager->persist($user);
-                $manager->flush();
-
-
-                //dd($user->getPointages()->toArray());
-
-
-
-
-
-                /* $conger = $this->congerService->getIfConger($dateDbf, $user);
-                    $user = $this->congerService->getemployer();
-                    $autorisationSortie = $this->autorisationSortieService->getIfAutorisationSortie($dateDbf, $user);
-                    $pointage = new Pointage();
-                    $pointage->setDate($this->dateService->dateString_d_m_Y_ToDateTime($record->attdate));
-                    $pointage->setHoraire($this->horaireService->getHoraireForDate($pointage->getDate()));
-                    $pointage->setCongerPayer($conger);
-                    $pointage->setAutorisationSortie($autorisationSortie);
-                    $pointage->setAbscence(null);
-
-
-                    if ($record->starttime != "" and $this->timeService->isTimeHi($record->starttime))
-                        $pointage->setEntrer(new DateTime($record->starttime));
-                    else {
-                        $pointage->setEntrer(new DateTime("00:00:00"));
-                        $this->flash->add('danger ', 'saisie automatique de l\'heur d\'entrer a 00:00:00 pour la date ' . $record->attdate);
-                    }
-                    if ($record->endtime != ""  and $this->timeService->isTimeHi($record->endtime))
-                        $pointage->setSortie(new DateTime($record->endtime));
-                    else {
-                        $pointage->setSortie(new DateTime("23:00:00"));
-                        $this->flash->add('danger ', 'saisie automatique de l\'heur de sortie a 23:00:00 pour la date ' . $record->attdate);
-                    }
-
-
-                    $this->pointageService->setPointage($pointage);
-                    $pointage->setNbrHeurTravailler($this->pointageService->nbrHeurTravailler());
-                    $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());
-                    $pointage->setDepartAnticiper(null);
-                    $pointage->setRetardMidi(null);
-                    $pointage->setTotaleRetard($this->pointageService->totalRetard());
-                    $pointage->setHeurNormalementTravailler($this->pointageService->heurNormalementTravailler());
-                    $pointage->setDiff($this->pointageService->diff());
-                    $user->addPointage($pointage); */
-
-                $manager->flush();
-                $this->addFlash('success', 'id.updated_successfully');
             }
+            $user->setSoldConger($this->employerService->calculerSoldConger($user));
+            $user->setSoldAutorisationSortie($this->employerService->calculerAS($user));
+            $manager->persist($user);
+            $manager->flush();
+
+
+            //dd($user->getPointages()->toArray());
+
+
+
+
+
+            /* $conger = $this->congerService->getIfConger($dateDbf, $user);
+                $user = $this->congerService->getemployer();
+                $autorisationSortie = $this->autorisationSortieService->getIfAutorisationSortie($dateDbf, $user);
+                $pointage = new Pointage();
+                $pointage->setDate($this->dateService->dateString_d_m_Y_ToDateTime($record->attdate));
+                $pointage->setHoraire($this->horaireService->getHoraireForDate($pointage->getDate()));
+                $pointage->setCongerPayer($conger);
+                $pointage->setAutorisationSortie($autorisationSortie);
+                $pointage->setAbscence(null);
+
+
+                if ($record->starttime != "" and $this->timeService->isTimeHi($record->starttime))
+                    $pointage->setEntrer(new DateTime($record->starttime));
+                else {
+                    $pointage->setEntrer(new DateTime("00:00:00"));
+                    $this->flash->add('danger ', 'saisie automatique de l\'heur d\'entrer a 00:00:00 pour la date ' . $record->attdate);
+                }
+                if ($record->endtime != ""  and $this->timeService->isTimeHi($record->endtime))
+                    $pointage->setSortie(new DateTime($record->endtime));
+                else {
+                    $pointage->setSortie(new DateTime("23:00:00"));
+                    $this->flash->add('danger ', 'saisie automatique de l\'heur de sortie a 23:00:00 pour la date ' . $record->attdate);
+                }
+
+
+                $this->pointageService->setPointage($pointage);
+                $pointage->setNbrHeurTravailler($this->pointageService->nbrHeurTravailler());
+                $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());
+                $pointage->setDepartAnticiper(null);
+                $pointage->setRetardMidi(null);
+                $pointage->setTotaleRetard($this->pointageService->totalRetard());
+                $pointage->setHeurNormalementTravailler($this->pointageService->heurNormalementTravailler());
+                $pointage->setDiff($this->pointageService->diff());
+                $user->addPointage($pointage); */
+
+            $manager->flush();
+            $this->addFlash('success', 'id.updated_successfully');
+            
             $url = $this->adminUrlGenerator
                 ->setController(PointageCrudController::class)
                 ->setAction('index')

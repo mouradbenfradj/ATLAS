@@ -136,14 +136,13 @@ class HoraireService
             } while ($workTime = next($this->workTime) and !$trouve);
         }
         if ($this->horaire) {
-            $this->HeursJournerDeTravaille = new DateTime($this->horaire->getHeurFinTravaille()->format("H:i:s"));
+            $this->HeursJournerDeTravaille = $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format("H:i:s"));
             $heurDebutTravaille = $this->horaire->getHeurDebutTravaille();
-            $e = $this->sumPause();
-            $this->HeursJournerDeTravaille->sub($this->timeService->dateTimeToDateInterval($e));
+            $this->HeursJournerDeTravaille->sub($this->timeService->dateTimeToDateInterval($this->sumPause()));
             $this->HeursJournerDeTravaille = $this->timeService->diffTime($this->HeursJournerDeTravaille, $heurDebutTravaille);
             $this->HeursJournerDeTravaille = $this->timeService->dateIntervalToDateTime($this->HeursJournerDeTravaille);
-            $this->HeursDemiJournerDeTravaille = new DateTime(intdiv($this->HeursJournerDeTravaille->format('H'), 2) . ':' . intdiv($this->HeursJournerDeTravaille->format('i'), 2) . ':' . intdiv($this->HeursJournerDeTravaille->format('s'), 2));
-            $this->HeursQuardJournerDeTravaille = new DateTime(intdiv($this->HeursJournerDeTravaille->format('H'), 4) . ':' . intdiv($this->HeursJournerDeTravaille->format('i'), 4) . ':' . intdiv($this->HeursJournerDeTravaille->format('s'), 4));
+            $this->HeursDemiJournerDeTravaille = $this->timeService->generateTime(intdiv($this->HeursJournerDeTravaille->format('H'), 2) . ':' . intdiv($this->HeursJournerDeTravaille->format('i'), 2) . ':' . intdiv($this->HeursJournerDeTravaille->format('s'), 2));
+            $this->HeursQuardJournerDeTravaille = $this->timeService->generateTime(intdiv($this->HeursJournerDeTravaille->format('H'), 4) . ':' . intdiv($this->HeursJournerDeTravaille->format('i'), 4) . ':' . intdiv($this->HeursJournerDeTravaille->format('s'), 4));
         }
         return $this->horaire;
     }

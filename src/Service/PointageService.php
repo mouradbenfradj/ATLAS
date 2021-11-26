@@ -276,10 +276,20 @@ class PointageService
                 $this->autorisationSortieService->requirement($attchktime, $this->horaire, $this->entrer, $this->sortie);
                 $this->autorisationSortieService->partielConstruct($this->employer, $this->date);
                 $this->autorisationSortie = $this->autorisationSortieService->getAutorisation();
-                if (!$this->autorisationSortie and count($attchktime)<4) {
+                /* if (!$this->autorisationSortie and count($attchktime)<4) {
+                    dump($this->horaire);
+                    dump($this->horaireService->getHeursQuardJournerDeTravaille());
+                    dump($this->horaireService->getHeursDemiJournerDeTravaille());
+                    dump($this->horaireService->getHeursTroisQuardJournerDeTravaille());
+                    dump($this->horaireService->getHeursJournerDeTravaille());
+                    dump($dbf->getAttchktime());
+                    dump($this->entrer);
+                    dump($this->sortie);
+                    dd($this->timeService->diffTime($this->entrer, $this->sortie));
+                    
                     $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $this->autorisationSortieService->de(), $this->autorisationSortieService->a(), true);
                     $this->autorisationSortie = $this->autorisationSortie?$this->autorisationSortie:$this->autorisationSortieService->ConstructEntity();
-                }
+                } */
                 $this->workHourService->setAutorisationSortie($this->autorisationSortie);
             }
         }

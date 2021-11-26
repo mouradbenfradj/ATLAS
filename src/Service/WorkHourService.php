@@ -458,18 +458,6 @@ class WorkHourService
                         $this->horaire->getDebutPauseMidi(),
                         $this->horaire->getFinPauseMidi()
                     ));
-                    dump($this->attchktime);
-                    dump($this->debutPauseDejeuner);
-                    dump($this->horaire);
-                    dump($this->employer);
-                    dump($this->date);
-                    dump($this->congerPayer);
-                    dump($this->autorisationSortie);
-                    dump($this->entrer);
-                    dump($this->sortie);
-                    dump($this->entrer1);
-                    dump($this->entrer2);
-                    dd($this->nbrHeurTravailler);
                 }
         
             break;
