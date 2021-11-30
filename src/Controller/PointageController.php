@@ -5,8 +5,7 @@ namespace App\Controller;
 use App\Entity\Pointage;
 use App\Form\PointageType;
 use App\Repository\PointageRepository;
-use App\Service\PointageService;
-use DateTime;
+use App\Service\BilanService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,39 +31,39 @@ class PointageController extends AbstractController
      * @Route("/bilanSemestiriel", name="bilan_semestiriel", methods={"GET"})
      * 
      * @param Security $security
-     * @param PointageService $pointageService
+     * @param BilanService $bilanService
      * @return Response
      */
-    public function bilanSemestiriel(Security $security, PointageService $pointageService): Response
+    public function bilanSemestiriel(Security $security, BilanService $bilanService): Response
     {
         return $this->render('pointage/bilanSemestiriel.html.twig', [
-            'bilan' =>  $pointageService->getBilanSemestriel($security->getUser()->getPointages()),
+            'bilan' => $bilanService->getBilanSemestriel($security->getUser()->getPointages()->toArray()),
         ]);
     }
     /**
      * @Route("/bilanMensuel", name="bilan_mensuel", methods={"GET"})
      *
      * @param Security $security
-     * @param PointageService $pointageService
+     * @param BilanService $bilanService
      * @return Response
      */
-    public function bilanMensuel(Security $security, PointageService $pointageService): Response
+    public function bilanMensuel(Security $security, BilanService $bilanService): Response
     {
 
         return $this->render('pointage/bilanMensuel.html.twig', [
-            'bilan' =>  $pointageService->getBilanMensuel($security->getUser()->getPointages()),
+            'bilan' =>  $bilanService->getBilanMensuel($security->getUser()->getPointages()->toArray()),
         ]);
     }
     /**
      * @Route("/bilanAnnuel", name="bilan_annuel", methods={"GET"})
      * @param Security $security
-     * @param PointageService $pointageService
+     * @param BilanService $bilanService
      * @return Response
      */
-    public function bilanAnnuel(Security $security, PointageService $pointageService): Response
+    public function bilanAnnuel(Security $security, BilanService $bilanService): Response
     {
         return $this->render('pointage/bilanAnnuel.html.twig', [
-            'bilan' =>  $pointageService->getBilanAnnuel($security->getUser()->getPointages()),
+            'bilan' =>  $bilanService->getBilanAnnuel($security->getUser()->getPointages()->toArray()),
         ]);
     }
 

@@ -32,13 +32,13 @@ class HoraireFixtures extends Fixture
         $horaire->setDateFin(new DateTime("2021/05/14"));
         $horaire->setHeurDebutTravaille(new DateTime("07:30:00"));
         $horaire->setHeurFinTravaille(new DateTime("15:00:00"));
-        $horaire->setDebutPauseMatinal(new DateTime("00:00:00"));
-        $horaire->setFinPauseMatinal(new DateTime("00:00:00"));
-        $horaire->setDebutPauseDejeuner(new DateTime("00:00:00"));
-        $horaire->setFinPauseDejeuner(new DateTime("00:00:00"));
-        $horaire->setDebutPauseMidi(new DateTime("00:00:00"));
-        $horaire->setFinPauseMidi(new DateTime("00:00:00"));
-        $horaire->setMargeDuRetard(new DateTime("01:00:00"));
+        $horaire->setDebutPauseMatinal(new DateTime("09:00:00"));
+        $horaire->setFinPauseMatinal(new DateTime("09:00:00"));
+        $horaire->setDebutPauseDejeuner(new DateTime("11:00:00"));
+        $horaire->setFinPauseDejeuner(new DateTime("11:00:00"));
+        $horaire->setDebutPauseMidi(new DateTime("13:30:00"));
+        $horaire->setFinPauseMidi(new DateTime("13:30:00"));
+        $horaire->setMargeDuRetard(new DateTime("00:30:00"));
         $manager->persist($horaire);
 
         $horaire = new Horaire();
@@ -47,13 +47,13 @@ class HoraireFixtures extends Fixture
         $horaire->setDateFin(new DateTime("2021/08/31"));
         $horaire->setHeurDebutTravaille(new DateTime("07:30:00"));
         $horaire->setHeurFinTravaille(new DateTime("15:00:00"));
-        $horaire->setDebutPauseMatinal(new DateTime("00:00:00"));
-        $horaire->setFinPauseMatinal(new DateTime("00:00:00"));
-        $horaire->setDebutPauseDejeuner(new DateTime("00:00:00"));
-        $horaire->setFinPauseDejeuner(new DateTime("00:00:00"));
-        $horaire->setDebutPauseMidi(new DateTime("00:00:00"));
-        $horaire->setFinPauseMidi(new DateTime("00:00:00"));
-        $horaire->setMargeDuRetard(new DateTime("01:00:00"));
+        $horaire->setDebutPauseMatinal(new DateTime("09:00:00"));
+        $horaire->setFinPauseMatinal(new DateTime("09:00:00"));
+        $horaire->setDebutPauseDejeuner(new DateTime("11:00:00"));
+        $horaire->setFinPauseDejeuner(new DateTime("11:00:00"));
+        $horaire->setDebutPauseMidi(new DateTime("13:30:00"));
+        $horaire->setFinPauseMidi(new DateTime("13:30:00"));
+        $horaire->setMargeDuRetard(new DateTime("00:30:00"));
         $manager->persist($horaire);
 
         $manager->flush();

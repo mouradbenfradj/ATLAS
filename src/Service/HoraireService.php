@@ -39,6 +39,12 @@ class HoraireService
      * @var TimeService
      */
     private $timeService;
+    /**
+     * workTimeService
+     *
+     * @var WorkTimeService
+     */
+    private $workTimeService;
 
     /**
      * HeursJournerDeTravaille
@@ -65,10 +71,11 @@ class HoraireService
      * @param EntityManagerInterface $manager
      * @param TimeService $timeService
      */
-    public function __construct(EntityManagerInterface $manager, TimeService $timeService)
+    public function __construct(EntityManagerInterface $manager, TimeService $timeService, WorkTimeService $workTimeService)
     {
         $this->horaires = $manager->getRepository(Horaire::class)->findAll();
         $this->timeService = $timeService;
+        $this->workTimeService = $workTimeService;
     }
 
     /**
@@ -94,6 +101,7 @@ class HoraireService
         }
         $this->horaire = $resultat;
         $trouve = false;
+        $this->workTime = $employer->getWorkTimes()->toArray();
         $workTime  = reset($this->workTime);
         $workTime = current($this->workTime);
         if ($workTime) {

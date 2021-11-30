@@ -13,9 +13,23 @@ class BilanService
      * @var array
      */
     private $initBilan;
+    /**
+     * timeService variable
+     *
+     * @var TimeService
+     */
+    private $timeService;
+    /**
+     * pointageService variable
+     *
+     * @var PointageService
+     */
+    private $pointageService;
 
-    public function __construct()
+    public function __construct(TimeService $timeService, PointageService $pointageService)
     {
+        $this->timeService = $timeService;
+        $this->pointageService = $pointageService;
         $this->initBilan = [
             "colspan" => 1,
             "background" => null,
@@ -40,30 +54,39 @@ class BilanService
 
     public function calculateurBilan(Pointage $pointage, array $bilan)
     {
-        $bilan["nbrHeurTravailler"] = $this->bilan($this->nbrHeurTravailler, $bilan["nbrHeurTravailler"]);
-        if ($this->retardEnMinute) {
-            $bilan["retardEnMinute"] = $this->bilan($this->retardEnMinute, $bilan["retardEnMinute"]);
+        $bilan["nbrHeurTravailler"] = $this->bilan($pointage->getNbrHeurTravailler(), $bilan["nbrHeurTravailler"]);
+        if ($pointage->getNbrHeurTravailler()) {
+            $bilan["retardEnMinute"] = $this->bilan($pointage->getRetardEnMinute(), $bilan["retardEnMinute"]);
         }
-        if ($this->departAnticiper) {
-            $bilan["departAnticiper"] = $this->bilan($this->departAnticiper, $bilan["departAnticiper"]);
+        if ($pointage->getDepartAnticiper()) {
+            $bilan["departAnticiper"] = $this->bilan($pointage->getDepartAnticiper(), $bilan["departAnticiper"]);
         }
-        if ($this->retardMidi) {
-            $bilan["retardMidi"] = $this->bilan($this->retardMidi, $bilan["retardMidi"]);
+        if ($pointage->getRetardMidi()) {
+            $bilan["retardMidi"] = $this->bilan($pointage->getRetardMidi(), $bilan["retardMidi"]);
         }
-        $bilan["totalRetard"] = $this->bilan($this->totalRetard, $bilan["totalRetard"]);
-        if ($this->autorisationSortie) {
-            $bilan["autorisationSortie"] = $this->bilan($this->autorisationSortie->getTime(), $bilan["autorisationSortie"]);
+        $bilan["totalRetard"] = $this->bilan($pointage->getTotaleRetard(), $bilan["totalRetard"]);
+        if ($pointage->getAutorisationSortie()) {
+            $bilan["autorisationSortie"] =
+                $this->bilan(
+                    $this->timeService->dateIntervalToDateTime(
+                        $this->timeService->diffTime(
+                            $pointage->getAutorisationSortie()->getDe(),
+                            $pointage->getAutorisationSortie()->getA()
+                        )
+                    ),
+                    $bilan["autorisationSortie"]
+                );
         }
-        if ($this->congerPayer) {
-            if ($this->congerPayer->getDemiJourner()) {
+        if ($pointage->getCongerPayer()) {
+            if ($pointage->congerPayer->getDemiJourner()) {
                 $bilan["congerPayer"] += 0.5;
             } else {
                 $bilan["congerPayer"] += 1;
             }
         }
-        $bilan["abscence"] = $this->abscence ? $bilan["abscence"] + 1 : $bilan["abscence"];
+        $bilan["abscence"] = $pointage->getAbscence() ? $bilan["abscence"] + 1 : $bilan["abscence"];
         $bilan["heurNormalementTravailler"] = $this->bilan($pointage->getHeurNormalementTravailler(), $bilan["heurNormalementTravailler"]);
-        $bilan["diff"] = $this->bilan($this->diff, $bilan["diff"]);
+        $bilan["diff"] = $this->bilan($pointage->getDiff(), $bilan["diff"]);
         return $bilan;
     }
 
@@ -78,24 +101,30 @@ class BilanService
         $total += $time->format('s'); // Add the seconds to our total
         return $total;
     }
-    public function getBilanSemestriel($pointages)
+    /**
+     * Undocumented function
+     *
+     * @param Pointage[] $pointages
+     * @return array
+     */
+    public function getBilanSemestriel(array $pointages): array
     {
         $bilan = $this->initBilan;
         $thisWeek = 0;
         $countWeek = 1;
         $collectSemaine = [];
-        foreach ($pointages as $this->pointage) {
-            $this->constructFromPointage($this->pointage);
-            if ($thisWeek != $this->date->format('W')) {
+        foreach ($pointages as $pointage) {
+            $this->pointageService->constructFromPointage($pointage);
+            if ($thisWeek != $pointage->getDate()->format('W')) {
                 if ($thisWeek) {
                     array_push($collectSemaine, $bilan);
                     $countWeek++;
                 }
-                $thisWeek = $this->date->format('W');
+                $thisWeek = $pointage->getDate()->format('W');
                 $bilan = $this->initBilan;
                 $bilan["date"] = $countWeek;
             }
-            $bilan = $this->calculateurBilan($this->pointage, $bilan);
+            $bilan = $this->calculateurBilan($pointage, $bilan);
         }
         array_push($collectSemaine, $bilan);
         return $collectSemaine;
@@ -106,18 +135,18 @@ class BilanService
         $thisYear = 0;
         $thisMonth = 0;
         $collectMensuel = [];
-        foreach ($pointages as $this->pointage) {
-            $this->constructFromPointage($this->pointage);
-            if ($thisYear . '-' . $thisMonth != $this->date->format('Y-m')) {
+        foreach ($pointages as $pointage) {
+            $this->pointageService->constructFromPointage($pointage);
+            if ($thisYear . '-' . $thisMonth != $pointage->getDate()->format('Y-m')) {
                 if ($thisYear and $thisMonth) {
                     array_push($collectMensuel, $bilan);
                 }
-                $thisYear =  $this->date->format('Y');
-                $thisMonth =  $this->date->format('m');
+                $thisYear =  $pointage->getDate()->format('Y');
+                $thisMonth =  $pointage->getDate()->format('m');
                 $bilan = $this->initBilan;
-                $bilan["date"] =  $this->date->format('Y-m');
+                $bilan["date"] =  $pointage->getDate()->format('Y-m');
             }
-            $bilan = $this->calculateurBilan($this->pointage, $bilan);
+            $bilan = $this->calculateurBilan($pointage, $bilan);
         }
         array_push($collectMensuel, $bilan);
         return $collectMensuel;
@@ -127,17 +156,17 @@ class BilanService
         $bilan = $this->initBilan;
         $thisYear = 0;
         $collectAnnuel = [];
-        foreach ($pointages as $this->pointage) {
-            $this->constructFromPointage($this->pointage);
-            if ($thisYear != $this->date->format('Y')) {
+        foreach ($pointages as $pointage) {
+            $this->pointageService->constructFromPointage($pointage);
+            if ($thisYear != $pointage->getDate()->format('Y')) {
                 if ($thisYear) {
                     array_push($collectAnnuel, $bilan);
                 }
-                $thisYear =  $this->date->format('Y');
+                $thisYear =  $pointage->getDate()->format('Y');
                 $bilan = $this->initBilan;
-                $bilan["date"] =  $this->date->format('Y');
+                $bilan["date"] =  $pointage->getDate()->format('Y');
             }
-            $bilan = $this->calculateurBilan($this->pointage, $bilan);
+            $bilan = $this->calculateurBilan($pointage, $bilan);
         }
         array_push($collectAnnuel, $bilan);
         return $collectAnnuel;
@@ -197,19 +226,19 @@ class BilanService
             array_push($collectGeneral, [
                 "colspan" => 1,
                 "date" =>   $pointage->getDate()->format('Y-m-d'),
-                "horaire" =>  $this->horaire,
-                "entrer" =>  $this->entrer ? $this->entrer->format('H:i:s') : "",
-                "sortie" =>  $this->sortie ? $this->sortie->format('H:i:s') : "",
-                "nbrHeurTravailler" => $this->nbrHeurTravailler ? $this->nbrHeurTravailler->format('H:i:s') : "",
-                "retardEnMinute" => $this->retardEnMinute ? $this->retardEnMinute->format('H:i:s') : "",
-                "departAnticiper" => $this->departAnticiper ? $this->departAnticiper->format('H:i:s') : "",
-                "retardMidi" => $this->retardMidi ? $this->retardMidi->format('H:i:s') : "",
-                "totalRetard" => $this->totalRetard ? $this->totalRetard->format('H:i:s') : "",
-                "autorisationSortie" => $this->autorisationSortie ? $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($this->autorisationSortie->getDe(), $this->autorisationSortie->getA()))->format('H:i:s') : "",
-                "congerPayer" =>  $this->congerPayer,
-                "abscence" => $this->abscence,
-                "heurNormalementTravailler" => $this->heurNormalementTravailler() ? $this->heurNormalementTravailler()->format('H:i:s') : "",
-                "diff" => $this->diff ? $this->diff->format('H:i:s') : "",
+                "horaire" =>  $pointage->getHoraire(),
+                "entrer" =>  $pointage->getEntrer() ? $pointage->getEntrer()->format('H:i:s') : "",
+                "sortie" =>  $pointage->getSortie() ? $pointage->getSortie()->format('H:i:s') : "",
+                "nbrHeurTravailler" => $pointage->getNbrHeurTravailler() ? $pointage->getNbrHeurTravailler()->format('H:i:s') : "",
+                "retardEnMinute" => $pointage->getRetardEnMinute() ? $pointage->getRetardEnMinute()->format('H:i:s') : "",
+                "departAnticiper" => $pointage->getDepartAnticiper() ? $pointage->getDepartAnticiper()->format('H:i:s') : "",
+                "retardMidi" => $pointage->getRetardMidi() ? $pointage->getRetardMidi()->format('H:i:s') : "",
+                "totalRetard" => $pointage->getTotaleRetard() ? $pointage->getTotaleRetard()->format('H:i:s') : "",
+                "autorisationSortie" => $pointage->getAutorisationSortie() ? $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($pointage->getAutorisationSortie()->getDe(), $pointage->getAutorisationSortie()->getA()))->format('H:i:s') : "",
+                "congerPayer" =>  $pointage->getCongerPayer(),
+                "abscence" => $pointage->getAbscence(),
+                "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format('H:i:s') : "",
+                "diff" => $pointage->getDiff() ? $pointage->getDiff()->format('H:i:s') : "",
             ]);
             $thisMonth =   $pointage->getDate()->format('m');
             $thisYear =   $pointage->getDate()->format('Y');
