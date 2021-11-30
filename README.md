@@ -8,3 +8,4 @@ php bin/console doctrine:database:create
 php bin/console doctrine:database:drop --force
 yarn encore dev
 symfony server:stop
+./vendor/bin/phpstan analyse src --level 5

@@ -29,7 +29,7 @@ class CongerController extends AbstractController
     /**
      * @Route("/new", name="conger_new", methods={"GET","POST"})
      */
-    public function new(Request $request,Security $security): Response
+    public function new(Request $request, Security $security): Response
     {
         $conger = new Conger();
         $form = $this->createForm(CongerType::class, $conger);
@@ -37,7 +37,8 @@ class CongerController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
-            $conger->setEmployer($security->getUser());
+            $employer = $security->getUser();
+            $conger->setEmployer($employer);
             $entityManager->persist($conger);
             $entityManager->flush();
 
