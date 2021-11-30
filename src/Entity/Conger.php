@@ -68,9 +68,15 @@ class Conger
      */
     private $demiJourner;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Xlsx::class, mappedBy="congerPayer")
+     */
+    private $xlsxes;
+
     public function __construct()
     {
         $this->pointages = new ArrayCollection();
+        $this->xlsxes = new ArrayCollection();
     }
 
 
@@ -189,6 +195,36 @@ class Conger
     public function setDemiJourner(?bool $demiJourner): self
     {
         $this->demiJourner = $demiJourner;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Xlsx[]
+     */
+    public function getXlsxes(): Collection
+    {
+        return $this->xlsxes;
+    }
+
+    public function addXlsx(Xlsx $xlsx): self
+    {
+        if (!$this->xlsxes->contains($xlsx)) {
+            $this->xlsxes[] = $xlsx;
+            $xlsx->setCongerPayer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeXlsx(Xlsx $xlsx): self
+    {
+        if ($this->xlsxes->removeElement($xlsx)) {
+            // set the owning side to null (unless already changed)
+            if ($xlsx->getCongerPayer() === $this) {
+                $xlsx->setCongerPayer(null);
+            }
+        }
 
         return $this;
     }

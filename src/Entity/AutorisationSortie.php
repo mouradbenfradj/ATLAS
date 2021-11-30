@@ -58,10 +58,16 @@ class AutorisationSortie
      */
     private $a;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Xlsx::class, mappedBy="autorisationSortie")
+     */
+    private $xlsxes;
+
 
     public function __construct()
     {
         $this->pointages = new ArrayCollection();
+        $this->xlsxes = new ArrayCollection();
     }
     public function __toString()
     {
@@ -174,6 +180,36 @@ class AutorisationSortie
     public function setA(\DateTimeInterface $a): self
     {
         $this->a = $a;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Xlsx[]
+     */
+    public function getXlsxes(): Collection
+    {
+        return $this->xlsxes;
+    }
+
+    public function addXlsx(Xlsx $xlsx): self
+    {
+        if (!$this->xlsxes->contains($xlsx)) {
+            $this->xlsxes[] = $xlsx;
+            $xlsx->setAutorisationSortie($this);
+        }
+
+        return $this;
+    }
+
+    public function removeXlsx(Xlsx $xlsx): self
+    {
+        if ($this->xlsxes->removeElement($xlsx)) {
+            // set the owning side to null (unless already changed)
+            if ($xlsx->getAutorisationSortie() === $this) {
+                $xlsx->setAutorisationSortie(null);
+            }
+        }
 
         return $this;
     }

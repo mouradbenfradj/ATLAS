@@ -93,10 +93,16 @@ class Horaire
      */
     private $margeDuRetard;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Xlsx::class, mappedBy="horaire", orphanRemoval=true)
+     */
+    private $xlsxes;
+
     public function __construct()
     {
         $this->pointages = new ArrayCollection();
         $this->workTimes = new ArrayCollection();
+        $this->xlsxes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -305,6 +311,36 @@ class Horaire
     public function setMargeDuRetard(\DateTimeInterface $margeDuRetard): self
     {
         $this->margeDuRetard = $margeDuRetard;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Xlsx[]
+     */
+    public function getXlsxes(): Collection
+    {
+        return $this->xlsxes;
+    }
+
+    public function addXlsx(Xlsx $xlsx): self
+    {
+        if (!$this->xlsxes->contains($xlsx)) {
+            $this->xlsxes[] = $xlsx;
+            $xlsx->setHoraire($this);
+        }
+
+        return $this;
+    }
+
+    public function removeXlsx(Xlsx $xlsx): self
+    {
+        if ($this->xlsxes->removeElement($xlsx)) {
+            // set the owning side to null (unless already changed)
+            if ($xlsx->getHoraire() === $this) {
+                $xlsx->setHoraire(null);
+            }
+        }
 
         return $this;
     }

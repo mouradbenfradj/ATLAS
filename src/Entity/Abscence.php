@@ -43,9 +43,15 @@ class Abscence
      */
     private $pointages;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Xlsx::class, mappedBy="abcence")
+     */
+    private $xlsxes;
+
     public function __construct()
     {
         $this->pointages = new ArrayCollection();
+        $this->xlsxes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -113,6 +119,36 @@ class Abscence
             // set the owning side to null (unless already changed)
             if ($pointage->getAbscence() === $this) {
                 $pointage->setAbscence(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Xlsx[]
+     */
+    public function getXlsxes(): Collection
+    {
+        return $this->xlsxes;
+    }
+
+    public function addXlsx(Xlsx $xlsx): self
+    {
+        if (!$this->xlsxes->contains($xlsx)) {
+            $this->xlsxes[] = $xlsx;
+            $xlsx->setAbcence($this);
+        }
+
+        return $this;
+    }
+
+    public function removeXlsx(Xlsx $xlsx): self
+    {
+        if ($this->xlsxes->removeElement($xlsx)) {
+            // set the owning side to null (unless already changed)
+            if ($xlsx->getAbcence() === $this) {
+                $xlsx->setAbcence(null);
             }
         }
 
