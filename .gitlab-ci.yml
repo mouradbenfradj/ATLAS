@@ -47,7 +47,7 @@ phpunit:
       MYSQL_DATABASE: atlas
       MYSQL_USER: mourad
       MYSQL_PASSWORD: mourad
-      DATABASE_URL: 'mysql://mourad:mourad@mysql:3306/atlas_test'
+      DATABASE_URL: 'mysql://root:@mysql:3306/atlas_test'
     before_script:
         - apt-get update && apt-get install -y git libzip-dev
         - curl -sSk https://getcomposer.org/installer | php -- --disable-tls && mv composer.phar /usr/local/bin/composer
