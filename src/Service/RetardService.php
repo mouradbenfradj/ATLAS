@@ -333,8 +333,9 @@ class RetardService
              dd($this->retardMidi); */
                 break;
         }
-        if ($this->retardMidi)
+        if ($this->retardMidi) {
             return $this->timeService->dateIntervalToDateTime($this->retardMidi);
+        }
         return $this->retardMidi;
     }
 
@@ -463,8 +464,9 @@ class RetardService
             dump($this->autorisationSortie);
             dd($heurDebutTravaille);
         } */
-        if (!$this->retardEnMinute)
+        if (!$this->retardEnMinute) {
             return $this->retardEnMinute;
+        }
         //$this->retardEnMinute = $this->timeService->diffTime($heurDebutTravaille, $this->entrer);
         return $this->timeService->dateIntervalToDateTime($this->retardEnMinute);
     }
