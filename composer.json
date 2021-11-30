@@ -18,6 +18,7 @@
         "hisamu/php-xbase": "^2.0",
         "phpdocumentor/reflection-docblock": "^5.2",
         "phpoffice/phpspreadsheet": "^1.18",
+        "phpstan/phpstan": "^1.2",
         "sensio/framework-extra-bundle": "^6.1",
         "symfony/asset": "5.3.*",
         "symfony/console": "5.3.*",
