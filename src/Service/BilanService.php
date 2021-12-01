@@ -68,12 +68,7 @@ class BilanService
         if ($pointage->getAutorisationSortie()) {
             $bilan["autorisationSortie"] =
                 $this->bilan(
-                    $this->timeService->dateIntervalToDateTime(
-                        $this->timeService->diffTime(
-                            $pointage->getAutorisationSortie()->getDe(),
-                            $pointage->getAutorisationSortie()->getA()
-                        )
-                    ),
+                    $pointage->getAutorisationSortie()->getHeurAutoriser(),
                     $bilan["autorisationSortie"]
                 );
         }
@@ -234,7 +229,7 @@ class BilanService
                 "departAnticiper" => $pointage->getDepartAnticiper() ? $pointage->getDepartAnticiper()->format('H:i:s') : "",
                 "retardMidi" => $pointage->getRetardMidi() ? $pointage->getRetardMidi()->format('H:i:s') : "",
                 "totalRetard" => $pointage->getTotaleRetard() ? $pointage->getTotaleRetard()->format('H:i:s') : "",
-                "autorisationSortie" => $pointage->getAutorisationSortie() ? $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($pointage->getAutorisationSortie()->getDe(), $pointage->getAutorisationSortie()->getA()))->format('H:i:s') : "",
+                "autorisationSortie" => $pointage->getAutorisationSortie() ? $pointage->getAutorisationSortie()->getHeurAutoriser()->format('H:i:s') : "",
                 "congerPayer" =>  $pointage->getCongerPayer(),
                 "absence" => $pointage->getAbsence(),
                 "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format('H:i:s') : "",
@@ -242,7 +237,7 @@ class BilanService
             ]);
             $thisMonth =   $pointage->getDate()->format('m');
             $thisYear =   $pointage->getDate()->format('Y');
-            $nextWeek =  $pointage->getDate()->setISODate($pointage->getDate()->format('o'),  $pointage->getDate()->format('W') + 1);
+            $nextWeek =  $pointage->getDate()->setISODate($pointage->getDate()->format('o'), $pointage->getDate()->format('W') + 1);
         }
         return $collectGeneral;
     }

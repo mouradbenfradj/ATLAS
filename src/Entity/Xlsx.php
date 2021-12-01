@@ -23,7 +23,7 @@ class Xlsx
     private $date;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Horaire::class, inversedBy="xlsxes")
+     * @ORM\ManyToOne(targetEntity=Horaire::class, cascade={"persist"}, inversedBy="xlsxes")
      * @ORM\JoinColumn(nullable=false)
      */
     private $horaire;
@@ -64,17 +64,17 @@ class Xlsx
     private $totalRetard;
 
     /**
-     * @ORM\ManyToOne(targetEntity=AutorisationSortie::class, inversedBy="xlsxes")
+     * @ORM\ManyToOne(targetEntity=AutorisationSortie::class, cascade={"persist"}, inversedBy="xlsxes")
      */
     private $autorisationSortie;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Conger::class, inversedBy="xlsxes")
+     * @ORM\ManyToOne(targetEntity=Conger::class, cascade={"persist"}, inversedBy="xlsxes")
      */
     private $congerPayer;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Absence::class, inversedBy="xlsxes")
+     * @ORM\ManyToOne(targetEntity=Absence::class, cascade={"persist"}, inversedBy="xlsxes")
      */
     private $absence;
 
@@ -87,6 +87,11 @@ class Xlsx
      * @ORM\Column(type="time", nullable=true)
      */
     private $diff;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="xlsxes")
+     */
+    private $employer;
 
     public function getId(): ?int
     {
@@ -257,6 +262,18 @@ class Xlsx
     public function setDiff(?\DateTimeInterface $diff): self
     {
         $this->diff = $diff;
+
+        return $this;
+    }
+
+    public function getEmployer(): ?User
+    {
+        return $this->employer;
+    }
+
+    public function setEmployer(?User $employer): self
+    {
+        $this->employer = $employer;
 
         return $this;
     }

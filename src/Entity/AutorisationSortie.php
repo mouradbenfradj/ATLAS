@@ -49,19 +49,14 @@ class AutorisationSortie
     private $refuser;
 
     /**
-     * @ORM\Column(type="time")
-     */
-    private $de;
-
-    /**
-     * @ORM\Column(type="time")
-     */
-    private $a;
-
-    /**
      * @ORM\OneToMany(targetEntity=Xlsx::class, mappedBy="autorisationSortie")
      */
     private $xlsxes;
+
+    /**
+     * @ORM\Column(type="time")
+     */
+    private $heurAutoriser;
 
 
     public function __construct()
@@ -71,10 +66,7 @@ class AutorisationSortie
     }
     public function __toString()
     {
-        $timeMax = new DateTime(date('H:i:s', strtotime($this->de->format("H:i:s"))));
-        $timeMin = new DateTime(date('H:i:s', strtotime($this->a->format("H:i:s"))));
-        $diff =  date_diff($timeMax, $timeMin);
-        return  $diff->h . ":" . $diff->i . ":" . $diff->s;
+        return  $this->heurAutoriser->format("H:i:s");
     }
 
     public function getId(): ?int
@@ -160,30 +152,6 @@ class AutorisationSortie
         return $this;
     }
 
-    public function getDe(): ?\DateTimeInterface
-    {
-        return $this->de;
-    }
-
-    public function setDe(\DateTimeInterface $de): self
-    {
-        $this->de = $de;
-
-        return $this;
-    }
-
-    public function getA(): ?\DateTimeInterface
-    {
-        return $this->a;
-    }
-
-    public function setA(\DateTimeInterface $a): self
-    {
-        $this->a = $a;
-
-        return $this;
-    }
-
     /**
      * @return Collection|Xlsx[]
      */
@@ -210,6 +178,18 @@ class AutorisationSortie
                 $xlsx->setAutorisationSortie(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getHeurAutoriser(): ?\DateTimeInterface
+    {
+        return $this->heurAutoriser;
+    }
+
+    public function setHeurAutoriser(\DateTimeInterface $heurAutoriser): self
+    {
+        $this->heurAutoriser = $heurAutoriser;
 
         return $this;
     }

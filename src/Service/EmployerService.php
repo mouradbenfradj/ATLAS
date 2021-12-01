@@ -32,6 +32,7 @@ class EmployerService
         foreach ($employer->getCongers() as $conger) {
             dd($conger);
         }
+
         return $debutSoldConger;
     }
     public function calculerAS(User $employer)
@@ -45,10 +46,12 @@ class EmployerService
             $perimierJourDeTravaille->modify('+1 year');
         }
         $perimierJourDeTravaille->modify('-1 year');
-      
+        /**
+         *
+         */
         foreach ($employer->getAutorisationSorties() as $as) {
             if ($perimierJourDeTravaille <= $as->getDateAutorisation()) {
-                $diffAs = $this->timeService->diffTime($as->getDe(), $as->getA());
+                $diffAs = $this->timeService->dateTimeToDateInterval($as->getHeurAutoriser());
                 $debutSoldAS->sub($diffAs);
             }
         }

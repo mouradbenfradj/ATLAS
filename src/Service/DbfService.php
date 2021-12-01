@@ -124,12 +124,12 @@ class DbfService
     }
 
     /**
-     * dateDbfInDb
+     * dateInDb
      *
      * @param User $user
      * @return array
      */
-    public function dateDbfInDb(User $user): array
+    public function dateInDb(User $user): array
     {
         return array_map(
             fn ($date): string => $date->getAttdate()->format('Y-m-d'),
@@ -239,7 +239,6 @@ class DbfService
         $dbf->setSspedaywee($this->sspedaywee);
         $dbf->setSspedayhol($this->sspedayhol);
         $dbf->setAtttime($this->atttime);
-        ;
         $dbf->setAttchktime($this->attchktime);
         $dbf->setEmployer($this->user);
         return $dbf;

@@ -13,6 +13,7 @@ use App\Entity\AutorisationSortie;
 use App\Entity\Config;
 use App\Entity\Dbf;
 use App\Entity\WorkTime;
+use App\Entity\Xlsx;
 use App\Repository\UserRepository;
 use App\Service\BilanService;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +27,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 
 class DashboardController extends AbstractDashboardController
 {
-
     private $adminContextProvider;
     private $bilanService;
     private $userRepository;
@@ -42,10 +42,11 @@ class DashboardController extends AbstractDashboardController
      */
     public function index(): Response
     {
-        if (!empty($this->adminContextProvider->getContext()->getRequest()->request->all()))
+        if (!empty($this->adminContextProvider->getContext()->getRequest()->request->all())) {
             $user = $this->getDoctrine()->getRepository(User::class)->find($this->adminContextProvider->getContext()->getRequest()->request->get('user'));
-        else
+        } else {
             $user = $this->getUser();
+        }
         //usort($user->getPointages(), fn ($a, $b) => $a['date'] > $b['date'])
 
         return $this->render('admin/dashboard.html.twig', [
@@ -77,6 +78,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Conger', 'fas fa-list', Conger::class),
             MenuItem::linkToCrud('Pointage', 'fas fa-list', Pointage::class),
             MenuItem::linkToCrud('Dbf', 'fas fa-list', Dbf::class),
+            MenuItem::linkToCrud('Xlsx', 'fas fa-list', Xlsx::class),
             MenuItem::linkToCrud('Employer', 'fas fa-list', User::class),
         ]);
         yield MenuItem::subMenu('Config', 'fa fa-article')->setSubItems([

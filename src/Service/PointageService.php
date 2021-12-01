@@ -287,8 +287,6 @@ class PointageService
                     dump($this->sortie);
                     dd($this->timeService->diffTime($this->entrer, $this->sortie));
                     
-                    $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $this->autorisationSortieService->de(), $this->autorisationSortieService->a(), true);
-                    $this->autorisationSortie = $this->autorisationSortie?$this->autorisationSortie:$this->autorisationSortieService->ConstructEntity();
                 } */
                 $this->workHourService->setAutorisationSortie($this->autorisationSortie);
             }

@@ -91,30 +91,6 @@ class WorkHourService
 
     public function requirement(array $attchktime, Horaire $horaire, User $employer, DateTime $date, ?DateTime $entrer, ?DateTime $sortie)
     {
-        /**switch (count($attchktime)) {
-                case 1:
-                    $this->entrer = $entrer?$this->timeService->generateTime($entrer->format('H:i:s')):$attchktime[0]?$this->timeService->generateTime($attchktime[0]):null;
-                    $this->sortie = $sortie?$this->timeService->generateTime($sortie->format('H:i:s')):$attchktime[0]?$this->timeService->generateTime($attchktime[0]):null;
-                    break;
-                    case 2:
-                $this->entrer = $entrer?$this->timeService->generateTime($entrer->format('H:i:s')):$attchktime[0]?$this->timeService->generateTime($attchktime[0]):null;
-                $this->sortie = $sortie?$this->timeService->generateTime($sortie->format('H:i:s')):$attchktime[1]?$this->timeService->generateTime($attchktime[1]):null;
-                break;
-                case 3:
-                    $this->entrer = $entrer?$this->timeService->generateTime($entrer->format('H:i:s')):$attchktime[0]?$this->timeService->generateTime($attchktime[0]):null;
-                    $this->entrer1 = $attchktime[1]?$this->timeService->generateTime($attchktime[1]):null;
-                    $this->sortie = $sortie?$this->timeService->generateTime($sortie->format('H:i:s')):$attchktime[2]?$this->timeService->generateTime($attchktime[2]):null;
-                    break;
-                    case 4:
-                        $this->entrer = $entrer?$this->timeService->generateTime($entrer->format('H:i:s')):$attchktime[0]?$this->timeService->generateTime($attchktime[0]):null;
-                        $this->entrer1 = $attchktime[1]?$this->timeService->generateTime($attchktime[1]):null;
-                        $this->entrer2 = $attchktime[2]?$this->timeService->generateTime($attchktime[2]):null;
-                        $this->sortie = $sortie?$this->timeService->generateTime($sortie->format('H:i:s')):null;
-                        break;
-                        default:
-                        $this->entrer2=null;
-                        break;
-                    } */
         $this->attchktime = $attchktime;
         $this->entrer = $entrer ? $entrer : null;
         $this->entrer1 = null;
@@ -123,6 +99,7 @@ class WorkHourService
         $this->horaire = $horaire;
         $this->employer = $employer;
         $this->date = $date;
+        dd($this->date);
         $this->heurDebutTravaille = $this->timeService->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s'));
         $this->debutPauseMatinal = $this->timeService->generateTime($this->horaire->getDebutPauseMatinal()->format('H:i:s'));
         $this->finPauseMatinal = $this->timeService->generateTime($this->horaire->getFinPauseMatinal()->format('H:i:s'));
@@ -397,7 +374,7 @@ class WorkHourService
             return $this->horaireService->getHeursDemiJournerDeTravaille();
         } elseif (!$this->congerPayer and $this->autorisationSortie) {
             $this->heurNormalementTravailler = $this->horaireService->getHeursJournerDeTravaille();
-            $this->heurNormalementTravailler->sub($this->timeService->diffTime($this->autorisationSortie->getDe(), $this->autorisationSortie->getA()));
+            $this->heurNormalementTravailler->sub($this->timeService->dateTimeToDateInterval($this->autorisationSortie->getHeurAutoriser()));
         } else {
             $this->heurNormalementTravailler = $this->horaireService->getHeursJournerDeTravaille();
         }

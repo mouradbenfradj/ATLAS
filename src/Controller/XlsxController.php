@@ -60,11 +60,11 @@ class XlsxController extends AbstractController
      */
     private $employerService;
     /**
-     * dbfService variable
+     * xlsxService variable
      *
-     * @var DbfService
+     * @var XlsxService
      */
-    private $dbfService;
+    private $xlsxService;
     /**
      * absenceService variable
      *
@@ -125,13 +125,13 @@ class XlsxController extends AbstractController
 
     /**
      * upload
-     * @Route("/upload/{user}", name="xlsx_upload", methods={"GET","POST"})
+     * @Route("/upload/{employer}", name="xlsx_upload", methods={"GET","POST"})
      *
      * @param Request $request
-     * @param User $user
+     * @param User $employer
      * @return Response
      */
-    public function upload(Request $request, User $user): Response
+    public function upload(Request $request, User $employer): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
@@ -140,55 +140,61 @@ class XlsxController extends AbstractController
             if ($xlsx) {
                 $reader = new Xlsx();
                 $spreadsheet = $reader->load($xlsx);
-                $ignoredDay = array_merge($this->dbfService->dateDbfInDb($user), $this->pointageService->dateInDB($user), $this->jourFerierService->jourFerier());
+                $ignoredDay = array_merge($this->xlsxService->dateInDb($employer), $this->pointageService->dateInDB($employer), $this->jourFerierService->jourFerier());
                 $manager = $this->getDoctrine()->getManager();
-                $sheetCount = $spreadsheet->getSheetCount();
-                for ($i = 0; $i < $sheetCount; $i++) {
-                    $sheet = $spreadsheet->getSheet($i);
-                    $sheetData = $sheet->toArray(null, true, true, true);
-                    $this->xlsxService->construct($record->userid, $record->badgenumbe, $record->ssn, $record->username, $record->autosch, $record->attdate, $record->schid, $record->clockintim, $record->clockoutti, $record->starttime, $record->endtime, $record->workday, $record->realworkda, $record->late, $record->early, $record->absent, $record->overtime, $record->worktime, $record->exceptioni, $record->mustin, $record->mustout, $record->deptid, $record->sspedaynor, $record->sspedaywee, $record->sspedayhol, $record->atttime, $record->attchktime, $user);
-
-                    foreach ($sheetData as  $ligne) {
-                        if ($this->dateService->isDate($ligne['A']) and isset($horaires[$ligne['B']])) {
-                            $dateString = $this->dateService->dateToStringY_m_d($ligne['A']);
-                            $isJourFerier = $this->jourFerierService->isJourFerier($dateString);
-                            $date = $this->dateService->dateString_d_m_Y_ToDateTime($ligne['A']);
-                            if (
-                                $isJourFerier
-                                or
-                                $ligne['C'] == 'CP'
-                                or
-                                $this->timeService->isTimeHi($ligne['C'])
-                                or
-                                $this->timeService->isTimeHi($ligne['D'])
-                                or
-                                in_array($ligne['K'], ['1', '1.5'])
-                                or
-                                $ligne['L']
-                                or
-                                $nowDate >= $date
-                            ) {
-                                $horaire = $horaires[$ligne['B']];
-                                if (!$isJourFerier and !in_array($dateString, $arrayDate)) {
-                                    array_push($arrayDate, $dateString);
-                                    $user = $this->pointageService->addLigne($ligne, $user);
-                                }
-                            } else
-                                $this->flash->add('danger ', 'ignored ligne ' . implode(" | ", $ligne));
+                $allSheet = $spreadsheet->getAllSheets();
+                foreach ($allSheet as $worksheet) {
+                    $highestRow = $worksheet->getHighestRow();
+                    $cols = $worksheet->rangeToArray(
+                        'A1:O'.$highestRow,
+                        null,
+                        true,
+                        true,
+                        true
+                    );
+                    foreach ($cols as $col) {
+                        if ($this->dateService->isDate($col['A']) and $col['C'] and $col['D']) {
+                            $this->xlsxService->construct($col, $employer);
+                            $xlsx = $this->xlsxService->createEntity();
+                            $employer->addXlsx($xlsx);
                         }
+                        $employer->setSoldConger($this->employerService->calculerSoldConger($employer));
+                        $employer->setSoldAutorisationSortie($this->employerService->calculerAS($employer));
+                        $manager->persist($employer);
+                        $manager->flush();
                     }
-                }
-                $this->getDoctrine()->getManager()->flush();
+                }/* for ($i = 0; $i < $sheetCount; $i++) {
+                    $worksheet = $spreadsheet->getSheet($i);
+                    $highestRow = $worksheet->getHighestRow();
+                    dd($highestRow);
+                    $cols = $worksheet->rangeToArray(
+                        'A1:O'.$highestRow,
+                        null,
+                        true,
+                        true,
+                        true
+                    );
+                    foreach ($cols as $col) {
+                        if ($this->dateService->isDate($col['A']) and $col['C'] and $col['D']) {
+                            $this->xlsxService->construct($col, $employer);
+                            $xlsx = $this->xlsxService->createEntity();
+                            $employer->addXlsx($xlsx);
+                        }
+                        $employer->setSoldConger($this->employerService->calculerSoldConger($employer));
+                        $employer->setSoldAutorisationSortie($this->employerService->calculerAS($employer));
+                        $manager->persist($employer);
+                        $manager->flush();
+                    }
+                } */
                 $this->addFlash('success', 'updated_successfully');
             }
-
             $url = $this->adminUrlGenerator
-                ->setController(PointageCrudController::class)
-                ->setAction('index')
-                ->generateUrl();
+            ->setController(PointageCrudController::class)
+            ->setAction('index')
+            ->generateUrl();
             return $this->redirect($url);
-            //$table = new TableReader($dbf);
-            //$pointageGenerator->fromDbfFile($table, $user);
+            //$table = new TableReader($xlsx);
+            //$pointageGenerator->fromXlsxFile($table, $user);
         }
         return $this->render('xlsx/upload.html.twig', [
             'form' => $form->createView(),

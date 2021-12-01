@@ -2,28 +2,20 @@
 
 namespace App\Service;
 
+use App\Entity\User;
+use App\Entity\WorkTime;
+use DateTime;
+
 class WorkTimeService
 {
     public function __construct()
     {
     }
-    public function getHoraireForDate(DateTime $dateTime, User $employer): Horaire
+    public function getWorkTimeForDate(DateTime $dateTime, User $employer): ?WorkTime
     {
-        $resultat = reset($this->horaires);
-        $resultat = current($this->horaires);
-        $trouve = false;
-        while ($horaire = next($this->horaires) and !$trouve) {
-            if (!$horaire->getDateFin()) {
-                $horaire->setDateFin(new DateTime());
-            }
-            if ($dateTime >= $horaire->getDateDebut() and $dateTime <= $horaire->getDateFin()) {
-                $resultat = $horaire;
-                $trouve = true;
-            }
-        }
-        $this->horaire = $resultat;
-        $trouve = false;
-        $this->workTime = $this->workTimeService->$workTime  = reset($this->workTime);
+        return null;
+        $this->workTime = $employer->getWorkTimes()->toArray();
+        $workTime  = reset($this->workTime);
         $workTime = current($this->workTime);
         if ($workTime) {
             if (!$workTime->getDateFin()) {
@@ -64,15 +56,6 @@ class WorkTimeService
                 }
             } while ($workTime = next($this->workTime) and !$trouve);
         }
-        if ($this->horaire) {
-            $this->HeursJournerDeTravaille = $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format("H:i:s"));
-            $heurDebutTravaille = $this->horaire->getHeurDebutTravaille();
-            $this->HeursJournerDeTravaille->sub($this->timeService->dateTimeToDateInterval($this->sumPause()));
-            $this->HeursJournerDeTravaille = $this->timeService->diffTime($this->HeursJournerDeTravaille, $heurDebutTravaille);
-            $this->HeursJournerDeTravaille = $this->timeService->dateIntervalToDateTime($this->HeursJournerDeTravaille);
-            $this->HeursDemiJournerDeTravaille = $this->timeService->generateTime(intdiv($this->HeursJournerDeTravaille->format('H'), 2) . ':' . intdiv($this->HeursJournerDeTravaille->format('i'), 2) . ':' . intdiv($this->HeursJournerDeTravaille->format('s'), 2));
-            $this->HeursQuardJournerDeTravaille = $this->timeService->generateTime(intdiv($this->HeursJournerDeTravaille->format('H'), 4) . ':' . intdiv($this->HeursJournerDeTravaille->format('i'), 4) . ':' . intdiv($this->HeursJournerDeTravaille->format('s'), 4));
-        }
-        return $this->horaire;
+        return  $workTime;
     }
 }

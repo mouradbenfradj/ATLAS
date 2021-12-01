@@ -128,6 +128,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $absences;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Xlsx::class, cascade={"persist"}, orphanRemoval=true, mappedBy="employer")
+     */
+    private $xlsxes;
+
     public function __construct()
     {
         $this->pointages = new ArrayCollection();
@@ -136,6 +141,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->workTimes = new ArrayCollection();
         $this->dbfs = new ArrayCollection();
         $this->absences = new ArrayCollection();
+        $this->xlsxes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -533,6 +539,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($absence->getEmployer() === $this) {
                 $absence->setEmployer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Xlsx[]
+     */
+    public function getXlsxes(): Collection
+    {
+        return $this->xlsxes;
+    }
+
+    public function addXlsx(Xlsx $xlsx): self
+    {
+        if (!$this->xlsxes->contains($xlsx)) {
+            $this->xlsxes[] = $xlsx;
+            $xlsx->setEmployer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeXlsx(Xlsx $xlsx): self
+    {
+        if ($this->xlsxes->removeElement($xlsx)) {
+            // set the owning side to null (unless already changed)
+            if ($xlsx->getEmployer() === $this) {
+                $xlsx->setEmployer(null);
             }
         }
 

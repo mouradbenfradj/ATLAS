@@ -133,15 +133,6 @@ class RetardService
 
         $this->heurFinTravaille = $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format('H:i:s'));
         $this->margeDuRetard = $this->timeService->generateTime($this->horaire->getMargeDuRetard()->format('H:i:s'));
-        if ($this->autorisationSortie and $this->autorisationSortie->getA() >= $this->finPauseMidi) {
-            $this->heurFinTravaille->sub($this->timeService->diffTime($this->autorisationSortie->getDe(), $this->autorisationSortie->getA()));
-            $this->heurFinTravaille->sub($this->timeService->diffTime($this->debutPauseMidi, $this->finPauseMidi));
-        } elseif ($this->autorisationSortie) {
-            dump($this->attchktime);
-            dump($this->autorisationSortie);
-            dump($this->heurFinTravaille);
-            dd($this->autorisationSortie);
-        }
     }
 
     public function retardMidi(): ?DateTime
@@ -401,8 +392,8 @@ class RetardService
                 }
                 break;
             case 3:
-
-                if ($heurDebutTravaille < $this->entrer and $this->autorisationSortie->getDe() > $this->entrer and $this->autorisationSortie->getA() > $this->entrer) {
+dd($this->autorisationSortie->getHeurAutoriser());
+                if ($heurDebutTravaille < $this->entrer and $this->autorisationSortie->getHeurAutoriser() > $this->entrer and $this->autorisationSortie->getHeurAutoriser() > $this->entrer) {
                     $this->retardEnMinute = $this->timeService->diffTime($heurDebutTravaille, $this->entrer);
                 } else {
                     dump($this->attchktime);
@@ -421,53 +412,20 @@ class RetardService
                 }
                 break;
             default:
-                dump($this->attchktime);
-                dump($this->horaire);
-                dump($this->entrer);
-                dump($this->sortie);
-                dump($this->conger);
-                dump($this->autorisationSortie);
-                dd($this->retardEnMinute);
-                break;
-        }/*
-        $heurDebutTravaille =$this->heurDebutTravaille;
-        $heurDebutTravaille->add($this->timeService->dateTimeToDateInterval($this->margeDuRetard));
-
-        $this->retardEnMinute = $this->timeService->dateTimeToDateInterval(new DateTime("00:00:00"));
-        //return new DateTime("00:00:00");
-        if (($heurDebutTravaille < $this->entrer) and ($this->conger and $this->conger->getDemiJourner())) {
-            $this->retardEnMinute = $this->timeService->diffTime($heurDebutTravaille, $this->entrer);
-        } elseif (($this->finPauseDejeuner < $this->entrer) or ($this->conger and $this->conger->getDemiJourner())) {
-            $this->retardEnMinute = $this->timeService->diffTime($heurDebutTravaille, $this->entrer);
-            dump($this->attchktime);
-            dump($this->horaire);
-            dump($this->entrer);
-            dump($this->sortie);
-            dump($this->conger);
-            dump($this->autorisationSortie);
-            dd($this->retardEnMinute);
-        } else {
-            if (count($this->attchktime)<4) {
-                dump($this->attchktime);
-                dump($this->horaire);
-                dump($this->entrer);
-                dump($this->sortie);
-                dump($this->conger);
-                dump($this->autorisationSortie);
-                dd($heurDebutTravaille);
+            if ($heurDebutTravaille < $this->entrer) {
+                $this->retardEnMinute = $this->timeService->diffTime($heurDebutTravaille, $this->entrer);
+                if ($this->conger) {
+                    dd($this->conger);
+                }
+                if ($this->autorisationSortie) {
+                    dd($this->autorisationSortie);
+                }
             }
-            dump($this->attchktime);
-            dump($this->horaire);
-            dump($this->entrer);
-            dump($this->sortie);
-            dump($this->conger);
-            dump($this->autorisationSortie);
-            dd($heurDebutTravaille);
-        } */
+            break;
+        }
         if (!$this->retardEnMinute) {
             return $this->retardEnMinute;
         }
-        //$this->retardEnMinute = $this->timeService->diffTime($heurDebutTravaille, $this->entrer);
         return $this->timeService->dateIntervalToDateTime($this->retardEnMinute);
     }
 
@@ -557,23 +515,28 @@ class RetardService
                 }
                 break;
             default:
-                dump($this->attchktime);
-                dump($this->horaire);
-                dump($this->entrer);
-                dump($this->entrer1);
-                dump($this->entrer2);
-                dump($this->sortie);
+            if ($heurFinTravaille > $this->sortie) {
+                if ($this->conger) {
+                    dd($this->conger);
+                }
+                if ($this->autorisationSortie) {
+                    dd($this->autorisationSortie);
+                }
+                $heurDebutTravaille = $this->heurDebutTravaille;
                 dump($heurDebutTravaille);
-                dump($debutPauseMatinal);
-                dump($finPauseMatinal);
-                dump($debutPauseDejeuner);
-                dump($finPauseDejeuner);
-                dump($debutPauseMidi);
-                dump($finPauseMidi);
-                dump($heurFinTravaille);
-                dd($this->departAnticiper);
+                if ($heurDebutTravaille) {
+                    $heurFinTravaille->add($this->timeService->dateTimeToDateInterval($this->margeDuRetard));
+                }
+                dd($heurFinTravaille);
 
-                break;
+                $this->departAnticiper = $this->timeService->diffTime($heurFinTravaille, $this->sortie);
+                dump($heurFinTravaille);
+                dump($this->departAnticiper);
+                dump($this->entrer);
+                dd($this->sortie);
+                return $this->timeService->dateIntervalToDateTime($this->departAnticiper);
+            }
+            break;
         }
 
         if ($this->departAnticiper) {
