@@ -4,14 +4,14 @@ namespace App\EventSubscriber;
 
 use App\Entity\Dbf;
 use App\Entity\User;
-use App\Entity\Abscence;
+use App\Entity\Absence;
 use App\Entity\AutorisationSortie;
 use App\Entity\Conger;
 use App\Entity\Pointage;
 use App\Service\ConfigService;
 use App\Service\PointageService;
 use App\Repository\DbfRepository;
-use App\Service\AbscenceService;
+use App\Service\AbsenceService;
 use App\Service\CongerService;
 use App\Service\HoraireService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,7 +30,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     private $pointageService;
     private $configService;
     private $horaireService;
-    private $abscenceService;
+    private $absenceService;
     private $congerService;
 
     /**
@@ -39,7 +39,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      * @param ConfigService $configService
      * @param PointageService $pointageService
      * @param HoraireService $horaireService
-     * @param AbscenceService $abscenceService
+     * @param AbsenceService $absenceService
      * @param CongerService $congerService
      */
     public function __construct(
@@ -47,7 +47,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         ConfigService $configService,
         PointageService $pointageService,
         HoraireService $horaireService,
-        AbscenceService $abscenceService,
+        AbsenceService $absenceService,
         CongerService $congerService,
         EntityManagerInterface $manager
     ) {
@@ -55,7 +55,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         $this->pointageService = $pointageService;
         $this->configService = $configService;
         $this->horaireService = $horaireService;
-        $this->abscenceService = $abscenceService;
+        $this->absenceService = $absenceService;
         $this->congerService = $congerService;
         $this->manager = $manager;
     }
@@ -71,28 +71,28 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             BeforeEntityPersistedEvent::class => ['hashPassword'],
             BeforeEntityUpdatedEvent::class => ['totaleRetard',],
             AfterEntityUpdatedEvent::class => ['dbfUpdated'],
-            BeforeEntityDeletedEvent::class => ['abscenceDeleter'],
+            BeforeEntityDeletedEvent::class => ['absenceDeleter'],
         ];
     }
 
-    public function abscenceDeleter(BeforeEntityDeletedEvent $event)
+    public function absenceDeleter(BeforeEntityDeletedEvent $event)
     {
-        $abscence = $event->getEntityInstance();
-        if (!($abscence instanceof Abscence)) {
+        $absence = $event->getEntityInstance();
+        if (!($absence instanceof Absence)) {
             return;
         }
         $pointage = current(array_filter(array_map(
-            fn ($pointage): ?Pointage => ($abscence->getDebut() <= $pointage->getDate() and $pointage->getDate() <= $abscence->getFin()) ? $pointage : null,
-            $abscence->getPointages()->toArray()
+            fn ($pointage): ?Pointage => ($absence->getDebut() <= $pointage->getDate() and $pointage->getDate() <= $absence->getFin()) ? $pointage : null,
+            $absence->getPointages()->toArray()
         )));
-        $pointage->setAbscence(null);
-        $this->congerService->constructFromAbscence($abscence);
+        $pointage->setAbsence(null);
+        $this->congerService->constructFromAbsence($absence);
         //$this->manager->persist($pointage);
         $this->manager->persist($this->congerService->createEntity());
         $this->manager->flush();
-        /*  if ($abscence->getStarttime() and $abscence->getEndtime() /* and !$conger and !$autorisationSortie ) {
-            $this->pointageService->constructFromDbf($abscence);
-            $this->pointageService->dbfUpdated($abscence);
+        /*  if ($absence->getStarttime() and $absence->getEndtime() /* and !$conger and !$autorisationSortie ) {
+            $this->pointageService->constructFromDbf($absence);
+            $this->pointageService->dbfUpdated($absence);
         } */
         return;
         /* 

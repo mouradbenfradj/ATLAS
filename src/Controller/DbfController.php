@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\Admin\PointageCrudController;
-use App\Service\AbscenceService;
+use App\Service\AbsenceService;
 use App\Service\AutorisationSortieService;
 use App\Service\CongerService;
 use App\Service\DbfService;
@@ -65,11 +65,11 @@ class DbfController extends AbstractController
      */
     private $dbfService;
     /**
-     * abscenceService variable
+     * absenceService variable
      *
-     * @var AbscenceService
+     * @var AbsenceService
      */
-    private $abscenceService;
+    private $absenceService;
     /**
      * congerService variable
      *
@@ -93,7 +93,7 @@ class DbfController extends AbstractController
         EmployerService $employerService,
         //HoraireService $horaireService,
         DbfService $dbfService,
-        AbscenceService $abscenceService,
+        AbsenceService $absenceService,
         CongerService $congerService,
         AutorisationSortieService $autorisationSortieService
     ) {
@@ -105,7 +105,7 @@ class DbfController extends AbstractController
         $this->pointageService = $pointageService;
         $this->employerService = $employerService;
         $this->dbfService = $dbfService;
-        $this->abscenceService = $abscenceService;
+        $this->absenceService = $absenceService;
         $this->congerService = $congerService;
         $this->autorisationSortieService = $autorisationSortieService;
     }
@@ -145,14 +145,14 @@ class DbfController extends AbstractController
                     if (!in_array($dateDbf->format('Y-m-d'), $ignoredDay)) {
                         $this->dbfService->construct($record->userid, $record->badgenumbe, $record->ssn, $record->username, $record->autosch, $record->attdate, $record->schid, $record->clockintim, $record->clockoutti, $record->starttime, $record->endtime, $record->workday, $record->realworkda, $record->late, $record->early, $record->absent, $record->overtime, $record->worktime, $record->exceptioni, $record->mustin, $record->mustout, $record->deptid, $record->sspedaynor, $record->sspedaywee, $record->sspedayhol, $record->atttime, $record->attchktime, $user);
                         $dbf = $this->dbfService->createEntity();
-                        $this->abscenceService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
+                        $this->absenceService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
                         $this->congerService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
                         $this->autorisationSortieService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
                         if (
                             !$this->dateService->isWeek($dateDbf)
                             and (
                                 ($dbf->getStarttime() and $dbf->getEndtime())
-                                or $this->abscenceService->estAbscent()
+                                or $this->absenceService->estAbscent()
                                 or $this->congerService->estUnConger()
                                 or $this->autorisationSortieService->getAutorisation())
                         ) {
@@ -160,7 +160,7 @@ class DbfController extends AbstractController
                             $pointage = $this->pointageService->createEntity();
                             /*  $accespted = ($pointage->getEntrer() and $pointage->getSortie())
                                  or ($pointage->getCongerPayer() and $pointage->getCongerPayer()->getValider())
-                                 or $pointage->getAbscence();
+                                 or $pointage->getAbsence();
 
                              if ($accespted) { */
                             $user->addPointage($pointage);

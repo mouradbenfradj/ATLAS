@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\Abscence;
+use App\Entity\Absence;
 use DateTime;
 use App\Entity\User;
 use App\Entity\Conger;
@@ -125,11 +125,11 @@ class PointageService
     private $workTime;
 
     /**
-     * abscence
+     * absence
      *
-     * @var Abscence|null
+     * @var Absence|null
      */
-    private $abscence;
+    private $absence;
 
     /**
      * horaireService
@@ -153,11 +153,11 @@ class PointageService
     private $pointage;
 
     /**
-     * abscenceService
+     * absenceService
      *
-     * @var AbscenceService
+     * @var AbsenceService
      */
-    private $abscenceService;
+    private $absenceService;
     /**
      * congerService
      *
@@ -203,7 +203,7 @@ class PointageService
         TimeService $timeService,
         ConfigService $configService,
         EntityManagerInterface $manager,
-        AbscenceService $abscenceService,
+        AbsenceService $absenceService,
         CongerService $congerService,
         AutorisationSortieService $autorisationSortieService,
         RetardService $retardService,
@@ -214,7 +214,7 @@ class PointageService
         $this->flash = $flash;
         $this->configService = $configService;
         $this->manager = $manager;
-        $this->abscenceService = $abscenceService;
+        $this->absenceService = $absenceService;
         $this->congerService = $congerService;
         $this->autorisationSortieService = $autorisationSortieService;
         $this->retardService = $retardService;
@@ -242,7 +242,7 @@ class PointageService
         $this->congerPayer =null;
         $this->autorisationSortie =null;
         $this->workTime =null;
-        $this->abscence =null;
+        $this->absence =null;
     }
 
     /**
@@ -265,10 +265,10 @@ class PointageService
         //$this->entrer = $dbf->getStarttime() ? $dbf->getStarttime() : $this->entrerService->getEntrerFromArray($attchktime, $this->horaire, $this->employer, $this->date);
         $this->sortie = $this->workHourService->getSortieFromArray();
         //$this->sortie = $dbf->getEndtime() ? $dbf->getEndtime() : $this->sortieService->getSortieFromArray($attchktime, $this->horaire, $this->employer, $this->date);
-        $this->abscenceService->partielConstruct($this->employer, $this->date, $this->date);
-        $this->abscence = $this->abscenceService->findOrCreate($this->entrer, $this->sortie);
-        //$this->abscence = $this->abscenceService->estAbscent($this->date);
-        if (!$this->abscence) {
+        $this->absenceService->partielConstruct($this->employer, $this->date, $this->date);
+        $this->absence = $this->absenceService->findOrCreate($this->entrer, $this->sortie);
+        //$this->absence = $this->absenceService->estAbscent($this->date);
+        if (!$this->absence) {
             $this->congerService->partielConstruct($this->employer, $this->date, $this->date);
             $this->congerPayer = $this->congerService->findOrCreate($this->entrer, $this->sortie);
             $this->workHourService->setCongerPayer($this->congerPayer);
@@ -318,7 +318,7 @@ class PointageService
         $this->autorisationSortie =  $this->autorisationSortieService->getAutorisation($this->date);
         $this->entrer = $pointage->getEntrer();
         $this->sortie = $pointage->getSortie();
-        $this->abscence = $pointage->getAbscence();
+        $this->absence = $pointage->getAbsence();
         $this->congerPayer = $pointage->getCongerPayer();
         $this->nbrHeurTravailler = $pointage->getNbrHeurTravailler();
         $this->retardEnMinute = $pointage->getRetardEnMinute();
@@ -341,7 +341,7 @@ class PointageService
         $this->pointage = new Pointage();
         $this->pointage->setDate($this->date);
         $this->pointage->setHoraire($this->horaire);
-        $this->pointage->setAbscence($this->abscence);
+        $this->pointage->setAbsence($this->absence);
         $this->pointage->setCongerPayer($this->congerPayer);
         $this->pointage->setAutorisationSortie($this->autorisationSortie);
         $this->pointage->setEntrer($this->entrer);
@@ -368,7 +368,7 @@ class PointageService
         $this->pointage = new Pointage();
         $this->pointage->setDate($this->date);
         $this->pointage->setHoraire($this->horaire);
-        $this->pointage->setAbscence($this->abscence);
+        $this->pointage->setAbsence($this->absence);
         $this->pointage->setCongerPayer($this->congerPayer);
         $this->pointage->setAutorisationSortie($this->autorisationSortie);
         $this->pointage->setEntrer($this->entrer);
@@ -561,7 +561,7 @@ class PointageService
                     break;
                 case 'L':
                     if ($colomn)
-                        $this->pointage->setAbscence($colomn);
+                        $this->pointage->setAbsence($colomn);
                     break;
                 case 'M':
                     $this->pointage->setHeurNormalementTravailler($this->heurNormalementTravailler());

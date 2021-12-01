@@ -2,15 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\AbscenceRepository;
+use App\Repository\AbsenceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=AbscenceRepository::class)
+ * @ORM\Entity(repositoryClass=AbsenceRepository::class)
  */
-class Abscence
+class Absence
 {
     /**
      * @ORM\Id
@@ -24,7 +24,7 @@ class Abscence
         return "1";
     }
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="abscences")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="absences")
      */
     private $employer;
 
@@ -39,12 +39,12 @@ class Abscence
     private $fin;
 
     /**
-     * @ORM\OneToMany(targetEntity=Pointage::class, mappedBy="abscence")
+     * @ORM\OneToMany(targetEntity=Pointage::class, mappedBy="absence")
      */
     private $pointages;
 
     /**
-     * @ORM\OneToMany(targetEntity=Xlsx::class, mappedBy="abcence")
+     * @ORM\OneToMany(targetEntity=Xlsx::class, mappedBy="absence")
      */
     private $xlsxes;
 
@@ -107,7 +107,7 @@ class Abscence
     {
         if (!$this->pointages->contains($pointage)) {
             $this->pointages[] = $pointage;
-            $pointage->setAbscence($this);
+            $pointage->setAbsence($this);
         }
 
         return $this;
@@ -117,8 +117,8 @@ class Abscence
     {
         if ($this->pointages->removeElement($pointage)) {
             // set the owning side to null (unless already changed)
-            if ($pointage->getAbscence() === $this) {
-                $pointage->setAbscence(null);
+            if ($pointage->getAbsence() === $this) {
+                $pointage->setAbsence(null);
             }
         }
 
@@ -137,7 +137,7 @@ class Abscence
     {
         if (!$this->xlsxes->contains($xlsx)) {
             $this->xlsxes[] = $xlsx;
-            $xlsx->setAbcence($this);
+            $xlsx->setAbsence($this);
         }
 
         return $this;
@@ -147,8 +147,8 @@ class Abscence
     {
         if ($this->xlsxes->removeElement($xlsx)) {
             // set the owning side to null (unless already changed)
-            if ($xlsx->getAbcence() === $this) {
-                $xlsx->setAbcence(null);
+            if ($xlsx->getAbsence() === $this) {
+                $xlsx->setAbsence(null);
             }
         }
 

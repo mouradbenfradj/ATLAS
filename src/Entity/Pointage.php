@@ -95,9 +95,9 @@ class Pointage
     private $workTime;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Abscence::class, inversedBy="pointages",cascade={"persist"}, fetch="EAGER"))
+     * @ORM\ManyToOne(targetEntity=Absence::class, inversedBy="pointages",cascade={"persist"}, fetch="EAGER"))
      */
-    private $abscence;
+    private $absence;
 
     public function getId(): ?int
     {
@@ -284,14 +284,14 @@ class Pointage
         return $this;
     }
 
-    public function getAbscence(): ?Abscence
+    public function getAbsence(): ?Absence
     {
-        return $this->abscence;
+        return $this->absence;
     }
 
-    public function setAbscence(?Abscence $abscence): self
+    public function setAbsence(?Absence $absence): self
     {
-        $this->abscence = $abscence;
+        $this->absence = $absence;
 
         return $this;
     }

@@ -88,36 +88,27 @@ class XlsxService
         $this->pointageService = $pointageService;
         $this->flash = $flash;
     }
-    public function construct(float $userid, int $badgenumbe, string $ssn, string $username, ?string $autosch, string $attdate, ?float $schid, ?string $clockintim, ?string $clockoutti, ?string $starttime, ?string $endtime, ?float $workday, ?float $realworkda, ?string $late, ?string $early, ?float $absent, ?string $overtime, ?string $worktime, ?string $exceptioni, ?string $mustin, ?string $mustout, ?float $deptid, ?float $sspedaynor, ?float $sspedaywee, ?float $sspedayhol, ?string $atttime, ?string $attchktime, ?User $user)
+    public function construct(string $date, string $horaire, ?string $entrer, ?string $sortie, ?string $nbrHeursTravailler, ?string $retardEnMinute, ?string $departAnticiper, ?string  $retardMidi, ?string $totalRetard, ?string $autorisationSortie, ?string $congerPayer, ?string $absence, ?string $heurNormalementTravailler, ?string $diff, ?User $employer)
     {
-        $this->userid = $userid;
-        $this->badgenumbe = $badgenumbe;
-        $this->ssn = $ssn;
-        $this->username = $username;
-        $this->autosch = $autosch;
-        $this->attdate = $this->dateService->dateString_d_m_Y_ToDateTime($attdate);
-        $this->schid = $schid;
-        $this->clockintim = $this->timeService->timeStringToDateTime($clockintim);
-        $this->clockoutti = $this->timeService->timeStringToDateTime($clockoutti);
-        $this->starttime = $this->timeService->timeStringToDateTime($starttime);
-        $this->endtime = $this->timeService->timeStringToDateTime($endtime);
-        $this->workday = $workday;
-        $this->realworkda = $realworkda;
-        $this->late = $this->timeService->timeStringToDateTime($late);
-        $this->early = $this->timeService->timeStringToDateTime($early);
-        $this->absent = $absent;
-        $this->overtime = $this->timeService->timeStringToDateTime($overtime);
-        $this->worktime = $this->timeService->timeStringToDateTime($worktime);
-        $this->exceptioni = $exceptioni;
-        $this->mustin = $mustin;
-        $this->mustout = $mustout;
-        $this->deptid = $deptid;
-        $this->sspedaynor = $sspedaynor;
-        $this->sspedaywee = $sspedaywee;
-        $this->sspedayhol = $sspedayhol;
-        $this->atttime = $this->timeService->timeStringToDateTime($atttime);
-        $this->attchktime = explode(" ", $attchktime);
-        $this->user = $user;
+        
+        $this->date = $date;
+        $this->employer = $employer;
+        $this->horaire = $this->horaireService->getHoraireForDate($this->date, $this->employer);
+        $this->autorisationSortieService->partielConstruct($this->employer);
+        $this->autorisationSortie =  $this->autorisationSortieService->getAutorisation($this->date);
+        $this->entrer = $entrer;
+        $this->sortie = $sortie;
+        $this->absence = $absence;
+        $this->congerPayer = $pointage->getCongerPayer();
+        $this->nbrHeurTravailler = $pointage->getNbrHeurTravailler();
+        $this->retardEnMinute = $pointage->getRetardEnMinute();
+        $this->departAnticiper = $pointage->getDepartAnticiper();
+        $this->retardMidi = $pointage->getRetardMidi();
+        ;
+        $this->totalRetard = $pointage->getTotaleRetard();
+        $this->heurNormalementTravailler = $pointage->getHeurNormalementTravailler();
+        $this->diff = $pointage->getDiff();
+        $this->workTime = $pointage->getWorkTime();
     }
 
     /**
@@ -178,8 +169,9 @@ class XlsxService
                             array_push($arrayDate, $dateString);
                             $user = $this->pointageService->addLigne($ligne, $user);
                         }
-                    } else
+                    } else {
                         $this->flash->add('danger ', 'ignored ligne ' . implode(" | ", $ligne));
+                    }
                 }
             }
         }

@@ -74,9 +74,9 @@ class Xlsx
     private $congerPayer;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Abscence::class, inversedBy="xlsxes")
+     * @ORM\ManyToOne(targetEntity=Absence::class, inversedBy="xlsxes")
      */
-    private $abcence;
+    private $absence;
 
     /**
      * @ORM\Column(type="time", nullable=true)
@@ -225,14 +225,14 @@ class Xlsx
         return $this;
     }
 
-    public function getAbcence(): ?Abscence
+    public function getAbsence(): ?Absence
     {
-        return $this->abcence;
+        return $this->absence;
     }
 
-    public function setAbcence(?Abscence $abcence): self
+    public function setAbsence(?Absence $absence): self
     {
-        $this->abcence = $abcence;
+        $this->absence = $absence;
 
         return $this;
     }

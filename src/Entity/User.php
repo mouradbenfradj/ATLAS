@@ -124,9 +124,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $dbfs;
 
     /**
-     * @ORM\OneToMany(targetEntity=Abscence::class, mappedBy="employer",cascade={"persist"}, orphanRemoval=true, fetch="EAGER")
+     * @ORM\OneToMany(targetEntity=Absence::class, mappedBy="employer",cascade={"persist"}, orphanRemoval=true, fetch="EAGER")
      */
-    private $abscences;
+    private $absences;
 
     public function __construct()
     {
@@ -135,7 +135,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->autorisationSorties = new ArrayCollection();
         $this->workTimes = new ArrayCollection();
         $this->dbfs = new ArrayCollection();
-        $this->abscences = new ArrayCollection();
+        $this->absences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -510,29 +510,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection|Abscence[]
+     * @return Collection|Absence[]
      */
-    public function getAbscences(): Collection
+    public function getAbsences(): Collection
     {
-        return $this->abscences;
+        return $this->absences;
     }
 
-    public function addAbscence(Abscence $abscence): self
+    public function addAbsence(Absence $absence): self
     {
-        if (!$this->abscences->contains($abscence)) {
-            $this->abscences[] = $abscence;
-            $abscence->setEmployer($this);
+        if (!$this->absences->contains($absence)) {
+            $this->absences[] = $absence;
+            $absence->setEmployer($this);
         }
 
         return $this;
     }
 
-    public function removeAbscence(Abscence $abscence): self
+    public function removeAbsence(Absence $absence): self
     {
-        if ($this->abscences->removeElement($abscence)) {
+        if ($this->absences->removeElement($absence)) {
             // set the owning side to null (unless already changed)
-            if ($abscence->getEmployer() === $this) {
-                $abscence->setEmployer(null);
+            if ($absence->getEmployer() === $this) {
+                $absence->setEmployer(null);
             }
         }
 

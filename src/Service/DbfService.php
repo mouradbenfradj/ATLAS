@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Dbf;
+use App\Entity\JourFerier;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -53,14 +54,47 @@ class DbfService
     private $timeService;
 
 
-
+    /**
+     * adminUrlGenerator variable
+     *
+     * @var AdminUrlGenerator
+     */
     private $adminUrlGenerator;
+    /**
+     * jourFerierService variable
+     *
+     * @var JourFerierService
+     */
     private $jourFerierService;
-    private $pointageGeneratorService;
+    /**
+     * congerService variable
+     *
+     * @var CongerService
+     */
     private $congerService;
+    /**
+     * horaireService variable
+     *
+     * @var HoraireService
+     */
     private $horaireService;
+    /**
+     * pointageService variable
+     *
+     * @var PointageService
+     */
     private $pointageService;
+    /**
+     * flash variable
+     *
+     * @var FlashBagInterface
+     */
     private $flash;
+    /**
+     * autorisationSortieService variable
+     *
+     * @var AutorisationSortieService
+     */
     private $autorisationSortieService;
 
     /**
@@ -69,7 +103,6 @@ class DbfService
      * @param AdminUrlGenerator $adminUrlGenerator
      * @param DateService $dateService
      * @param JourFerierService $jourFerierService
-     * @param PointageGeneratorService $pointageGeneratorService
      * @param HoraireService $horaireService
      * @param PointageService $pointageService
      * @param FlashBagInterface $flash
@@ -77,12 +110,11 @@ class DbfService
      * @param CongerService $congerService
      * @param AutorisationSortieService $autorisationSortieService
      */
-    public function __construct(DateService $dateService, TimeService $timeService, AdminUrlGenerator $adminUrlGenerator,  JourFerierService $jourFerierService, PointageGeneratorService $pointageGeneratorService, HoraireService $horaireService, PointageService $pointageService, FlashBagInterface $flash, CongerService $congerService, AutorisationSortieService $autorisationSortieService)
+    public function __construct(DateService $dateService, TimeService $timeService, AdminUrlGenerator $adminUrlGenerator, JourFerierService $jourFerierService, HoraireService $horaireService, PointageService $pointageService, FlashBagInterface $flash, CongerService $congerService, AutorisationSortieService $autorisationSortieService)
     {
         $this->adminUrlGenerator = $adminUrlGenerator;
         $this->dateService = $dateService;
         $this->jourFerierService = $jourFerierService;
-        $this->pointageGeneratorService = $pointageGeneratorService;
         $this->congerService = $congerService;
         $this->horaireService = $horaireService;
         $this->pointageService = $pointageService;
@@ -206,7 +238,8 @@ class DbfService
         $dbf->setSspedaynor($this->sspedaynor);
         $dbf->setSspedaywee($this->sspedaywee);
         $dbf->setSspedayhol($this->sspedayhol);
-        $dbf->setAtttime($this->atttime);;
+        $dbf->setAtttime($this->atttime);
+        ;
         $dbf->setAttchktime($this->attchktime);
         $dbf->setEmployer($this->user);
         return $dbf;

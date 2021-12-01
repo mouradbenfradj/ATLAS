@@ -22,7 +22,7 @@ class PointageType extends AbstractType
             ->add('totaleRetard')
             ->add('autorisationSortie')
             ->add('congerPayer')
-            ->add('abscence')
+            ->add('absence')
             ->add('heurNormalementTravailler')
             ->add('diff')
             ->add('employer')

@@ -5,7 +5,7 @@ namespace App\Service;
 use DateTime;
 use App\Entity\User;
 use App\Entity\Conger;
-use App\Entity\Abscence;
+use App\Entity\Absence;
 use Doctrine\ORM\EntityManagerInterface;
 use phpDocumentor\Reflection\Types\Integer;
 
@@ -86,12 +86,12 @@ class CongerService
         return $conger;
     }
 
-    public function constructFromAbscence(Abscence $abscence): void
+    public function constructFromAbsence(Absence $absence): void
     {
-        $this->employer = $abscence->getEmployer();
-        $this->debut = $abscence->getDebut();
-        $this->fin = $abscence->getFin();
-        $this->pointages = $abscence->getPointages()->toArray();
+        $this->employer = $absence->getEmployer();
+        $this->debut = $absence->getDebut();
+        $this->fin = $absence->getFin();
+        $this->pointages = $absence->getPointages()->toArray();
         $this->type = "CP";
         $this->valider = true;
         $this->refuser = false;

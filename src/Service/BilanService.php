@@ -44,7 +44,7 @@ class BilanService
             "totalRetard" => 0,
             "autorisationSortie" => 0,
             "congerPayer" =>  0,
-            "abscence" =>  0,
+            "absence" =>  0,
             "heurNormalementTravailler" => 0,
             "diff" => 0,
         ];
@@ -84,7 +84,7 @@ class BilanService
                 $bilan["congerPayer"] += 1;
             }
         }
-        $bilan["abscence"] = $pointage->getAbscence() ? $bilan["abscence"] + 1 : $bilan["abscence"];
+        $bilan["absence"] = $pointage->getAbsence() ? $bilan["absence"] + 1 : $bilan["absence"];
         $bilan["heurNormalementTravailler"] = $this->bilan($pointage->getHeurNormalementTravailler(), $bilan["heurNormalementTravailler"]);
         $bilan["diff"] = $this->bilan($pointage->getDiff(), $bilan["diff"]);
         return $bilan;
@@ -236,7 +236,7 @@ class BilanService
                 "totalRetard" => $pointage->getTotaleRetard() ? $pointage->getTotaleRetard()->format('H:i:s') : "",
                 "autorisationSortie" => $pointage->getAutorisationSortie() ? $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($pointage->getAutorisationSortie()->getDe(), $pointage->getAutorisationSortie()->getA()))->format('H:i:s') : "",
                 "congerPayer" =>  $pointage->getCongerPayer(),
-                "abscence" => $pointage->getAbscence(),
+                "absence" => $pointage->getAbsence(),
                 "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format('H:i:s') : "",
                 "diff" => $pointage->getDiff() ? $pointage->getDiff()->format('H:i:s') : "",
             ]);

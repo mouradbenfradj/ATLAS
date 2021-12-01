@@ -8,7 +8,7 @@ use App\Form\UploadType;
 use App\Service\DateService;
 use App\Service\XlsxService;
 use App\Service\CongerService;
-use App\Service\AbscenceService;
+use App\Service\AbsenceService;
 use App\Service\EmployerService;
 use App\Service\PointageService;
 use App\Service\JourFerierService;
@@ -66,11 +66,11 @@ class XlsxController extends AbstractController
      */
     private $dbfService;
     /**
-     * abscenceService variable
+     * absenceService variable
      *
-     * @var AbscenceService
+     * @var AbsenceService
      */
-    private $abscenceService;
+    private $absenceService;
     /**
      * congerService variable
      *
@@ -94,7 +94,7 @@ class XlsxController extends AbstractController
         EmployerService $employerService,
         //HoraireService $horaireService,
         XlsxService $xlsxService,
-        AbscenceService $abscenceService,
+        AbsenceService $absenceService,
         CongerService $congerService,
         AutorisationSortieService $autorisationSortieService
     ) {
@@ -106,7 +106,7 @@ class XlsxController extends AbstractController
         $this->pointageService = $pointageService;
         $this->employerService = $employerService;
         $this->xlsxService = $xlsxService;
-        $this->abscenceService = $abscenceService;
+        $this->absenceService = $absenceService;
         $this->congerService = $congerService;
         $this->autorisationSortieService = $autorisationSortieService;
     }

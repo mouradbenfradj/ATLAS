@@ -35,7 +35,7 @@ class PointageCrudController extends AbstractCrudController
             TimeField::new('totaleRetard')->onlyOnIndex(),
             AssociationField::new('autorisationSortie'),
             AssociationField::new('congerPayer'),
-            AssociationField::new('abscence'),
+            AssociationField::new('absence'),
             TimeField::new('heurNormalementTravailler')->onlyOnIndex(),
             TimeField::new('diff')->onlyOnIndex(),
         ];
@@ -55,7 +55,7 @@ class PointageCrudController extends AbstractCrudController
             ->add('totaleRetard')
             ->add('autorisationSortie')
             ->add('congerPayer')
-            ->add('abscence')
+            ->add('absence')
             ->add('heurNormalementTravailler')
             ->add('diff')
             ->add('employer');

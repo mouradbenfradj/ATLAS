@@ -2,25 +2,25 @@
 
 namespace App\Repository;
 
-use App\Entity\Abscence;
+use App\Entity\Absence;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Abscence|null find($id, $lockMode = null, $lockVersion = null)
- * @method Abscence|null findOneBy(array $criteria, array $orderBy = null)
- * @method Abscence[]    findAll()
- * @method Abscence[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Absence|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Absence|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Absence[]    findAll()
+ * @method Absence[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class AbscenceRepository extends ServiceEntityRepository
+class AbsenceRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Abscence::class);
+        parent::__construct($registry, Absence::class);
     }
 
     // /**
-    //  * @return Abscence[] Returns an array of Abscence objects
+    //  * @return Absence[] Returns an array of Absence objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class AbscenceRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Abscence
+    public function findOneBySomeField($value): ?Absence
     {
         return $this->createQueryBuilder('a')
             ->andWhere('a.exampleField = :val')
