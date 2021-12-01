@@ -11,7 +11,7 @@ use App\Service\JourFerierService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
-class PointageGeneratorService
+class XlsxService
 {
 
     /**
@@ -87,6 +87,37 @@ class PointageGeneratorService
         $this->timeService = $timeService;
         $this->pointageService = $pointageService;
         $this->flash = $flash;
+    }
+    public function construct(float $userid, int $badgenumbe, string $ssn, string $username, ?string $autosch, string $attdate, ?float $schid, ?string $clockintim, ?string $clockoutti, ?string $starttime, ?string $endtime, ?float $workday, ?float $realworkda, ?string $late, ?string $early, ?float $absent, ?string $overtime, ?string $worktime, ?string $exceptioni, ?string $mustin, ?string $mustout, ?float $deptid, ?float $sspedaynor, ?float $sspedaywee, ?float $sspedayhol, ?string $atttime, ?string $attchktime, ?User $user)
+    {
+        $this->userid = $userid;
+        $this->badgenumbe = $badgenumbe;
+        $this->ssn = $ssn;
+        $this->username = $username;
+        $this->autosch = $autosch;
+        $this->attdate = $this->dateService->dateString_d_m_Y_ToDateTime($attdate);
+        $this->schid = $schid;
+        $this->clockintim = $this->timeService->timeStringToDateTime($clockintim);
+        $this->clockoutti = $this->timeService->timeStringToDateTime($clockoutti);
+        $this->starttime = $this->timeService->timeStringToDateTime($starttime);
+        $this->endtime = $this->timeService->timeStringToDateTime($endtime);
+        $this->workday = $workday;
+        $this->realworkda = $realworkda;
+        $this->late = $this->timeService->timeStringToDateTime($late);
+        $this->early = $this->timeService->timeStringToDateTime($early);
+        $this->absent = $absent;
+        $this->overtime = $this->timeService->timeStringToDateTime($overtime);
+        $this->worktime = $this->timeService->timeStringToDateTime($worktime);
+        $this->exceptioni = $exceptioni;
+        $this->mustin = $mustin;
+        $this->mustout = $mustout;
+        $this->deptid = $deptid;
+        $this->sspedaynor = $sspedaynor;
+        $this->sspedaywee = $sspedaywee;
+        $this->sspedayhol = $sspedayhol;
+        $this->atttime = $this->timeService->timeStringToDateTime($atttime);
+        $this->attchktime = explode(" ", $attchktime);
+        $this->user = $user;
     }
 
     /**

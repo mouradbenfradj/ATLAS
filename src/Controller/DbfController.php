@@ -75,7 +75,8 @@ class DbfController extends AbstractController
      *
      * @var CongerService
      */
-    private $congerService;/**
+    private $congerService;
+    /**
      * autorisationSortieService variable
      *
      * @var AutorisationSortieService
@@ -149,12 +150,11 @@ class DbfController extends AbstractController
                         $this->autorisationSortieService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
                         if (
                             !$this->dateService->isWeek($dateDbf)
-                        and (
-                            ($dbf->getStarttime() and $dbf->getEndtime())
-                            or $this->abscenceService->estAbscent()
-                            or $this->congerService->estUnConger()
-                            or $this->autorisationSortieService->getAutorisation()
-                            )
+                            and (
+                                ($dbf->getStarttime() and $dbf->getEndtime())
+                                or $this->abscenceService->estAbscent()
+                                or $this->congerService->estUnConger()
+                                or $this->autorisationSortieService->getAutorisation())
                         ) {
                             $this->pointageService->constructFromDbf($dbf);
                             $pointage = $this->pointageService->createEntity();
@@ -174,52 +174,8 @@ class DbfController extends AbstractController
             $user->setSoldAutorisationSortie($this->employerService->calculerAS($user));
             $manager->persist($user);
             $manager->flush();
-
-
-            //dd($user->getPointages()->toArray());
-
-
-
-
-
-            /* $conger = $this->congerService->getIfConger($dateDbf, $user);
-                $user = $this->congerService->getemployer();
-                $autorisationSortie = $this->autorisationSortieService->getIfAutorisationSortie($dateDbf, $user);
-                $pointage = new Pointage();
-                $pointage->setDate($this->dateService->dateString_d_m_Y_ToDateTime($record->attdate));
-                $pointage->setHoraire($this->horaireService->getHoraireForDate($pointage->getDate()));
-                $pointage->setCongerPayer($conger);
-                $pointage->setAutorisationSortie($autorisationSortie);
-                $pointage->setAbscence(null);
-
-
-                if ($record->starttime != "" and $this->timeService->isTimeHi($record->starttime))
-                    $pointage->setEntrer(new DateTime($record->starttime));
-                else {
-                    $pointage->setEntrer(new DateTime("00:00:00"));
-                    $this->flash->add('danger ', 'saisie automatique de l\'heur d\'entrer a 00:00:00 pour la date ' . $record->attdate);
-                }
-                if ($record->endtime != ""  and $this->timeService->isTimeHi($record->endtime))
-                    $pointage->setSortie(new DateTime($record->endtime));
-                else {
-                    $pointage->setSortie(new DateTime("23:00:00"));
-                    $this->flash->add('danger ', 'saisie automatique de l\'heur de sortie a 23:00:00 pour la date ' . $record->attdate);
-                }
-
-
-                $this->pointageService->setPointage($pointage);
-                $pointage->setNbrHeurTravailler($this->pointageService->nbrHeurTravailler());
-                $pointage->setRetardEnMinute($this->pointageService->retardEnMinute());
-                $pointage->setDepartAnticiper(null);
-                $pointage->setRetardMidi(null);
-                $pointage->setTotaleRetard($this->pointageService->totalRetard());
-                $pointage->setHeurNormalementTravailler($this->pointageService->heurNormalementTravailler());
-                $pointage->setDiff($this->pointageService->diff());
-                $user->addPointage($pointage); */
-
-            $manager->flush();
             $this->addFlash('success', 'id.updated_successfully');
-            
+
             $url = $this->adminUrlGenerator
                 ->setController(PointageCrudController::class)
                 ->setAction('index')
