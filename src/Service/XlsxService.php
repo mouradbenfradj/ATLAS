@@ -117,7 +117,9 @@ class XlsxService
     private $diff;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="xlsxes")
+     * employer variable
+     *
+     * @var User
      */
     private $employer;
 
@@ -232,68 +234,68 @@ class XlsxService
         $this->retardService = $retardService;
     }
 
-    public function construct(array $col, ?User $employer)
+    public function construct(array $cols, User $employer)
     {
         $this->employer = $employer;
-        $this->date = $this->dateService->dateString_d_m_Y_ToDateTime($col['A']);
+        $this->date = $this->dateService->dateString_d_m_Y_ToDateTime($cols['A']);
         $this->date = $this->date->setTime(0, 0);
-        $this->horaire = $this->horaireService->getHoraireForDate($this->date, $this->employer, $col['B']);
+        $this->horaire = $this->horaireService->getHoraireForDate($this->date, $this->employer, $cols['B']);
 
-        $this->entrer = $col['C'] ? $this->timeService->generateTime($col['C']) : null;
-        $this->sortie = $col['D'] ? $this->timeService->generateTime($col['D']) : null;
+        $this->entrer = $cols['C'] ? $this->timeService->generateTime($cols['C']) : null;
+        $this->sortie = $cols['D'] ? $this->timeService->generateTime($cols['D']) : null;
         $this->autorisationSortieService->partielConstruct($this->employer);
         $this->autorisationSortie =  $this->autorisationSortieService->getAutorisation($this->date);
-        if ($col['J'] and !$this->autorisationSortie) {
-            $this->autorisationSortie = $col['J'] ? $this->timeService->generateTime($col['J']) : null;
+        if ($cols['J'] and !$this->autorisationSortie) {
+            $this->autorisationSortie = $cols['J'] ? $this->timeService->generateTime($cols['J']) : null;
             $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $this->autorisationSortie, true, false);
             $this->autorisationSortie =  $this->autorisationSortieService->ConstructEntity();
         }
         $this->congerService->partielConstruct($this->employer, $this->date, $this->date);
         $this->congerPayer = $this->congerService->findOrCreate($this->entrer, $this->sortie);
-        if ($col['K'] and !$this->congerPayer) {
-            if (floatval($col['K']) < 1) {
+        if ($cols['K'] and !$this->congerPayer) {
+            if (floatval($cols['K']) < 1) {
                 $this->congerService->partielConstruct($this->employer, $this->date, $this->date, 'CP', true, false, true);
-            } elseif (floatval($col['K']) == 1) {
+            } elseif (floatval($cols['K']) == 1) {
                 $this->congerService->partielConstruct($this->employer, $this->date, $this->date, 'CP', true, false, false);
             } else {
-                dd($col['K']);
+                dd($cols['K']);
             }
             $this->congerPayer = $this->congerService->ConstructEntity();
         }
         $this->absenceService->partielConstruct($this->employer, $this->date, $this->date);
         $this->absence = $this->absenceService->findOrCreate($this->entrer, $this->sortie);
-        if ($col['L']) {
-            dd($col['L'] and !$this->absence);
-            $this->absence = $col['L'];
+        if ($cols['L']) {
+            dd($cols['L'] and !$this->absence);
+            $this->absence = $cols['L'];
         }
-        if ($col['E']) {
-            $this->nbrHeurTravailler = $this->timeService->generateTime($col['E']);
+        if ($cols['E']) {
+            $this->nbrHeurTravailler = $this->timeService->generateTime($cols['E']);
         } else {
             $this->workHourService->requirement([], $this->horaire, $this->employer, $this->date, $this->entrer, $this->sortie);
             $this->nbrHeurTravailler = $this->workHourService->nbrHeurTravailler();
         }
-        if ($col['F']) {
-            $this->retardEnMinute = $this->timeService->generateTime($col['F']);
+        if ($cols['F']) {
+            $this->retardEnMinute = $this->timeService->generateTime($cols['F']);
         } else {
             $this->retardService->requirement([], $this->horaire, $this->entrer, $this->sortie, $this->congerPayer, $this->autorisationSortie);
             $this->retardEnMinute = $this->retardService->retardEnMinute(); //$dbf->getLate();
         }
-        if ($col['G']) {
-            $this->departAnticiper = $this->timeService->generateTime($col['G']);
+        if ($cols['G']) {
+            $this->departAnticiper = $this->timeService->generateTime($cols['G']);
         } else {
             $this->retardService->requirement([], $this->horaire, $this->entrer, $this->sortie, $this->congerPayer, $this->autorisationSortie);
             $this->departAnticiper = $this->retardService->departAnticiper();
         }
-        if ($col['H']) {
-            $this->retardMidi =  $this->timeService->generateTime($col['H']);
+        if ($cols['H']) {
+            $this->retardMidi =  $this->timeService->generateTime($cols['H']);
         } else {
             $this->retardService->requirement([], $this->horaire, $this->entrer, $this->sortie, $this->congerPayer, $this->autorisationSortie);
             $this->retardMidi  = $this->retardService->retardMidi();
         }
-        $this->totalRetard = $col['I'] ?  $this->timeService->generateTime($col['I']) : null;
+        $this->totalRetard = $cols['I'] ?  $this->timeService->generateTime($cols['I']) : null;
 
-        $this->heurNormalementTravailler =  $col['M'] ?  $this->timeService->generateTime($col['M']) : null;
-        $this->diff = $col['N'] ?  $this->timeService->generateTime($col['N']) : null;
+        $this->heurNormalementTravailler =  $cols['M'] ?  $this->timeService->generateTime($cols['M']) : null;
+        $this->diff = $cols['N'] ?  $this->timeService->generateTime($cols['N']) : null;
     }
 
     public function createEntity(): Xlsx

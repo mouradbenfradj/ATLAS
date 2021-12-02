@@ -145,23 +145,22 @@ class XlsxController extends AbstractController
                 $allSheet = $spreadsheet->getAllSheets();
                 foreach ($allSheet as $worksheet) {
                     $highestRow = $worksheet->getHighestRow();
-                    $cols = $worksheet->rangeToArray(
+                    $rows = $worksheet->rangeToArray(
                         'A1:O'.$highestRow,
                         null,
                         true,
                         true,
                         true
                     );
-                    foreach ($cols as $col) {
-                        if ($this->dateService->isDate($col['A']) and $col['C'] and $col['D']) {
-                            $this->xlsxService->construct($col, $employer);
-                            $xlsx = $this->xlsxService->createEntity();
-                            $employer->addXlsx($xlsx);
+                    foreach ($rows as $cols) {
+                        if ($this->dateService->isDate($cols['A']) and $cols['C'] and $cols['D']) {
+                            $dateXlsx =  $this->dateService->dateString_d_m_Y_ToDate_Y_m_d($cols['A']);
+                            if (!in_array($dateXlsx->format('Y-m-d'), $ignoredDay)) {
+                                $this->xlsxService->construct($cols, $employer);
+                                $xlsx = $this->xlsxService->createEntity();
+                                $employer->addXlsx($xlsx);
+                            }
                         }
-                        $employer->setSoldConger($this->employerService->calculerSoldConger($employer));
-                        $employer->setSoldAutorisationSortie($this->employerService->calculerAS($employer));
-                        $manager->persist($employer);
-                        $manager->flush();
                     }
                 }/* for ($i = 0; $i < $sheetCount; $i++) {
                     $worksheet = $spreadsheet->getSheet($i);
@@ -186,6 +185,11 @@ class XlsxController extends AbstractController
                         $manager->flush();
                     }
                 } */
+                
+                $employer->setSoldConger($this->employerService->calculerSoldConger($employer));
+                $employer->setSoldAutorisationSortie($this->employerService->calculerAS($employer));
+                $manager->persist($employer);
+                $manager->flush();
                 $this->addFlash('success', 'updated_successfully');
             }
             $url = $this->adminUrlGenerator

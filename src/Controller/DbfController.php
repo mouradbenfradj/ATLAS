@@ -137,7 +137,7 @@ class DbfController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $dbf = $form->get('upload')->getData();
             if ($dbf) {
-                $ignoredDay = array_merge($this->dbfService->dateDbfInDb($user), $this->pointageService->dateInDB($user), $this->jourFerierService->jourFerier());
+                $ignoredDay = array_merge($this->dbfService->dateInDb($user), $this->pointageService->dateInDB($user), $this->jourFerierService->jourFerier());
                 $manager = $this->getDoctrine()->getManager();
                 $dbfs = new TableReader($dbf);
                 while ($record = $dbfs->nextRecord()) {

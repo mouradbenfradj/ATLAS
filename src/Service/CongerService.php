@@ -120,21 +120,25 @@ class CongerService
             fn ($conger): ?Conger => ($conger->getDebut() <= $this->debut and $this->fin <= $conger->getFin()) ? $conger : null,
             $this->employer->getCongers()->toArray()
         )));
+        if ($conger) {
+            return $conger ;
+        }
         $quardJourner = $this->horaireService->getHeursQuardJournerDeTravaille();
         $maxDemiJourner = $this->horaireService->getHeursQuardJournerDeTravaille();
         $demiJourner = $this->horaireService->getHeursDemiJournerDeTravaille();
         $maxDemiJourner->add($this->timeService->dateTimeToDateInterval($demiJourner));
-        $diff = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($entrer, $sortie));
-
         if (!$entrer and !$sortie) {
             $this->partielConstruct($this->employer, $this->debut, $this->fin, "CP", true, false, false);
-
+            dump($conger);
             dump($entrer);
             dd($sortie);
             return  $this->ConstructEntity();
-        } elseif ($diff > $quardJourner and $diff < $maxDemiJourner) {
-            $this->partielConstruct($this->employer, $this->debut, $this->fin, "CP", true, false, true);
-            $conger = $this->ConstructEntity();
+        } else {
+            $diff = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($entrer, $sortie));
+            if ($diff > $quardJourner and $diff < $maxDemiJourner) {
+                $this->partielConstruct($this->employer, $this->debut, $this->fin, "CP", true, false, true);
+                $conger = $this->ConstructEntity();
+            }
         }
         return  $conger ?  $conger : null;
     }

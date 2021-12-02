@@ -254,7 +254,7 @@ class PointageService
     public function constructFromDbf(Dbf $dbf): void
     {
         $this->initAttribute();
-        $attchktime = ($dbf->getAttchktime()[0] =="")?[]:$dbf->getAttchktime();
+        $attchktime = (count($dbf->getAttchktime()) == 1)?(($dbf->getAttchktime()[0] =="")?[]:$dbf->getAttchktime()):$dbf->getAttchktime();
         $this->date = $dbf->getAttdate();
         $this->employer = $dbf->getEmployer();
         $this->horaireService->setWorkTime($this->employer->getWorkTimes()->toArray());
@@ -286,7 +286,6 @@ class PointageService
                     dump($this->entrer);
                     dump($this->sortie);
                     dd($this->timeService->diffTime($this->entrer, $this->sortie));
-                    
                 } */
                 $this->workHourService->setAutorisationSortie($this->autorisationSortie);
             }
@@ -361,24 +360,9 @@ class PointageService
      * @param Dbf $dbf
      * @return void
      */
-    public function dbfUpdated(Dbf $dbf): void
+    public function dbfUpdated(Pointage $pointage, Dbf $dbf): void
     {
-        $this->pointage = new Pointage();
-        $this->pointage->setDate($this->date);
-        $this->pointage->setHoraire($this->horaire);
-        $this->pointage->setAbsence($this->absence);
-        $this->pointage->setCongerPayer($this->congerPayer);
-        $this->pointage->setAutorisationSortie($this->autorisationSortie);
-        $this->pointage->setEntrer($this->entrer);
-        $this->pointage->setSortie($this->sortie);
-        $this->pointage->setNbrHeurTravailler($this->nbrHeurTravailler);
-        $this->pointage->setRetardEnMinute($this->retardEnMinute);
-        $this->pointage->setDepartAnticiper($this->departAnticiper);
-        $this->pointage->setRetardMidi($this->retardMidi);
-        $this->pointage->setTotaleRetard($this->totalRetard);
-        $this->pointage->setHeurNormalementTravailler($this->heurNormalementTravailler);
-        $this->pointage->setDiff($this->diff);
-        $this->pointage->setEmployer($this->employer);
+        $this->pointage = $pointage;
         $this->manager->persist($this->pointage);
         $this->manager->remove($dbf);
         $this->manager->flush();

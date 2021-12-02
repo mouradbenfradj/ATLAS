@@ -95,7 +95,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             $this->pointageService->dbfUpdated($absence);
         } */
         return;
-        /* 
+        /*
         $slug = $this->slugger->slugify($entity->getTitle());
         $entity->setSlug($slug); */
     }
@@ -111,9 +111,10 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         if (!($dbf instanceof Dbf)) {
             return;
         }
-        if ($dbf->getStarttime() and $dbf->getEndtime() /* and !$conger and !$autorisationSortie */) {
+        if (($dbf->getStarttime() and $dbf->getEndtime()) or count($dbf->getAttchktime())==0) {
             $this->pointageService->constructFromDbf($dbf);
-            $this->pointageService->createEntity();
+            $pointage = $this->pointageService->createEntity();
+            $this->pointageService->dbfUpdated($pointage, $dbf);
         }
         return;
     }
@@ -137,7 +138,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         //$entity->setSoldConger($this->configService->getConfig()->getDebutSoldConger());
         //$entity->setSoldAutorisationSortie($this->configService->getConfig()->getDebutSoldAS());
 
-        /* 
+        /*
         $slug = $this->slugger->slugify($entity->getTitle());
         $entity->setSlug($slug); */
     }
@@ -157,7 +158,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         /*   dd($entity);
         $this->pointageService->setPointage($entity);
         $entity->setTotaleRetard($this->pointageService->totalRetard()); */
-        /* 
+        /*
         $slug = $this->slugger->slugify($entity->getTitle());
         $entity->setSlug($slug); */
     }
