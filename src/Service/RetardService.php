@@ -66,6 +66,12 @@ class RetardService
      */
     private $autorisationSortie;
     /**
+     * heurAutorisation variable
+     *
+     * @var DateTime
+     */
+    private $heurAutorisation;
+    /**
      * conger variable
      *
      * @var Conger
@@ -115,14 +121,15 @@ class RetardService
                 $this->entrer2 = $attchktime[2] ? $this->timeService->generateTime($attchktime[2]) : null;
                 break;
             default:
-                $this->entrer = $entrer;
-                $this->sortie = $sortie;
+                $this->entrer = $entrer ? $this->timeService->generateTime($entrer->format("H:i:s")) : null;
+                $this->sortie = $sortie ? $this->timeService->generateTime($sortie->format("H:i:s")) : null;
                 $this->entrer1 = null;
                 $this->entrer2 = null;
                 break;
         }
         $this->conger = $conger;
         $this->autorisationSortie = $autorisationSortie;
+        $this->heurAutorisation = $this->autorisationSortie ? $this->autorisationSortie->getHeurAutoriser() : null;
         $this->heurDebutTravaille = $this->timeService->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s'));
         $this->debutPauseMatinal = $this->timeService->generateTime($this->horaire->getDebutPauseMatinal()->format('H:i:s'));
         $this->finPauseMatinal = $this->timeService->generateTime($this->horaire->getFinPauseMatinal()->format('H:i:s'));
@@ -392,7 +399,7 @@ class RetardService
                 }
                 break;
             case 3:
-dd($this->autorisationSortie->getHeurAutoriser());
+                dd($this->autorisationSortie->getHeurAutoriser());
                 if ($heurDebutTravaille < $this->entrer and $this->autorisationSortie->getHeurAutoriser() > $this->entrer and $this->autorisationSortie->getHeurAutoriser() > $this->entrer) {
                     $this->retardEnMinute = $this->timeService->diffTime($heurDebutTravaille, $this->entrer);
                 } else {
@@ -412,16 +419,28 @@ dd($this->autorisationSortie->getHeurAutoriser());
                 }
                 break;
             default:
-            if ($heurDebutTravaille < $this->entrer) {
-                $this->retardEnMinute = $this->timeService->diffTime($heurDebutTravaille, $this->entrer);
-                if ($this->conger) {
-                    dd($this->conger);
+                if ($heurDebutTravaille < $this->entrer) {
+                    $this->retardEnMinute = $this->timeService->diffTime($heurDebutTravaille, $this->entrer);
+                    if ($this->conger) {
+                        dump($this->entrer);
+                        dump($this->sortie);
+                        dd($this->conger);
+                    }
+                    if ($this->autorisationSortie) {
+                        if ($this->heurAutorisation >= $this->timeService->dateIntervalToDateTime($this->retardEnMinute)) {
+                            $this->heurAutorisation->sub($this->retardEnMinute);
+                            $this->retardEnMinute = null;
+                        } else {
+
+
+                            dump($this->entrer);
+                            dump($this->sortie);
+                            dump($this->retardEnMinute);
+                            dd($this->autorisationSortie->getHeurAutoriser());
+                        }
+                    }
                 }
-                if ($this->autorisationSortie) {
-                    dd($this->autorisationSortie);
-                }
-            }
-            break;
+                break;
         }
         if (!$this->retardEnMinute) {
             return $this->retardEnMinute;
@@ -515,28 +534,29 @@ dd($this->autorisationSortie->getHeurAutoriser());
                 }
                 break;
             default:
-            if ($heurFinTravaille > $this->sortie) {
-                if ($this->conger) {
-                    dd($this->conger);
+                if ($heurFinTravaille > $this->sortie) {
+                    if ($this->conger) {
+                        dump($this->attchktime);
+                        dump($heurFinTravaille);
+                        dump($this->horaireService->getHeursDemiJournerDeTravaille());
+                        dump($this->sortie);
+                        dump($this->entrer);
+                        dump($heurDebutTravaille);
+                        dd($this->conger);
+                    }
+                    if ($this->autorisationSortie) {
+                        dd($this->heurAutorisation);
+                        dd($this->autorisationSortie);
+                    }
+                    $heurDebutTravaille = $this->heurDebutTravaille;
+                    if ($this->retardEnMinute) {
+                        $heurFinTravaille->add($this->timeService->dateTimeToDateInterval($this->margeDuRetard));
+                    } else
+                        $heurFinTravaille->add($this->timeService->diffTime($this->entrer, $this->heurDebutTravaille));
+                    $this->departAnticiper = $this->timeService->diffTime($heurFinTravaille, $this->sortie);
+                    return $this->timeService->dateIntervalToDateTime($this->departAnticiper);
                 }
-                if ($this->autorisationSortie) {
-                    dd($this->autorisationSortie);
-                }
-                $heurDebutTravaille = $this->heurDebutTravaille;
-                dump($heurDebutTravaille);
-                if ($heurDebutTravaille) {
-                    $heurFinTravaille->add($this->timeService->dateTimeToDateInterval($this->margeDuRetard));
-                }
-                dd($heurFinTravaille);
-
-                $this->departAnticiper = $this->timeService->diffTime($heurFinTravaille, $this->sortie);
-                dump($heurFinTravaille);
-                dump($this->departAnticiper);
-                dump($this->entrer);
-                dd($this->sortie);
-                return $this->timeService->dateIntervalToDateTime($this->departAnticiper);
-            }
-            break;
+                break;
         }
 
         if ($this->departAnticiper) {

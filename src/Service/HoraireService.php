@@ -85,21 +85,39 @@ class HoraireService
      * @param User $employer
      * @return Horaire|null
      */
-    public function getHoraireForDate(DateTime $dateTime, User $employer): ?Horaire
+    public function getHoraireForDate(DateTime $dateTime, User $employer, string $horaireName = ""): ?Horaire
     {
         reset($this->horaires);
+
         do {
             $horair = current($this->horaires);
 
             if (!$horair->getDateFin()) {
                 $horair->setDateFin(new DateTime());
             }
-            if ($horair->getDateDebut() <=$dateTime and $dateTime <= $horair->getDateFin()) {
-                $this->horaire= current($this->horaires);
+            if ($horair->getDateDebut() <= $dateTime and $dateTime <= $horair->getDateFin()) {
+                $this->horaire = current($this->horaires);
             }
         } while ($horair = next($this->horaires) and !$this->horaire);
+        if (!$this->horaire and $horaireName != "") {
+            $otherHoraire = $this->getHoraireByHoraireName($horaireName, $this->employer);
+            $this->horaire = new Horaire();
+            $this->horaire->setDateDebut($this->date);
+            $this->horaire->setDateFin($this->date);
+            $this->horaire->setHoraire($horaireName);
+            $this->horaire->setDebutPauseMatinal($otherHoraire->getDebutPauseMatinal());
+            $this->horaire->setDebutPauseDejeuner($otherHoraire->getDebutPauseDejeuner());
+            $this->horaire->setDebutPauseMidi($otherHoraire->getDebutPauseMidi());
+            $this->horaire->setHeurDebutTravaille($otherHoraire->getHeurDebutTravaille());
+            $this->horaire->setFinPauseDejeuner($otherHoraire->getFinPauseDejeuner());
+            $this->horaire->setFinPauseMatinal($otherHoraire->getFinPauseMatinal());
+            $this->horaire->setFinPauseMidi($otherHoraire->getFinPauseMidi());
+            $this->horaire->setHeurFinTravaille($otherHoraire->getHeurFinTravaille());
+            $this->horaire->setMargeDuRetard($otherHoraire->getMargeDuRetard());
+            //$this->em->persist($this->horaire);
+        }
         $this->workTime = $this->workTimeService->getWorkTimeForDate($dateTime, $employer);
-       
+
         if ($this->horaire) {
             $this->HeursJournerDeTravaille = $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format("H:i:s"));
             $heurDebutTravaille = $this->horaire->getHeurDebutTravaille();
@@ -117,7 +135,7 @@ class HoraireService
         do {
             $horair = current($this->horaires);
             if ($horair->getHoraire() == $horaire) {
-                $this->horaire= current($this->horaires);
+                $this->horaire = current($this->horaires);
             }
         } while ($horair = next($this->horaires) and !$this->horaire);
         //$this->workTime = $this->workTimeService->getWorkTimeForDate($dateTime, $employer);

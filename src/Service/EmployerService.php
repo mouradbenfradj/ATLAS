@@ -11,7 +11,7 @@ class EmployerService
     private $configService;
     private $dateService;
     private $timeService;
-    
+
     public function __construct(ConfigService $configService, DateService $dateService, TimeService $timeService)
     {
         $this->configService = $configService;
@@ -26,11 +26,15 @@ class EmployerService
         $perimierJourDeTravaille = new DateTime($employer->getDebutTravaille()->format("Y-m-d"));
         $perimierJourDeTravaille->modify("first day of this month");
         while ($perimierJourDeTravaille < $nowDay) {
-            $debutSoldConger+= $incConger;
+            $debutSoldConger += $incConger;
             $perimierJourDeTravaille->modify('+1 month');
         }
+
         foreach ($employer->getCongers() as $conger) {
-            dd($conger);
+            if ($conger->getDemiJourner())
+                $debutSoldConger -= 0.5;
+            else
+                $debutSoldConger -= 1;
         }
 
         return $debutSoldConger;

@@ -92,10 +92,10 @@ class WorkHourService
     public function requirement(array $attchktime, Horaire $horaire, User $employer, DateTime $date, ?DateTime $entrer, ?DateTime $sortie)
     {
         $this->attchktime = $attchktime;
-        $this->entrer = $entrer ? $entrer : null;
+        $this->entrer = $entrer ? $this->timeService->generateTime($entrer->format("H:i:s")) : null;
         $this->entrer1 = null;
         $this->entrer2 = null;
-        $this->sortie = $sortie ? $sortie : null;
+        $this->sortie = $sortie ? $this->timeService->generateTime($sortie->format("H:i:s")) : null;
         $this->horaire = $horaire;
         $this->employer = $employer;
         $this->date = $date;
