@@ -73,7 +73,7 @@ class BilanService
                 );
         }
         if ($pointage->getCongerPayer()) {
-            if ($pointage->congerPayer->getDemiJourner()) {
+            if ($pointage->getCongerPayer()->getDemiJourner()) {
                 $bilan["congerPayer"] += 0.5;
             } else {
                 $bilan["congerPayer"] += 1;
