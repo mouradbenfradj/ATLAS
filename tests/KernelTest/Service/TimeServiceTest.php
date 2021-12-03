@@ -15,7 +15,7 @@ class TimeServiceTest extends KernelTestCase
         $timeService = $container->get(TimeService::class);
         $generateTime = $timeService->generateTime("");
         $this->assertEquals("00:00:00", $generateTime->format('H:i:s'));
-        for ($i = 0; $i <100; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $randDate = new DateTime();
             $randDate->setTime(mt_rand(0, 23), mt_rand(0, 59));
             //echo  $randDate->format('H:i:s');
@@ -25,5 +25,8 @@ class TimeServiceTest extends KernelTestCase
         //$this->assertSame('test', $kernel->getEnvironment());
         //$routerService = static::getContainer()->get('router');
         //$myCustomService = static::getContainer()->get(CustomService::class);
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
     }
 }

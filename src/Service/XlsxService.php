@@ -248,7 +248,7 @@ class XlsxService
         if ($cols['J'] and !$this->autorisationSortie) {
             $this->autorisationSortie = $cols['J'] ? $this->timeService->generateTime($cols['J']) : null;
             $this->autorisationSortieService->partielConstruct($this->employer, $this->date, $this->autorisationSortie, true, false);
-            $this->autorisationSortie =  $this->autorisationSortieService->ConstructEntity();
+            $this->autorisationSortie =  $this->autorisationSortieService->constructEntity();
         }
         $this->congerService->partielConstruct($this->employer, $this->date, $this->date);
         $this->congerPayer = $this->congerService->findOrCreate($this->entrer, $this->sortie);
@@ -260,7 +260,7 @@ class XlsxService
             } else {
                 dd($cols['K']);
             }
-            $this->congerPayer = $this->congerService->ConstructEntity();
+            $this->congerPayer = $this->congerService->constructEntity();
         }
         $this->absenceService->partielConstruct($this->employer, $this->date, $this->date);
         $this->absence = $this->absenceService->findOrCreate($this->entrer, $this->sortie);

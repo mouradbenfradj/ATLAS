@@ -51,7 +51,7 @@ class AutorisationSortieService
      * @var DateTime
      */
     private $heurAutoriser;
-    
+
     /**
      * attchktime variable
      *
@@ -84,36 +84,37 @@ class AutorisationSortieService
 
     public function __construct(TimeService $timeService, HoraireService $horaireService)
     {
-        $this->timeService=$timeService;
-        $this->horaireService=$horaireService;
+        $this->timeService = $timeService;
+        $this->horaireService = $horaireService;
     }
     public function requirement(array $attchktime, Horaire $horaire, DateTime $entrer, DateTime $sortie)
     {
-        $this->attchktime=$attchktime;
-        $this->horaire=$horaire;
+        $this->attchktime = $attchktime;
+        $this->horaire = $horaire;
         switch (count($this->attchktime)) {
             case 2:
                 $this->entrer = $entrer;
                 $this->sortie = $sortie;
                 $this->entrer1 = null;
                 $this->entrer2 = null;
-            break;
+                break;
             case 3:
                 $this->entrer = $entrer;
                 $this->sortie = $sortie;
-                $this->entrer1 = $attchktime[1]?$this->timeService->generateTime($attchktime[1]):null;
-                $this->entrer2 = $attchktime[2]?$this->timeService->generateTime($attchktime[2]):null;
-            break;
+                $this->entrer1 = $attchktime[1] ? $this->timeService->generateTime($attchktime[1]) : null;
+                $this->entrer2 = $attchktime[2] ? $this->timeService->generateTime($attchktime[2]) : null;
+                break;
             case 4:
                 $this->entrer = $entrer;
                 $this->sortie = $sortie;
-                        $this->entrer1 = $attchktime[1]?$this->timeService->generateTime($attchktime[1]):null;
-        $this->entrer2 = $attchktime[2]?$this->timeService->generateTime($attchktime[2]):null;
-        break;
-        default:           $this->entrer = $entrer;
-        $this->sortie = $sortie;
-        break;
-    }
+                $this->entrer1 = $attchktime[1] ? $this->timeService->generateTime($attchktime[1]) : null;
+                $this->entrer2 = $attchktime[2] ? $this->timeService->generateTime($attchktime[2]) : null;
+                break;
+            default:
+                $this->entrer = $entrer;
+                $this->sortie = $sortie;
+                break;
+        }
 
         $this->heurDebutTravaille = $this->timeService->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s'));
         $this->debutPauseMatinal = $this->timeService->generateTime($this->horaire->getDebutPauseMatinal()->format('H:i:s'));
@@ -141,7 +142,7 @@ class AutorisationSortieService
         $this->refuser = $refuser;
     }
 
-    public function ConstructEntity(): AutorisationSortie
+    public function constructEntity(): AutorisationSortie
     {
         $autorisationSortie = new AutorisationSortie();
         $autorisationSortie->setDateAutorisation($this->dateAutorisation);

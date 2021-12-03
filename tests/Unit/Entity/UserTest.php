@@ -15,19 +15,19 @@ class UserTest extends TestCase
         $user = new User();
         $sconger = 10.040;
         $user->setEmail("mourad.ben.fradj@gmail.com")
-        ->setRoles(array('ROLE_USER'))
-        ->setPassword("mourad")
-        ->setUserID(127)
-        ->setBadgenumbe(207)
-        ->setFirstName("mourad")
-        ->setLastName("ben fradj")
-        ->setQualification("ingenieur informtique")
-        ->setMatricule(502)
-        ->setDebutTravaille($date)
-        ->setDemission($date)
-        ->setSoldAutorisationSortie($time)
-        ->setSoldConger($sconger)
-        ->setIsVerified(true);
+            ->setRoles(array('ROLE_USER'))
+            ->setPassword("mourad")
+            ->setUserID(127)
+            ->setBadgenumbe(207)
+            ->setFirstName("mourad")
+            ->setLastName("ben fradj")
+            ->setQualification("ingenieur informtique")
+            ->setMatricule(502)
+            ->setDebutTravaille($date)
+            ->setDemission($date)
+            ->setSoldAutorisationSortie($time)
+            ->setSoldConger($sconger)
+            ->setIsVerified(true);
         $this->assertTrue($user->getEmail() === "mourad.ben.fradj@gmail.com");
         $this->assertTrue($user->getRoles() === array('ROLE_USER'));
         $this->assertTrue($user->getPassword() === "mourad");
@@ -41,7 +41,10 @@ class UserTest extends TestCase
         $this->assertTrue($user->getDemission() ===  $date);
         $this->assertTrue($user->getSoldAutorisationSortie() === $time);
         $this->assertTrue($user->getSoldConger() ===  $sconger);
-        $this->assertTrue($user->isVerified() ===true);
+        $this->assertTrue($user->isVerified() === true);
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
     }
     public function testIsFalse(): void
     {
@@ -50,19 +53,19 @@ class UserTest extends TestCase
         $user = new User();
         $sconger = 10.040;
         $user->setEmail("mourad.ben.fradj@gmail.com")
-        ->setRoles(array('ROLE_USER'))
-        ->setPassword("mourad")
-        ->setUserID(127)
-        ->setBadgenumbe(207)
-        ->setFirstName("mourad")
-        ->setLastName("ben fradj")
-        ->setQualification("ingenieur informtique")
-        ->setMatricule(502)
-        ->setDebutTravaille($date)
-        ->setDemission($date)
-        ->setSoldAutorisationSortie($time)
-        ->setSoldConger($sconger)
-        ->setIsVerified(true);
+            ->setRoles(array('ROLE_USER'))
+            ->setPassword("mourad")
+            ->setUserID(127)
+            ->setBadgenumbe(207)
+            ->setFirstName("mourad")
+            ->setLastName("ben fradj")
+            ->setQualification("ingenieur informtique")
+            ->setMatricule(502)
+            ->setDebutTravaille($date)
+            ->setDemission($date)
+            ->setSoldAutorisationSortie($time)
+            ->setSoldConger($sconger)
+            ->setIsVerified(true);
         $this->assertFalse($user->getEmail() === "false@gmail.com");
         $this->assertFalse($user->getRoles() === ["false"]);
         $this->assertFalse($user->getPassword() === "false");
@@ -76,7 +79,10 @@ class UserTest extends TestCase
         $this->assertFalse($user->getDemission() === new DateTime("2020-11-30"));
         $this->assertFalse($user->getSoldAutorisationSortie() === new DateTime("23:23:23"));
         $this->assertFalse($user->getSoldConger() === 1);
-        $this->assertFalse($user->isVerified() ===false);
+        $this->assertFalse($user->isVerified() === false);
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
     }
     public function testIsEmpty(): void
     {
@@ -95,5 +101,8 @@ class UserTest extends TestCase
         $this->assertEmpty($user->getSoldAutorisationSortie());
         $this->assertEmpty($user->getSoldConger());
         $this->assertEmpty($user->isVerified());
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
     }
 }

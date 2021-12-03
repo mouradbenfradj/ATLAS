@@ -73,7 +73,7 @@ class CongerService
         $this->demiJourner = $demiJourner;
     }
 
-    public function ConstructEntity(): Conger
+    public function constructEntity(): Conger
     {
         $conger = new Conger();
         $conger->setDebut($this->debut);
@@ -121,7 +121,7 @@ class CongerService
             $this->employer->getCongers()->toArray()
         )));
         if ($conger) {
-            return $conger ;
+            return $conger;
         }
         $quardJourner = $this->horaireService->getHeursQuardJournerDeTravaille();
         $maxDemiJourner = $this->horaireService->getHeursQuardJournerDeTravaille();
@@ -132,12 +132,12 @@ class CongerService
             dump($conger);
             dump($entrer);
             dd($sortie);
-            return  $this->ConstructEntity();
+            return  $this->constructEntity();
         } else {
             $diff = $this->timeService->dateIntervalToDateTime($this->timeService->diffTime($entrer, $sortie));
             if ($diff > $quardJourner and $diff < $maxDemiJourner) {
                 $this->partielConstruct($this->employer, $this->debut, $this->fin, "CP", true, false, true);
-                $conger = $this->ConstructEntity();
+                $conger = $this->constructEntity();
             }
         }
         return  $conger ?  $conger : null;
