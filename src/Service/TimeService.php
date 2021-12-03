@@ -44,7 +44,7 @@ class TimeService
     /**
      * generateTime
      *
-     * @param string $time
+     * @param string $timeString
      *
      * @return DateTime
      */
@@ -83,7 +83,7 @@ class TimeService
      * diffTime
      *
      * @param DateTime $timeMax
-     * @param DateTime $timeMix
+     * @param DateTime $timeMin
      *
      * @return DateInterval
      */

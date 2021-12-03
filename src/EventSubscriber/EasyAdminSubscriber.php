@@ -5,17 +5,10 @@ namespace App\EventSubscriber;
 use App\Entity\Dbf;
 use App\Entity\User;
 use App\Entity\Absence;
-use App\Entity\AutorisationSortie;
-use App\Entity\Conger;
 use App\Entity\Pointage;
-use App\Service\ConfigService;
 use App\Service\PointageService;
-use App\Repository\DbfRepository;
-use App\Service\AbsenceService;
 use App\Service\CongerService;
-use App\Service\HoraireService;
 use Doctrine\ORM\EntityManagerInterface;
-use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityDeletedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityUpdatedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityDeletedEvent;
@@ -28,34 +21,22 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     private $manager;
     private $passwordHasher;
     private $pointageService;
-    private $configService;
-    private $horaireService;
-    private $absenceService;
     private $congerService;
 
     /**
      * __construct
      * @param UserPasswordHasherInterface $passwordHasher
-     * @param ConfigService $configService
      * @param PointageService $pointageService
-     * @param HoraireService $horaireService
-     * @param AbsenceService $absenceService
      * @param CongerService $congerService
      */
     public function __construct(
         UserPasswordHasherInterface $passwordHasher,
-        ConfigService $configService,
         PointageService $pointageService,
-        HoraireService $horaireService,
-        AbsenceService $absenceService,
         CongerService $congerService,
         EntityManagerInterface $manager
     ) {
         $this->passwordHasher = $passwordHasher;
         $this->pointageService = $pointageService;
-        $this->configService = $configService;
-        $this->horaireService = $horaireService;
-        $this->absenceService = $absenceService;
         $this->congerService = $congerService;
         $this->manager = $manager;
     }
@@ -135,9 +116,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             $entity,
             $entity->getPassword()
         ));
-        //$entity->setSoldConger($this->configService->getConfig()->getDebutSoldConger());
-        //$entity->setSoldAutorisationSortie($this->configService->getConfig()->getDebutSoldAS());
-
+      
         /*
         $slug = $this->slugger->slugify($entity->getTitle());
         $entity->setSlug($slug); */
