@@ -29,8 +29,13 @@ class DefaultController extends AbstractController
          * @var User $employer
          */
         $employer = $security->getUser();
+        if ($employer and property_exists($employer, 'pointages')) {
+            $bilans = $bilanService->getBilanGeneral($employer->getPointages()->toArray());
+        } else {
+            $bilans= [];
+        }
         return $this->render('default/index.html.twig', [
-            'bilan' => $bilanService->getBilanGeneral($employer->getPointages()->toArray())
+            'bilan' => $bilans
         ]);
     }
 }

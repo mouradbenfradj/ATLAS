@@ -26,8 +26,14 @@
 
 {% endmacro %}
 {% block content_title %}Bilan de l'employer
-	{{userBilan.lastName}}
-	{{userBilan.firstName}}
+	{% if app.user.lastName is defined %}
+
+		{{userBilan.lastName}}
+	{% endif %}
+	{% if app.user.firstName is defined %}
+
+		{{userBilan.firstName}}
+	{% endif %}
 {% endblock %}
 {% block page_actions %}
 	<form action="{{ path('admin_dashboard') }}" method="post">

@@ -9,18 +9,27 @@ security:
 
   # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
   providers:
+    backend_users:
+      memory:
+        users:
+          mourad_admin@gmail.com: {password: '$2a$12$W53sHW2howche8KT1n5IseF.7IO9MEJPJLWXQ.qjIhLEMSALAumoK', roles: ['ROLE_USER','ROLE_ADMIN'] }
+
     # used to reload user from session & other features (e.g. switch_user)
     app_user_provider:
       entity:
         class: App\Entity\User
         property: email
+
+    all_users:
+      chain:
+        providers: ['app_user_provider', 'backend_users']
   firewalls:
     dev:
       pattern: ^/(_(profiler|wdt)|css|images|js)/
       security: false
     main:
       lazy: true
-      provider: app_user_provider
+      provider: all_users
       custom_authenticator: App\Security\LoginFormAuthenticator
       logout:
         path: app_logout

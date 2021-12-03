@@ -55,7 +55,7 @@
 						<div
 							class="media">
 							{# 							<img src="../../dist/img/user1-128x128.jpg" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-																																																																						 #}
+																																																																																				 #}
 							<div class="media-body">
 								<h3 class="dropdown-item-title">
 									Brad Diesel
@@ -78,7 +78,7 @@
 						<div
 							class="media">
 							{# 							<img src="../../dist/img/user8-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
-																																																																						 #}
+																																																																																				 #}
 							<div class="media-body">
 								<h3 class="dropdown-item-title">
 									John Pierce
@@ -101,7 +101,7 @@
 						<div
 							class="media">
 							{# 							<img src="../../dist/img/user3-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
-																																																																						 #}
+																																																																																				 #}
 							<div class="media-body">
 								<h3 class="dropdown-item-title">
 									Nora Silvester
@@ -155,7 +155,7 @@
 				<a
 					href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
 					{# 					<img src="" class="user-image img-circle elevation-2" alt="User Image">
-																																																							 #}
+																																																																	 #}
 					<span class="d-none d-md-inline">
 						{% if app.user %}
 							{{ app.user.username }}
@@ -168,13 +168,16 @@
 					<li
 						class="user-header bg-primary">
 						{# 						<img src="" class="img-circle elevation-2" alt="User Image">
-																																																																		 #}
+																																																																														 #}
 						<p>
 							{% if app.user %}
 								{{ app.user }}
 							{% endif %}
 							<small>Member since
-								{{ app.user.debutTravaille|date("Y-m-d") }}</small>
+								{% if app.user.debutTravaille is defined %}
+									{{ app.user.debutTravaille|date("Y-m-d") }}
+								{% endif %}
+							</small>
 						</p>
 					</li>
 					<!-- Menu Body -->

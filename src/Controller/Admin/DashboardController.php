@@ -43,49 +43,57 @@ class DashboardController extends AbstractDashboardController
     public function index(): Response
     {
         if (!empty($this->adminContextProvider->getContext()->getRequest()->request->all())) {
-            $user = $this->getDoctrine()->getRepository(User::class)->find($this->adminContextProvider->getContext()->getRequest()->request->get('user'));
+            $employer = $this->getDoctrine()->getRepository(User::class)->find($this->adminContextProvider->getContext()->getRequest()->request->get('user'));
         } else {
-            $user = $this->getUser();
+            $employer = $this->getUser();
         }
         //usort($user->getPointages(), fn ($a, $b) => $a['date'] > $b['date'])
-
+        if ($employer and property_exists($employer, 'pointages')) {
+            $bilans = $this->bilanService->getBilanGeneral($employer->getPointages()->toArray());
+        } else {
+            $bilans= [];
+        }
         return $this->render('admin/dashboard.html.twig', [
             //'users' => $this->getDoctrine()->getRepository(User::class)->findAll(),
             'users' => $this->userRepository->findAll(),
-            'userBilan' =>  $user,
-            'bilan' =>  $this->bilanService->getBilanGeneral($user->getPointages()->toArray())
+            'userBilan' =>  $employer,
+            'bilan' => $bilans
         ]);
     }
 
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('ATLAS');
+            ->setTitle('ATLAS')
+            ->generateRelativeUrls()
+            ->disableUrlSignatures()
+            ->setFaviconPath('favicon.svg')
+            ;
     }
 
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linktoDashboard('Dashboard', 'fa fa-home');
-        // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
-        yield MenuItem::subMenu('bilan', 'fa fa-article')->setSubItems([
-            MenuItem::linkToRoute('Bilan annuel', 'fas fa-list', 'default_index'),
-            MenuItem::linkToRoute('Bilan mensuel', 'fas fa-list', 'default_index'),
-            MenuItem::linkToRoute('Bilan semestiriel', 'fas fa-list', 'default_index'),
+        // yield MenuItem::linkToCrud('The Label', 'fa fa-id-card', EntityClass::class);
+        yield MenuItem::subMenu('bilan', 'fa fa-gavel')->setSubItems([
+            MenuItem::linkToRoute('Bilan annuel', 'fa fa-thermometer-full', 'default'),
+            MenuItem::linkToRoute('Bilan mensuel', 'fa fa-thermometer-half', 'default'),
+            MenuItem::linkToRoute('Bilan semestiriel', 'fa fa-thermometer-quarter', 'default'),
         ]);
-        yield MenuItem::subMenu('Users', 'fa fa-article')->setSubItems([
-            MenuItem::linkToCrud('Absence', 'fas fa-list', Absence::class),
-            MenuItem::linkToCrud('Autorisation Sortie', 'fas fa-list', AutorisationSortie::class),
-            MenuItem::linkToCrud('Conger', 'fas fa-list', Conger::class),
-            MenuItem::linkToCrud('Pointage', 'fas fa-list', Pointage::class),
-            MenuItem::linkToCrud('Dbf', 'fas fa-list', Dbf::class),
-            MenuItem::linkToCrud('Xlsx', 'fas fa-list', Xlsx::class),
-            MenuItem::linkToCrud('Employer', 'fas fa-list', User::class),
+        yield MenuItem::subMenu('Users', 'fa fa-address-card')->setSubItems([
+            MenuItem::linkToCrud('Absence', 'fa fa-user-times', Absence::class),
+            MenuItem::linkToCrud('Autorisation Sortie', 'fa fa-hourglass-half', AutorisationSortie::class),
+            MenuItem::linkToCrud('Conger', 'fa fa-calendar-minus-o', Conger::class),
+            MenuItem::linkToCrud('Pointage', 'fa fa-hand-pointer-o', Pointage::class),
+            MenuItem::linkToCrud('Dbf', 'fa fa-file', Dbf::class),
+            MenuItem::linkToCrud('Xlsx', 'fa fa-file-excel-o', Xlsx::class),
+            MenuItem::linkToCrud('Employer', 'fa fa-user', User::class),
         ]);
-        yield MenuItem::subMenu('Config', 'fa fa-article')->setSubItems([
-            MenuItem::linkToCrud('Config', 'fas fa-list', Config::class),
-            MenuItem::linkToCrud('Jour Ferier', 'fas fa-list', JourFerier::class),
-            MenuItem::linkToCrud('Horaire', 'fas fa-list', Horaire::class),
-            MenuItem::linkToCrud('WorkTime', 'fas fa-list', WorkTime::class),
+        yield MenuItem::subMenu('Config', 'fa fa-cogs')->setSubItems([
+            MenuItem::linkToCrud('Config', 'fa fa-cog', Config::class),
+            MenuItem::linkToCrud('Jour Ferier', 'fa fa-calendar-times-o', JourFerier::class),
+            MenuItem::linkToCrud('Horaire', 'fa fa-calendar', Horaire::class),
+            MenuItem::linkToCrud('WorkTime', 'fa fa-id-card', WorkTime::class),
         ]);
     }
 
@@ -97,7 +105,8 @@ class DashboardController extends AbstractDashboardController
         // if you prefer to create the user menu from scratch, use: return UserMenu::new()->...
         return parent::configureUserMenu($user)
             // use the given $user object to get the user name
-            ->setName($user->getFullName())
+            ->setName($user->getUsername())
+            //->setName($user->getFullName())
             // use this method if you don't want to display the name of the user
             ->displayUserName(false)
 
