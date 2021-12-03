@@ -19,7 +19,7 @@ jobs:
     - name: run phpstan
       run: ./vendor/bin/phpstan analyse src --level 5
     - name: run phpunit
-      run: php ./vendor/bin/phpunit
+      run: ./vendor/bin/phpunit
 
     #- name: Cache Composer packages
     #  id: composer-cache

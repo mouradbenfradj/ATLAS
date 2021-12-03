@@ -39,7 +39,7 @@ class DefaultController extends AbstractController
         ]);
     }
     /**
-     * index
+     * default
      * @Route("/{_locale}/", name="default")
      *
      * @param Security $security
