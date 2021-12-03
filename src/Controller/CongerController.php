@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
- * @Route("/conger")
+ * @Route("/{_locale}/conger")
  */
 class CongerController extends AbstractController
 {

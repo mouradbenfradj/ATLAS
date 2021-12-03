@@ -23,7 +23,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 /**
- * @Route("/dbf")
+ * @Route("/{_locale}/dbf")
  */
 class DbfController extends AbstractController
 {

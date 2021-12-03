@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/autorisation/sortie")
+ * @Route("/{_locale}/autorisation/sortie")
  */
 class AutorisationSortieController extends AbstractController
 {

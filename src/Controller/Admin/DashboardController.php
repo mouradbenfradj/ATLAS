@@ -38,7 +38,7 @@ class DashboardController extends AbstractDashboardController
         $this->bilanService = $bilanService;
     }
     /**
-     * @Route("/admin", name="admin_dashboard")
+     * @Route("/{_locale}/admin", name="admin_dashboard")
      */
     public function index(): Response
     {

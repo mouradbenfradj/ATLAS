@@ -17,13 +17,36 @@ class DefaultController extends AbstractController
 {
     /**
      * index
-     * @Route("/", name="default")
+     * @Route("/")
      *
      * @param Security $security
      * @param PointageService $pointageService
      * @return Response
      */
     public function index(Security $security, BilanService $bilanService): Response
+    {
+        /**
+         * @var User $employer
+         */
+        $employer = $security->getUser();
+        if ($employer and property_exists($employer, 'pointages')) {
+            $bilans = $bilanService->getBilanGeneral($employer->getPointages()->toArray());
+        } else {
+            $bilans= [];
+        }
+        return $this->render('default/index.html.twig', [
+            'bilan' => $bilans
+        ]);
+    }
+    /**
+     * index
+     * @Route("/{_locale}/", name="default")
+     *
+     * @param Security $security
+     * @param PointageService $pointageService
+     * @return Response
+     */
+    public function default(Security $security, BilanService $bilanService): Response
     {
         /**
          * @var User $employer
