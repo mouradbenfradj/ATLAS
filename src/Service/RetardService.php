@@ -29,11 +29,11 @@ class RetardService
      */
     private $retardMidi;
     /**
-     * totalRetard variable
+     * totaleRetard variable
      *
      * @var DateTime
      */
-    private $totalRetard;
+    private $totaleRetard;
     /**
      * horaire variable
      *
@@ -712,23 +712,23 @@ class RetardService
 
 
     /**
-     * totalRetard
+     * totaleRetard
      *
      * @return DateTime
      */
-    public function totalRetard(): DateTime
+    public function totaleRetard(): DateTime
     {
-        $this->totalRetard = new DateTime('00:00:00');
+        $this->totaleRetard = new DateTime('00:00:00');
         if ($this->retardEnMinute) {
-            $this->totalRetard->add($this->retardEnMinute);
+            $this->totaleRetard->add($this->retardEnMinute);
         }
         if ($this->departAnticiper) {
-            $this->totalRetard->add($this->departAnticiper);
+            $this->totaleRetard->add($this->departAnticiper);
         }
         if ($this->retardMidi) {
-            $this->totalRetard->add($this->retardMidi);
+            $this->totaleRetard->add($this->retardMidi);
         }
-        return $this->totalRetard;
+        return $this->totaleRetard;
     }
 
 

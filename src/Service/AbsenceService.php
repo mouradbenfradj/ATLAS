@@ -59,8 +59,16 @@ class AbsenceService
         $this->congerService = $congerService;
     }
 
-
-    public function partielConstruct(?User $employer = null, ?DateTime $debut = null, ?DateTime $fin = null, array $pointages = [])
+    /**
+     * partielConstruct function
+     *
+     * @param User|null $employer
+     * @param DateTime|null $debut
+     * @param DateTime|null $fin
+     * @param array $pointages
+     * @return void
+     */
+    public function partielConstruct(?User $employer = null, ?DateTime $debut = null, ?DateTime $fin = null, array $pointages = []):void
     {
         $this->employer = $employer;
         $this->debut = $debut;
@@ -130,5 +138,101 @@ class AbsenceService
             return  $absence;
         }
         return null;
+    }
+
+    /**
+     * Get employer
+     *
+     * @return  User
+     */
+    public function getEmployer()
+    {
+        return $this->employer;
+    }
+
+    /**
+     * Set employer
+     *
+     * @param  User  $employer  employer
+     *
+     * @return  self
+     */
+    public function setEmployer(User $employer)
+    {
+        $this->employer = $employer;
+
+        return $this;
+    }
+
+    /**
+     * Get debut
+     *
+     * @return  DateTime
+     */
+    public function getDebut()
+    {
+        return $this->debut;
+    }
+
+    /**
+     * Set debut
+     *
+     * @param  DateTime  $debut  debut
+     *
+     * @return  self
+     */
+    public function setDebut(DateTime $debut)
+    {
+        $this->debut = $debut;
+
+        return $this;
+    }
+
+    /**
+     * Get fin
+     *
+     * @return  DateTime
+     */
+    public function getFin()
+    {
+        return $this->fin;
+    }
+
+    /**
+     * Set fin
+     *
+     * @param  DateTime  $fin  fin
+     *
+     * @return  self
+     */
+    public function setFin(DateTime $fin)
+    {
+        $this->fin = $fin;
+
+        return $this;
+    }
+
+    /**
+     * Get pointages
+     *
+     * @return  array
+     */
+    public function getPointages()
+    {
+        return $this->pointages;
+    }
+
+    /**
+     * Set pointages
+     *
+     * @param  array  $pointages  pointages
+     *
+     * @return  self
+     */
+    public function setPointages(array $pointages)
+    {
+        $this->pointages = $pointages;
+
+        return $this;
     }
 }

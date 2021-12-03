@@ -69,11 +69,11 @@ class PointageService
     private $retardMidi;
 
     /**
-     * totalRetard
+     * totaleRetard
      *
      * @var DateTime
      */
-    private $totalRetard;
+    private $totaleRetard;
 
     /**
      * heurNormalementTravailler
@@ -296,7 +296,7 @@ class PointageService
         $this->retardMidi = $this->retardService->retardMidi();
         $this->departAnticiper = $this->retardService->departAnticiper(); //$dbf->getEarly();
         $this->nbrHeurTravailler = $this->workHourService->nbrHeurTravailler(); // $dbf->getWorktime();
-        $this->totalRetard = $this->retardService->totalRetard();
+        $this->totaleRetard = $this->retardService->totaleRetard();
         $this->diff = $this->workHourService->diff();
     }
 
@@ -322,7 +322,7 @@ class PointageService
         $this->departAnticiper = $pointage->getDepartAnticiper();
         $this->retardMidi = $pointage->getRetardMidi();
         ;
-        $this->totalRetard = $pointage->getTotaleRetard();
+        $this->totaleRetard = $pointage->getTotaleRetard();
         $this->heurNormalementTravailler = $pointage->getHeurNormalementTravailler();
         $this->diff = $pointage->getDiff();
         $this->workTime = $pointage->getWorkTime();
@@ -347,7 +347,7 @@ class PointageService
         $this->pointage->setRetardEnMinute($this->retardEnMinute);
         $this->pointage->setDepartAnticiper($this->departAnticiper);
         $this->pointage->setRetardMidi($this->retardMidi);
-        $this->pointage->setTotaleRetard($this->totalRetard);
+        $this->pointage->setTotaleRetard($this->totaleRetard);
         $this->pointage->setHeurNormalementTravailler($this->heurNormalementTravailler);
         $this->pointage->setDiff($this->diff);
         $this->pointage->setEmployer($this->employer);
@@ -383,18 +383,386 @@ class PointageService
         );
     }
 
-
-
-
+    /**
+     * Get date
+     *
+     * @return  DateTime
+     */
+    public function getDate()
+    {
+        return $this->date;
+    }
 
     /**
-     * Set the value of initBilan
+     * Set date
+     *
+     * @param  DateTime  $date  date
      *
      * @return  self
      */
-    public function setInitBilan($initBilan)
+    public function setDate(DateTime $date)
     {
-        $this->initBilan = $initBilan;
+        $this->date = $date;
+
+        return $this;
+    }
+
+    /**
+     * Get entrer
+     *
+     * @return  DateTime
+     */
+    public function getEntrer()
+    {
+        return $this->entrer;
+    }
+
+    /**
+     * Set entrer
+     *
+     * @param  DateTime  $entrer  entrer
+     *
+     * @return  self
+     */
+    public function setEntrer(DateTime $entrer)
+    {
+        $this->entrer = $entrer;
+
+        return $this;
+    }
+
+    /**
+     * Get sortie
+     *
+     * @return  DateTime
+     */
+    public function getSortie()
+    {
+        return $this->sortie;
+    }
+
+    /**
+     * Set sortie
+     *
+     * @param  DateTime  $sortie  sortie
+     *
+     * @return  self
+     */
+    public function setSortie(DateTime $sortie)
+    {
+        $this->sortie = $sortie;
+
+        return $this;
+    }
+
+    /**
+     * Get nbrHeurTravailler
+     *
+     * @return  DateTime|null
+     */
+    public function getNbrHeurTravailler()
+    {
+        return $this->nbrHeurTravailler;
+    }
+
+    /**
+     * Set nbrHeurTravailler
+     *
+     * @param  DateTime|null  $nbrHeurTravailler  nbrHeurTravailler
+     *
+     * @return  self
+     */
+    public function setNbrHeurTravailler($nbrHeurTravailler)
+    {
+        $this->nbrHeurTravailler = $nbrHeurTravailler;
+
+        return $this;
+    }
+
+    /**
+     * Get retardEnMinute
+     *
+     * @return  DateTime|null
+     */
+    public function getRetardEnMinute()
+    {
+        return $this->retardEnMinute;
+    }
+
+    /**
+     * Set retardEnMinute
+     *
+     * @param  DateTime|null  $retardEnMinute  retardEnMinute
+     *
+     * @return  self
+     */
+    public function setRetardEnMinute($retardEnMinute)
+    {
+        $this->retardEnMinute = $retardEnMinute;
+
+        return $this;
+    }
+
+    /**
+     * Get departAnticiper
+     *
+     * @return  DateTime|null
+     */
+    public function getDepartAnticiper()
+    {
+        return $this->departAnticiper;
+    }
+
+    /**
+     * Set departAnticiper
+     *
+     * @param  DateTime|null  $departAnticiper  departAnticiper
+     *
+     * @return  self
+     */
+    public function setDepartAnticiper($departAnticiper)
+    {
+        $this->departAnticiper = $departAnticiper;
+
+        return $this;
+    }
+
+    /**
+     * Get retardMidi
+     *
+     * @return  DateTime|null
+     */
+    public function getRetardMidi()
+    {
+        return $this->retardMidi;
+    }
+
+    /**
+     * Set retardMidi
+     *
+     * @param  DateTime|null  $retardMidi  retardMidi
+     *
+     * @return  self
+     */
+    public function setRetardMidi($retardMidi)
+    {
+        $this->retardMidi = $retardMidi;
+
+        return $this;
+    }
+
+    /**
+     * Get totaleRetard
+     *
+     * @return  DateTime
+     */
+    public function getTotaleRetard()
+    {
+        return $this->totaleRetard;
+    }
+
+    /**
+     * Set totaleRetard
+     *
+     * @param  DateTime  $totaleRetard  totaleRetard
+     *
+     * @return  self
+     */
+    public function setTotaleRetard(DateTime $totaleRetard)
+    {
+        $this->totaleRetard = $totaleRetard;
+
+        return $this;
+    }
+
+    /**
+     * Get heurNormalementTravailler
+     *
+     * @return  DateTime
+     */
+    public function getHeurNormalementTravailler()
+    {
+        return $this->heurNormalementTravailler;
+    }
+
+    /**
+     * Set heurNormalementTravailler
+     *
+     * @param  DateTime  $heurNormalementTravailler  heurNormalementTravailler
+     *
+     * @return  self
+     */
+    public function setHeurNormalementTravailler(DateTime $heurNormalementTravailler)
+    {
+        $this->heurNormalementTravailler = $heurNormalementTravailler;
+
+        return $this;
+    }
+
+    /**
+     * Get diff
+     *
+     * @return  DateTime
+     */
+    public function getDiff()
+    {
+        return $this->diff;
+    }
+
+    /**
+     * Set diff
+     *
+     * @param  DateTime  $diff  diff
+     *
+     * @return  self
+     */
+    public function setDiff(DateTime $diff)
+    {
+        $this->diff = $diff;
+
+        return $this;
+    }
+
+    /**
+     * Get employer
+     *
+     * @return  User
+     */
+    public function getEmployer()
+    {
+        return $this->employer;
+    }
+
+    /**
+     * Set employer
+     *
+     * @param  User  $employer  employer
+     *
+     * @return  self
+     */
+    public function setEmployer(User $employer)
+    {
+        $this->employer = $employer;
+
+        return $this;
+    }
+
+    /**
+     * Get horaire
+     *
+     * @return  Horaire
+     */
+    public function getHoraire()
+    {
+        return $this->horaire;
+    }
+
+    /**
+     * Set horaire
+     *
+     * @param  Horaire  $horaire  horaire
+     *
+     * @return  self
+     */
+    public function setHoraire(Horaire $horaire)
+    {
+        $this->horaire = $horaire;
+
+        return $this;
+    }
+
+    /**
+     * Get congerPayer
+     *
+     * @return  Conger|null
+     */
+    public function getCongerPayer()
+    {
+        return $this->congerPayer;
+    }
+
+    /**
+     * Set congerPayer
+     *
+     * @param  Conger|null  $congerPayer  congerPayer
+     *
+     * @return  self
+     */
+    public function setCongerPayer($congerPayer)
+    {
+        $this->congerPayer = $congerPayer;
+
+        return $this;
+    }
+
+    /**
+     * Get autorisationSortie
+     *
+     * @return  AutorisationSortie|null
+     */
+    public function getAutorisationSortie()
+    {
+        return $this->autorisationSortie;
+    }
+
+    /**
+     * Set autorisationSortie
+     *
+     * @param  AutorisationSortie|null  $autorisationSortie  autorisationSortie
+     *
+     * @return  self
+     */
+    public function setAutorisationSortie($autorisationSortie)
+    {
+        $this->autorisationSortie = $autorisationSortie;
+
+        return $this;
+    }
+
+    /**
+     * Get workTime
+     *
+     * @return  WorkTime|null
+     */
+    public function getWorkTime()
+    {
+        return $this->workTime;
+    }
+
+    /**
+     * Set workTime
+     *
+     * @param  WorkTime|null  $workTime  workTime
+     *
+     * @return  self
+     */
+    public function setWorkTime($workTime)
+    {
+        $this->workTime = $workTime;
+
+        return $this;
+    }
+
+    /**
+     * Get absence
+     *
+     * @return  Absence|null
+     */
+    public function getAbsence()
+    {
+        return $this->absence;
+    }
+
+    /**
+     * Set absence
+     *
+     * @param  Absence|null  $absence  absence
+     *
+     * @return  self
+     */
+    public function setAbsence($absence)
+    {
+        $this->absence = $absence;
 
         return $this;
     }
@@ -412,151 +780,14 @@ class PointageService
     /**
      * Set pointage
      *
-     * @param  Pointage  $this->pointage  pointage
+     * @param  Pointage  $pointage  pointage
      *
      * @return  self
      */
     public function setPointage(Pointage $pointage)
     {
-        $this->pointage = $this->pointage;
+        $this->pointage = $pointage;
 
         return $this;
     }
-
-
-
-
-
-    /* public function addLigne(array $ligne, User $user)
-    {
-        $this->pointage = new Pointage();
-        foreach ($ligne as $char => $colomn) {
-            switch ($char) {
-                case 'A':
-                    $this->pointage->setDate($this->dateService->dateString_d_m_Y_ToDateTime($colomn));
-                    break;
-                case 'B':
-                    $this->pointage->setHoraire($this->horaireService->getHoraireForDate($this->date));
-                    break;
-                case 'C':
-                    if ($this->timeService->isTimeHi($colomn))
-                        $this->pointage->setEntrer($this->timeService->generateTime($colomn));
-                    else {
-                        if (!in_array($ligne['K'], ['1']) and $colomn != 'CP' and !$colomn)
-                            $this->flash->add('warning', 'not set entrer ' . $colomn . ' of ligne ' . implode(" | ", $ligne));
-                    }
-                    break;
-                case 'D':
-                    if ($this->timeService->isTimeHi($colomn))
-                        $this->pointage->setSortie($this->timeService->generateTime($colomn));
-                    else {
-                        if (!in_array($ligne['K'], ['1']) and $ligne['C'] != 'CP')
-                            $this->flash->add('warning', 'not set sortie ' . $colomn . ' of ligne ' . implode(" | ", $ligne));
-                    }
-                    break;
-                case 'E':
-                    if ($this->sortie and $this->entrer)
-                        $this->pointage->setNbrHeurTravailler($this->nbrHeurTravailler());
-                    else {
-                        $this->pointage->setNbrHeurTravailler(new DateTime('00:00:00'));
-                        if (!in_array($ligne['K'], ['1']) and $ligne['C'] != 'CP')
-                            $this->flash->add('warning', 'set to 0 nbrHeurTravailler, entrer ou sortie non saisie ' . $colomn . ' of ligne ' . implode(" | ", $ligne));
-                    }
-                    break;
-                case 'F':
-                    if ($this->sortie and $this->entrer)
-                        $this->pointage->setRetardEnMinute($this->retardEnMinute);
-                    break;
-                case 'G':
-                    if ($this->timeService->isTimeHi($colomn))
-                        $this->pointage->setDepartAnticiper(new DateTime($colomn));
-                    else {
-                        if ($colomn)
-                            $this->flash->add('warning', 'ignored departAnticiper' . $colomn . ' of ligne ' . implode(" | ", $ligne));
-                    }
-                    break;
-                case 'H':
-                    if ($this->timeService->isTimeHi($colomn))
-                        $this->pointage->setRetardMidi($this->timeService->generateTime($colomn));
-                    else {
-                        if ($colomn)
-                            $this->flash->add('warning', 'ignored retardMidi' . $colomn . ' of ligne ' . implode(" | ", $ligne));
-                    }
-                    break;
-                case 'I':
-                    $this->pointage->setTotaleRetard($this->totalRetard());
-                case 'J':
-                    if ($this->timeService->isTimeHi($colomn)) {
-                        $autrisationSotie = new AutorisationSortie();
-                        $autrisationSotie->setDateAutorisation($this->date);
-                        $autrisationSotie->setTime(new DateTime($colomn));
-                        $autrisationSotie->setEmployer($user);
-                        //if ($this->configService->getConfig()->getReinitialisationC() and ($lastYear != $date->format('Y')))
-                        //if ($this->configService->getConfig()->getReinitialisationAS() and ($lastYear != $date->format('Y')))
-                        //$lastYear = $date->format('Y');
-                    } else {
-                        if ($colomn)
-                            $this->flash->add('warning', 'ignored autorisationSortie' . $colomn . ' of ligne ' . implode(" | ", $ligne));
-                    }
-                    break;
-                case 'K':
-                    switch ($colomn) {
-                        case '0.5':
-                            $conger = new Conger();
-                            $conger->setType("CP");
-                            $conger->setEmployer($user);
-                            $conger->setDebut($this->date);
-                            $conger->setFin($this->date);
-                            $conger->setDemiJourner(true);
-                            $this->pointage->setCongerPayer($conger);
-                            break;
-                        case '1':
-                            $conger = new Conger();
-                            if ($ligne['C'] == 'CM')
-                                $conger->setType("CM");
-                            else
-                                $conger->setType("CP");
-                            $conger->setEmployer($user);
-                            $conger->setDebut($this->date);
-                            $conger->setFin($this->date);
-                            $conger->setDemiJourner(false);
-                            $this->pointage->setCongerPayer($conger);
-                            break;
-                        default:
-                            if (($ligne['C'] == 'CP' or $ligne['C'] == 'CM') and !$colomn) {
-                                $conger = new Conger();
-                                if ($ligne['C'] == 'CM')
-                                    $conger->setType("CM");
-                                else
-                                    $conger->setType("CP");
-                                $conger->setEmployer($user);
-                                $conger->setDebut($this->date);
-                                $conger->setFin($this->date);
-                                $conger->setDemiJourner(false);
-                                $this->pointage->setCongerPayer($conger);
-                                $this->flash->add('warning', 'cp added automatically of ligne ' . implode(" | ", $ligne));
-                            }
-                            if ($colomn)
-                                $this->flash->add('warning', 'ignored congerPayer' . $colomn . ' of ligne ' . implode(" | ", $ligne));
-                            break;
-                    }
-                    break;
-                case 'L':
-                    if ($colomn)
-                        $this->pointage->setAbsence($colomn);
-                    break;
-                case 'M':
-                    $this->pointage->setHeurNormalementTravailler($this->heurNormalementTravailler());
-                    break;
-                case 'N':
-                    $this->pointage->setDiff($this->diff());
-                    break;
-                default:
-                    //dump($ligne[$char]);
-                    break;
-            }
-        }
-        $user->addPointage($this->pointage);
-        return $user;
-    } */
 }

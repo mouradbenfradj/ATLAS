@@ -2,21 +2,46 @@
 
 namespace App\Tests\KernelTest\Service;
 
+use App\Repository\AbsenceRepository;
+use App\Repository\UserRepository;
+use App\Service\AbsenceService;
 use App\Service\CongerService;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class AbsenceServiceTest extends KernelTestCase
 {
+    public function testVerifyDataStat(): void
+    {
+        $container = static::getContainer();
+        $absenceRepository = $container->get(AbsenceRepository::class);
+        $absencesCount = count($absenceRepository->findAll());
+        $this->assertEquals(0, $absencesCount);
+    }
+    public function testPartielConstruct(): void
+    {
+        //$kernel = self::bootKernel();
+        $container = static::getContainer();
+        $userRepository = $container->get(UserRepository::class);
+        $absenceService = $container->get(AbsenceService::class);
+        $absenceService->partielConstruct();
+
+        $this->assertEquals(null, $absenceService->getEmployer());
+        //$this->assertEquals("00:00:00", $generateTime->format('H:i:s'));
+      
+        //$routerService = static::getContainer()->get('router');
+        //$myCustomService = static::getContainer()->get(CustomService::class);
+    }
     public function testConstructEntity(): void
     {
         //$kernel = self::bootKernel();
         $container = static::getContainer();
-        $timeService = $container->get(CongerService::class);
-        $generateTime = $timeService->generateTime("");
+        $userRepository = $container->get(UserRepository::class);
+        $testUser = $userRepository->findOneByEmail('mourad.ben.fradj@gmail.com');
+        $absenceService = $container->get(AbsenceService::class);
+
+        $this->assertEquals(1, $testUser->getId());
         //$this->assertEquals("00:00:00", $generateTime->format('H:i:s'));
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
         //$routerService = static::getContainer()->get('router');
         //$myCustomService = static::getContainer()->get(CustomService::class);
     }

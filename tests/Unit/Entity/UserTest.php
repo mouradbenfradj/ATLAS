@@ -42,9 +42,6 @@ class UserTest extends TestCase
         $this->assertTrue($user->getSoldAutorisationSortie() === $time);
         $this->assertTrue($user->getSoldConger() ===  $sconger);
         $this->assertTrue($user->isVerified() === true);
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
     }
     public function testIsFalse(): void
     {
@@ -80,9 +77,6 @@ class UserTest extends TestCase
         $this->assertFalse($user->getSoldAutorisationSortie() === new DateTime("23:23:23"));
         $this->assertFalse($user->getSoldConger() === 1);
         $this->assertFalse($user->isVerified() === false);
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
     }
     public function testIsEmpty(): void
     {
@@ -101,8 +95,5 @@ class UserTest extends TestCase
         $this->assertEmpty($user->getSoldAutorisationSortie());
         $this->assertEmpty($user->getSoldConger());
         $this->assertEmpty($user->isVerified());
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
     }
 }

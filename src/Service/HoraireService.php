@@ -135,12 +135,12 @@ class HoraireService
         }
         return $this->horaire;
     }
-    public function getHoraireByHoraireName(string $horaire): ?Horaire
+    public function getHoraireByHoraireName(string $horaireName): ?Horaire
     {
         reset($this->horaires);
         do {
             $horair = current($this->horaires);
-            if ($horair->getHoraire() == $horaire) {
+            if ($horair->getHoraire() == $horaireName) {
                 $this->horaire = current($this->horaires);
             }
         } while ($horair = next($this->horaires) and !$this->horaire);
