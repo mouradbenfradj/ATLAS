@@ -18,6 +18,7 @@ use App\Service\DbfService;
 use App\Service\EmployerService;
 use App\Service\HoraireService;
 use App\Service\PointageService;
+use DateTime;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -27,6 +28,194 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
  */
 class DbfController extends AbstractController
 {
+    /**
+     * userid variable
+     *
+     * @var float
+     */
+    private $userid;
+
+    /**
+     * badgenumbe variable
+     *
+     * @var int
+     */
+    private $badgenumbe;
+
+    /**
+     * ssn variable
+     *
+     * @var string
+     */
+    private $ssn;
+
+    /**
+     * username variable
+     *
+     * @var string
+     */
+    private $username;
+
+    /**
+     * autosch variable
+     *
+     * @var string|null
+     */
+    private $autosch;
+
+    /**
+     * attdate variable
+     *
+     * @var DateTime
+     */
+    private $attdate;
+
+    /**
+     * schid variable
+     *
+     * @var float|null
+     */
+    private $schid;
+
+    /**
+     * clockintim variable
+     *
+     * @var DateTime|null
+     */
+    private $clockintim;
+
+    /**
+     * clockoutti variable
+     *
+     * @var DateTime|null
+     */
+    private $clockoutti;
+
+    /**
+     * starttime variable
+     *
+     * @var DateTime|null
+     */
+    private $starttime;
+
+    /**
+     * endtime variable
+     *
+     * @var DateTime|null
+     */
+    private $endtime;
+
+    /**
+     * workday variable
+     *
+     * @var float|null
+     */
+    private $workday;
+
+    /**
+     * realworkda variable
+     *
+     * @var float|null
+     */
+    private $realworkda;
+
+    /**
+     * late variable
+     *
+     * @var DateTime|null
+     */
+    private $late;
+
+    /**
+     * early variable
+     *
+     * @var DateTime|null
+     */
+    private $early;
+
+    /**
+     * absent variable
+     *
+     * @var float|null
+     */
+    private $absent;
+
+    /**
+     * overtime variable
+     *
+     * @var DateTime|null
+     */
+    private $overtime;
+
+    /**
+     * worktime variable
+     *
+     * @var DateTime|null
+     */
+    private $worktime;
+
+    /**
+     * exceptioni variable
+     *
+     * @var string|null
+     */
+    private $exceptioni;
+
+    /**
+     * mustin variable
+     *
+     * @var string|null
+     */
+    private $mustin;
+
+    /**
+     * mustout variable
+     *
+     * @var string|null
+     */
+    private $mustout;
+
+    /**
+     * deptid variable
+     *
+     * @var float|null
+     */
+    private $deptid;
+
+    /**
+     * sspedaynor variable
+     *
+     * @var float|null
+     */
+    private $sspedaynor;
+
+    /**
+     * sspedaywee variable
+     *
+     * @var float|null
+     */
+    private $sspedaywee;
+
+    /**
+     * sspedayhol variable
+     *
+     * @var float|null
+     */
+    private $sspedayhol;
+
+    /**
+     * atttime variable
+     *
+     * @var DateTime|null
+     */
+    private $atttime;
+
+    /**
+     * attchktime variable
+     *
+     * @var array|null
+     */
+    private $attchktime = [];
 
     /**
      * adminUrlGenerator

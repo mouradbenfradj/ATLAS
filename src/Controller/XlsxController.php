@@ -146,7 +146,7 @@ class XlsxController extends AbstractController
                 foreach ($allSheet as $worksheet) {
                     $highestRow = $worksheet->getHighestRow();
                     $rows = $worksheet->rangeToArray(
-                        'A1:O'.$highestRow,
+                        'A1:O' . $highestRow,
                         null,
                         true,
                         true,
@@ -185,7 +185,7 @@ class XlsxController extends AbstractController
                         $manager->flush();
                     }
                 } */
-                
+
                 $employer->setSoldConger($this->employerService->calculerSoldConger($employer));
                 $employer->setSoldAutorisationSortie($this->employerService->calculerAS($employer));
                 $manager->persist($employer);
@@ -193,12 +193,10 @@ class XlsxController extends AbstractController
                 $this->addFlash('success', 'updated_successfully');
             }
             $url = $this->adminUrlGenerator
-            ->setController(PointageCrudController::class)
-            ->setAction('index')
-            ->generateUrl();
+                ->setController(PointageCrudController::class)
+                ->setAction('index')
+                ->generateUrl();
             return $this->redirect($url);
-            //$table = new TableReader($xlsx);
-            //$pointageGenerator->fromXlsxFile($table, $user);
         }
         return $this->render('xlsx/upload.html.twig', [
             'form' => $form->createView(),

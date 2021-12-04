@@ -117,6 +117,13 @@ class XlsxService
     private $diff;
 
     /**
+     * nbrHeurTravailler variable
+     *
+     * @var DateTime
+     */
+    private $nbrHeurTravailler;
+
+    /**
      * employer variable
      *
      * @var User
@@ -199,6 +206,7 @@ class XlsxService
     private $flash;
 
 
+
     /**
      * autorisationSortieService variable
      *
@@ -240,7 +248,6 @@ class XlsxService
         $this->date = $this->dateService->dateString_d_m_Y_ToDateTime($cols['A']);
         $this->date = $this->date->setTime(0, 0);
         $this->horaire = $this->horaireService->getHoraireForDate($this->date, $this->employer, $cols['B']);
-
         $this->entrer = $cols['C'] ? $this->timeService->generateTime($cols['C']) : null;
         $this->sortie = $cols['D'] ? $this->timeService->generateTime($cols['D']) : null;
         $this->autorisationSortieService->partielConstruct($this->employer);
@@ -331,58 +338,5 @@ class XlsxService
             fn ($date): string => $date->getDate()->format('Y-m-d'),
             $user->getXlsxes()->toArray()
         );
-    }
-
-    /**
-     * fromXlsxFile
-     *
-     * @param [type] $spreadsheet
-     * @param integer $userId
-     * @return User
-     */
-    public function fromXlsxFile($spreadsheet, User $user): User
-    {
-        $nowDate = new DateTime();
-        $horaires = [];
-        $arrayDate = $this->dateInDB($user);
-        foreach ($this->em->getRepository(Horaire::class)->findAll() as $horaire) {
-            $horaires[$horaire->getHoraire()] = $horaire;
-        }
-        $sheetCount = $spreadsheet->getSheetCount();
-        for ($i = 0; $i < $sheetCount; $i++) {
-            $sheet = $spreadsheet->getSheet($i);
-            $sheetData = $sheet->toArray(null, true, true, true);
-            foreach ($sheetData as  $ligne) {
-                if ($this->dateService->isDate($ligne['A']) and isset($horaires[$ligne['B']])) {
-                    $dateString = $this->dateService->dateToStringY_m_d($ligne['A']);
-                    $isJourFerier = $this->jourFerierService->isJourFerier($dateString);
-                    $date = $this->dateService->dateString_d_m_Y_ToDateTime($ligne['A']);
-                    if (
-                        $isJourFerier
-                        or
-                        $ligne['C'] == 'CP'
-                        or
-                        $this->timeService->isTimeHi($ligne['C'])
-                        or
-                        $this->timeService->isTimeHi($ligne['D'])
-                        or
-                        in_array($ligne['K'], ['1', '1.5'])
-                        or
-                        $ligne['L']
-                        or
-                        $nowDate >= $date
-                    ) {
-                        $horaire = $horaires[$ligne['B']];
-                        if (!$isJourFerier and !in_array($dateString, $arrayDate)) {
-                            array_push($arrayDate, $dateString);
-                            $user = $this->pointageService->addLigne($ligne, $user);
-                        }
-                    } else {
-                        $this->flash->add('danger ', 'ignored ligne ' . implode(" | ", $ligne));
-                    }
-                }
-            }
-        }
-        return $user;
     }
 }
