@@ -2,24 +2,23 @@ name: PHP Composer
 
 on:
   push:
-    branches: [ main ]
+    branches: [ATLAS5.3]
   pull_request:
-    branches: [ main ]
+    branches: [ATLAS5.3]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: run phpunit
-      run: php ./vendor/bin/phpunit
-    - name: install composer
-      run: composer install
-    - name: run phpstan
-      run: ./vendor/bin/phpstan analyse src --level 5
+      - name: run phpunit
+        run: php ./vendor/bin/phpunit
+      - name: install composer
+        run: composer install
+      - name: run phpstan
+        run: ./vendor/bin/phpstan analyse src --level 5
 
     #- name: Cache Composer packages
     #  id: composer-cache
