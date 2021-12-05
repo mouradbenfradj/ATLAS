@@ -21,8 +21,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->getBadgenumbe() . " " . $this->getLastName() . " " . $this->getFirstName();
     }
     /**
+     * @var int
      * @ORM\Id
-     * @ORM\GeneratedValue
+     * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -42,11 +43,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string")
      */
     private $password;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $userID;
 
     /**
      * @ORM\Column(type="integer")
@@ -233,17 +229,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getUserID(): ?int
-    {
-        return $this->userID;
-    }
-
-    public function setUserID(?int $userID): self
-    {
-        $this->userID = $userID;
-
-        return $this;
-    }
 
     public function getBadgenumbe(): ?int
     {
