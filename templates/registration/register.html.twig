@@ -35,6 +35,14 @@
 					</div>
 				</div>
 				<div class="input-group mb-3">
+					{{ form_widget(registrationForm.id) }}
+					<div class="input-group-append">
+						<div class="input-group-text">
+							<span class="fas fa-user"></span>
+						</div>
+					</div>
+				</div>
+				<div class="input-group mb-3">
 					{{ form_widget(registrationForm.badgenumbe) }}
 					<div class="input-group-append">
 						<div class="input-group-text">
@@ -51,16 +59,16 @@
 					</div>
 				</div>
 				{# <div class="input-group mb-3">
-									<div class="input-group date" id="reservationdate" data-target-input="nearest">
-				
-										<input type="text" class="form-control datetimepicker-input" data-target="#reservationdate"/>
-										<div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
-											<div class="input-group-text">
-												<i class="fa fa-calendar"></i>
-											</div>
-										</div>
-									</div>
-								</div> #}
+													<div class="input-group date" id="reservationdate" data-target-input="nearest">
+								
+														<input type="text" class="form-control datetimepicker-input" data-target="#reservationdate"/>
+														<div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+															<div class="input-group-text">
+																<i class="fa fa-calendar"></i>
+															</div>
+														</div>
+													</div>
+												</div> #}
 				<div class="input-group mb-3">
 					{{ form_widget(registrationForm.email) }}
 					<div class="input-group-append">
@@ -103,15 +111,15 @@
 				</div>
 				{{ form_end(registrationForm) }}
 				{# <div class="social-auth-links text-center">
-																																																		<a href="#" class="btn btn-block btn-primary">
-																																																			<i class="fab fa-facebook mr-2"></i>
-																																																			Sign up using Facebook
-																																																		</a>
-																																																		<a href="#" class="btn btn-block btn-danger">
-																																																			<i class="fab fa-google-plus mr-2"></i>
-																																																			Sign up using Google+
-																																																		</a>
-																																																	</div> #}
+																																																						<a href="#" class="btn btn-block btn-primary">
+																																																							<i class="fab fa-facebook mr-2"></i>
+																																																							Sign up using Facebook
+																																																						</a>
+																																																						<a href="#" class="btn btn-block btn-danger">
+																																																							<i class="fab fa-google-plus mr-2"></i>
+																																																							Sign up using Google+
+																																																						</a>
+																																																					</div> #}
 
 				<a href="{{ path('app_login') }}" class="text-center">I already have a membership</a>
 			</div>
