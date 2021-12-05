@@ -1,0 +1,21 @@
+parameters:
+    symfony:
+        container_xml_path: var/cache/dev/App_KernelDevDebugContainer.xml
+    scanDirectories:
+        - var/cache/dev/Symfony/Config
+    doctrine:
+        objectManagerLoader: tests/object-manager.php
+    level: 5
+    paths:
+        - src
+        - tests
+    ignoreErrors:
+        -
+            message: '#Call to an undefined method [a-zA-Z0-9\\_]+::getId\(\)#'
+            path: src/Security/EmailVerifier.php
+        -
+            message: '#Call to an undefined method [a-zA-Z0-9\\_]+::getEmail\(\)#'
+            path: src/Security/EmailVerifier.php
+        -
+            message: '#Call to an undefined method [a-zA-Z0-9\\_]+::setIsVerified\(\)#'
+            path: src/Security/EmailVerifier.php
