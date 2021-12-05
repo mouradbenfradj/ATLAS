@@ -7,6 +7,7 @@ use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
 use App\Service\ConfigService;
+use DateTime;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,8 +48,8 @@ class RegistrationController extends AbstractController
             );
 
             $entityManager = $this->getDoctrine()->getManager();
-            $user->setSoldConger($this->configService->getConfig()->getDebutSoldConger());
-            $user->setSoldAutorisationSortie($this->configService->getConfig()->getDebutSoldAS());
+            $user->setSoldConger(0);
+            $user->setSoldAutorisationSortie(new DateTime("00:00:00"));
             $entityManager->persist($user);
             $entityManager->flush();
 

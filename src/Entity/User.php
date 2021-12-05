@@ -559,4 +559,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    /**
+     * Set the value of id
+     *
+     * @param  int  $id
+     *
+     * @return  self
+     */
+    public function setId(int $id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
 }
