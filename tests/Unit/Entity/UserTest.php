@@ -14,7 +14,7 @@ class UserTest extends TestCase
         $time = new DateTime("23:00:00");
         $user = new User();
         $sconger = 10.040;
-        $user->setEmail("mourad.ben.fradj@gmail.com")
+        $user->setEmail("mourad.benfradj.atlas@gmail.com")
             ->setRoles(array('ROLE_USER'))
             ->setPassword("mourad")
             ->setUserID(127)
@@ -28,7 +28,7 @@ class UserTest extends TestCase
             ->setSoldAutorisationSortie($time)
             ->setSoldConger($sconger)
             ->setIsVerified(true);
-        $this->assertTrue($user->getEmail() === "mourad.ben.fradj@gmail.com");
+        $this->assertTrue($user->getEmail() === "mourad.benfradj.atlas@gmail.com");
         $this->assertTrue($user->getRoles() === array('ROLE_USER'));
         $this->assertTrue($user->getPassword() === "mourad");
         $this->assertTrue($user->getUserID() === 127);
@@ -49,7 +49,7 @@ class UserTest extends TestCase
         $time = new DateTime("23:00:00");
         $user = new User();
         $sconger = 10.040;
-        $user->setEmail("mourad.ben.fradj@gmail.com")
+        $user->setEmail("mourad.benfradj.atlas@gmail.com")
             ->setRoles(array('ROLE_USER'))
             ->setPassword("mourad")
             ->setUserID(127)

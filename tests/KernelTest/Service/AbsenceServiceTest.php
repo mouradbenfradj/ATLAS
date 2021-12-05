@@ -28,7 +28,7 @@ class AbsenceServiceTest extends KernelTestCase
 
         $this->assertEquals(null, $absenceService->getEmployer());
         //$this->assertEquals("00:00:00", $generateTime->format('H:i:s'));
-      
+
         //$routerService = static::getContainer()->get('router');
         //$myCustomService = static::getContainer()->get(CustomService::class);
     }
@@ -37,7 +37,7 @@ class AbsenceServiceTest extends KernelTestCase
         //$kernel = self::bootKernel();
         $container = static::getContainer();
         $userRepository = $container->get(UserRepository::class);
-        $testUser = $userRepository->findOneByEmail('mourad.ben.fradj@gmail.com');
+        $testUser = $userRepository->findOneByEmail('mourad.benfradj.atlas@gmail.com');
         $absenceService = $container->get(AbsenceService::class);
 
         $this->assertEquals(1, $testUser->getId());

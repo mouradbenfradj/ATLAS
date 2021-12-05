@@ -36,7 +36,7 @@ class UserFixtures extends Fixture
     public function load(ObjectManager $manager)
     {
         $user = new User();
-        $user->setEmail("mourad.ben.fradj@gmail.com");
+        $user->setEmail("mourad.benfradj.atlas@gmail.com");
         $user->setSoldConger(0);
         $user->setSoldAutorisationSortie(new DateTime("00:00:00"));
         $user->setBadgenumbe(207);
@@ -75,5 +75,4 @@ class UserFixtures extends Fixture
 
         $manager->flush();
     }
-
 }
