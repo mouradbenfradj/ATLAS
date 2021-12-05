@@ -5,7 +5,7 @@ namespace App\Service;
 use DateTime;
 use DateInterval;
 
-class TimeService
+class TimeServiceCopy
 {
     /**
      * timeStringToDateTime

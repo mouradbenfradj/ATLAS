@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Service;
+namespace App\AbstractService;
 
 use DateTime;
 use DateInterval;
 use App\Entity\JourFerier;
+use App\Interface\JoursFerierInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-class JourFerierService
+abstract class JourFerierService implements JoursFerierInterface
 {
     /**
      * em
@@ -44,6 +45,25 @@ class JourFerierService
         }
     }
     /**
+     * getJourFeriers
+     *
+     * @param EntityManagerInterface $em
+     * @return array
+     */
+    public function getJourFeriers(): array
+    {
+        $jourFeriers = $this->em->getRepository(JourFerier::class)->findAll();
+        $ignoreDay = [];
+        foreach ($jourFeriers as $jf) {
+            do {
+                array_push($ignoreDay,  $jf->getDebut()->format("Y-m-d"));
+                $jf->getDebut()->add(new DateInterval('P1D'));
+            } while ($jf->getDebut() <= $jf->getFin());
+        }
+        return $ignoreDay;
+    }
+
+    /**
      * jourFerier
      *
      * @return array
@@ -52,7 +72,6 @@ class JourFerierService
     {
         return $this->ignoreDay;
     }
-
     /**
      * @return string[]
      */

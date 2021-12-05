@@ -124,14 +124,14 @@ class HoraireService
             $this->HeursJournerDeTravaille->sub($this->timeService->dateTimeToDateInterval($this->sumPause()));
             $this->HeursJournerDeTravaille = $this->timeService->diffTime($this->HeursJournerDeTravaille, $heurDebutTravaille);
             $this->HeursJournerDeTravaille = $this->timeService->dateIntervalToDateTime($this->HeursJournerDeTravaille);
-            $h=(intdiv($this->HeursJournerDeTravaille->format('H'), 2)<10)? ('0'.intdiv($this->HeursJournerDeTravaille->format('H'), 2)) :intdiv($this->HeursJournerDeTravaille->format('H'), 2);
-            $i= (intdiv($this->HeursJournerDeTravaille->format('i'), 2)<10)? ('0'.intdiv($this->HeursJournerDeTravaille->format('i'), 2)) :intdiv($this->HeursJournerDeTravaille->format('i'), 2);
-            $s= (intdiv($this->HeursJournerDeTravaille->format('s'), 2)<10)? ('0'.intdiv($this->HeursJournerDeTravaille->format('s'), 2)) :intdiv($this->HeursJournerDeTravaille->format('s'), 2);
+            $h = (intdiv($this->HeursJournerDeTravaille->format('H'), 2) < 10) ? ('0' . intdiv($this->HeursJournerDeTravaille->format('H'), 2)) : intdiv($this->HeursJournerDeTravaille->format('H'), 2);
+            $i = (intdiv($this->HeursJournerDeTravaille->format('i'), 2) < 10) ? ('0' . intdiv($this->HeursJournerDeTravaille->format('i'), 2)) : intdiv($this->HeursJournerDeTravaille->format('i'), 2);
+            $s = (intdiv($this->HeursJournerDeTravaille->format('s'), 2) < 10) ? ('0' . intdiv($this->HeursJournerDeTravaille->format('s'), 2)) : intdiv($this->HeursJournerDeTravaille->format('s'), 2);
             $this->HeursDemiJournerDeTravaille = $this->timeService->generateTime($h . ':' . $i . ':' . $s);
-            $h=(intdiv($this->HeursJournerDeTravaille->format('H'), 4)<10)? ('0'.intdiv($this->HeursJournerDeTravaille->format('H'), 4)) :intdiv($this->HeursJournerDeTravaille->format('H'), 4);
-            $i= (intdiv($this->HeursJournerDeTravaille->format('i'), 4)<10)? ('0'.intdiv($this->HeursJournerDeTravaille->format('i'), 4)) :intdiv($this->HeursJournerDeTravaille->format('i'), 4);
-            $s= (intdiv($this->HeursJournerDeTravaille->format('s'), 4)<10)? ('0'.intdiv($this->HeursJournerDeTravaille->format('s'), 4)) :intdiv($this->HeursJournerDeTravaille->format('s'), 4);
-            $this->HeursQuardJournerDeTravaille = $this->timeService->generateTime($h. ':' .$i. ':' . $s);
+            $h = (intdiv($this->HeursJournerDeTravaille->format('H'), 4) < 10) ? ('0' . intdiv($this->HeursJournerDeTravaille->format('H'), 4)) : intdiv($this->HeursJournerDeTravaille->format('H'), 4);
+            $i = (intdiv($this->HeursJournerDeTravaille->format('i'), 4) < 10) ? ('0' . intdiv($this->HeursJournerDeTravaille->format('i'), 4)) : intdiv($this->HeursJournerDeTravaille->format('i'), 4);
+            $s = (intdiv($this->HeursJournerDeTravaille->format('s'), 4) < 10) ? ('0' . intdiv($this->HeursJournerDeTravaille->format('s'), 4)) : intdiv($this->HeursJournerDeTravaille->format('s'), 4);
+            $this->HeursQuardJournerDeTravaille = $this->timeService->generateTime($h . ':' . $i . ':' . $s);
         }
         return $this->horaire;
     }

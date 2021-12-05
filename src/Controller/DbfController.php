@@ -29,189 +29,189 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 class DbfController extends AbstractController
 {
     /**
-     * userid variable
+     * userid
      *
      * @var float
      */
     private $userid;
 
     /**
-     * badgenumbe variable
+     * badgenumbe
      *
      * @var int
      */
     private $badgenumbe;
 
     /**
-     * ssn variable
+     * ssn
      *
      * @var string
      */
     private $ssn;
 
     /**
-     * username variable
+     * username
      *
      * @var string
      */
     private $username;
 
     /**
-     * autosch variable
+     * autosch
      *
      * @var string|null
      */
     private $autosch;
 
     /**
-     * attdate variable
+     * attdate
      *
      * @var DateTime
      */
     private $attdate;
 
     /**
-     * schid variable
+     * schid
      *
      * @var float|null
      */
     private $schid;
 
     /**
-     * clockintim variable
+     * clockintim
      *
      * @var DateTime|null
      */
     private $clockintim;
 
     /**
-     * clockoutti variable
+     * clockoutti
      *
      * @var DateTime|null
      */
     private $clockoutti;
 
     /**
-     * starttime variable
+     * starttime
      *
      * @var DateTime|null
      */
     private $starttime;
 
     /**
-     * endtime variable
+     * endtime
      *
      * @var DateTime|null
      */
     private $endtime;
 
     /**
-     * workday variable
+     * workday
      *
      * @var float|null
      */
     private $workday;
 
     /**
-     * realworkda variable
+     * realworkda
      *
      * @var float|null
      */
     private $realworkda;
 
     /**
-     * late variable
+     * late
      *
      * @var DateTime|null
      */
     private $late;
 
     /**
-     * early variable
+     * early
      *
      * @var DateTime|null
      */
     private $early;
 
     /**
-     * absent variable
+     * absent
      *
      * @var float|null
      */
     private $absent;
 
     /**
-     * overtime variable
+     * overtime
      *
      * @var DateTime|null
      */
     private $overtime;
 
     /**
-     * worktime variable
+     * worktime
      *
      * @var DateTime|null
      */
     private $worktime;
 
     /**
-     * exceptioni variable
+     * exceptioni
      *
      * @var string|null
      */
     private $exceptioni;
 
     /**
-     * mustin variable
+     * mustin
      *
      * @var string|null
      */
     private $mustin;
 
     /**
-     * mustout variable
+     * mustout
      *
      * @var string|null
      */
     private $mustout;
 
     /**
-     * deptid variable
+     * deptid
      *
      * @var float|null
      */
     private $deptid;
 
     /**
-     * sspedaynor variable
+     * sspedaynor
      *
      * @var float|null
      */
     private $sspedaynor;
 
     /**
-     * sspedaywee variable
+     * sspedaywee
      *
      * @var float|null
      */
     private $sspedaywee;
 
     /**
-     * sspedayhol variable
+     * sspedayhol
      *
      * @var float|null
      */
     private $sspedayhol;
 
     /**
-     * atttime variable
+     * atttime
      *
      * @var DateTime|null
      */
     private $atttime;
 
     /**
-     * attchktime variable
+     * attchktime
      *
      * @var array|null
      */
@@ -224,79 +224,20 @@ class DbfController extends AbstractController
      */
     private $adminUrlGenerator;
     /**
-     * dateService
-     *
-     * @var DateService
-     */
-    private $dateService;
-    /**
-     * jourFerierService variable
-     *
-     * @var JourFerierService
-     */
-    private $jourFerierService;
-    /**
-     * pointageService variable
-     *
-     * @var PointageService
-     */
-    private $pointageService;
-    /**
-     * employerService variable
-     *
-     * @var EmployerService
-     */
-    private $employerService;
-    /**
-     * dbfService variable
+     * dbfService
      *
      * @var DbfService
      */
     private $dbfService;
-    /**
-     * absenceService variable
-     *
-     * @var AbsenceService
-     */
-    private $absenceService;
-    /**
-     * congerService variable
-     *
-     * @var CongerService
-     */
-    private $congerService;
-    /**
-     * autorisationSortieService variable
-     *
-     * @var AutorisationSortieService
-     */
-    private $autorisationSortieService;
-
 
     public function __construct(
         FlashBagInterface $flash,
         AdminUrlGenerator $adminUrlGenerator,
-        DateService $dateService,
-        JourFerierService $jourFerierService,
-        PointageService $pointageService,
-        EmployerService $employerService,
-        //HoraireService $horaireService,
         DbfService $dbfService,
-        AbsenceService $absenceService,
-        CongerService $congerService,
-        AutorisationSortieService $autorisationSortieService
     ) {
         $this->flash = $flash;
         $this->adminUrlGenerator = $adminUrlGenerator;
-        $this->dateService = $dateService;
-        $this->jourFerierService = $jourFerierService;
-        //$this->horaireService = $horaireService;
-        $this->pointageService = $pointageService;
-        $this->employerService = $employerService;
         $this->dbfService = $dbfService;
-        $this->absenceService = $absenceService;
-        $this->congerService = $congerService;
-        $this->autorisationSortieService = $autorisationSortieService;
     }
 
     /**
@@ -313,20 +254,21 @@ class DbfController extends AbstractController
 
     /**
      * upload function
-     * @Route("/upload/{user}", name="dbf_upload", methods={"GET","POST"})
+     * @Route("/upload/{employer}", name="dbf_upload", methods={"GET","POST"})
      *
      * @param Request $request
-     * @param User $user
+     * @param User $employer
      * @return Response
      */
-    public function upload(Request $request, User $user): Response
+    public function upload(Request $request, User $employer): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $dbf = $form->get('upload')->getData();
             if ($dbf) {
-                $ignoredDay = array_merge($this->dbfService->dateInDb($user), $this->pointageService->dateInDB($user), $this->jourFerierService->jourFerier());
+                $this->dbfService->setEmployer($employer);
+                $ignoredDay = $this->dbfService->ignoredDay();
                 $manager = $this->getDoctrine()->getManager();
                 $dbfs = new TableReader($dbf);
                 while ($record = $dbfs->nextRecord()) {
@@ -347,11 +289,6 @@ class DbfController extends AbstractController
                         ) {
                             $this->pointageService->constructFromDbf($dbf);
                             $pointage = $this->pointageService->createEntity();
-                            /*  $accespted = ($pointage->getEntrer() and $pointage->getSortie())
-                                 or ($pointage->getCongerPayer() and $pointage->getCongerPayer()->getValider())
-                                 or $pointage->getAbsence();
-
-                             if ($accespted) { */
                             $user->addPointage($pointage);
                         } else {
                             $user->addDbf($dbf);
