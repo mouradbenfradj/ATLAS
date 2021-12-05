@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
- * @Route("/{_locale}/work/time")
+ * @Route("/work/time")
  */
 class WorkTimeController extends AbstractController
 {

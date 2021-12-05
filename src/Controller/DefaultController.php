@@ -32,7 +32,7 @@ class DefaultController extends AbstractController
         if ($employer and property_exists($employer, 'pointages')) {
             $bilans = $bilanService->getBilanGeneral($employer->getPointages()->toArray());
         } else {
-            $bilans= [];
+            $bilans = [];
         }
         return $this->render('default/index.html.twig', [
             'bilan' => $bilans
@@ -40,7 +40,7 @@ class DefaultController extends AbstractController
     }
     /**
      * default
-     * @Route("/{_locale}/", name="default")
+     * @Route("/", name="default")
      *
      * @param Security $security
      * @param PointageService $pointageService
@@ -55,7 +55,7 @@ class DefaultController extends AbstractController
         if ($employer and property_exists($employer, 'pointages')) {
             $bilans = $bilanService->getBilanGeneral($employer->getPointages()->toArray());
         } else {
-            $bilans= [];
+            $bilans = [];
         }
         return $this->render('default/index.html.twig', [
             'bilan' => $bilans

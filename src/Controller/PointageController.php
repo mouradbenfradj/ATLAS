@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * @Route("/{_locale}/pointage")
+ * @Route("/pointage")
  */
 class PointageController extends AbstractController
 {

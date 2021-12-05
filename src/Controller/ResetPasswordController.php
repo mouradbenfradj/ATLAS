@@ -20,7 +20,7 @@ use SymfonyCasts\Bundle\ResetPassword\Exception\ResetPasswordExceptionInterface;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 
 /**
- * @Route("/{_locale}/reset-password")
+ * @Route("/reset-password")
  */
 class ResetPasswordController extends AbstractController
 {

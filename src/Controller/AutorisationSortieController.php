@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/{_locale}/autorisation/sortie")
+ * @Route("/autorisation/sortie")
  */
 class AutorisationSortieController extends AbstractController
 {
@@ -83,7 +83,7 @@ class AutorisationSortieController extends AbstractController
      */
     public function delete(Request $request, AutorisationSortie $autorisationSortie): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$autorisationSortie->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $autorisationSortie->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($autorisationSortie);
             $entityManager->flush();

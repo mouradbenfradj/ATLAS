@@ -24,7 +24,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 /**
- * @Route("/{_locale}/xlsx")
+ * @Route("/xlsx")
  */
 class XlsxController extends AbstractController
 {

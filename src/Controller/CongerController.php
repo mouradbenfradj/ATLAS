@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
- * @Route("/{_locale}/conger")
+ * @Route("/conger")
  */
 class CongerController extends AbstractController
 {
@@ -86,7 +86,7 @@ class CongerController extends AbstractController
      */
     public function delete(Request $request, Conger $conger): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$conger->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $conger->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($conger);
             $entityManager->flush();

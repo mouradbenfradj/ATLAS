@@ -38,7 +38,7 @@ class DashboardController extends AbstractDashboardController
         $this->bilanService = $bilanService;
     }
     /**
-     * @Route("/{_locale}/admin", name="admin_dashboard")
+     * @Route("/admin", name="admin_dashboard")
      */
     public function index(): Response
     {
@@ -51,7 +51,7 @@ class DashboardController extends AbstractDashboardController
         if ($employer and property_exists($employer, 'pointages')) {
             $bilans = $this->bilanService->getBilanGeneral($employer->getPointages()->toArray());
         } else {
-            $bilans= [];
+            $bilans = [];
         }
         return $this->render('admin/dashboard.html.twig', [
             //'users' => $this->getDoctrine()->getRepository(User::class)->findAll(),
@@ -67,8 +67,7 @@ class DashboardController extends AbstractDashboardController
             ->setTitle('ATLAS')
             ->generateRelativeUrls()
             ->disableUrlSignatures()
-            ->setFaviconPath('favicon.svg')
-            ;
+            ->setFaviconPath('favicon.svg');
     }
 
     public function configureMenuItems(): iterable
