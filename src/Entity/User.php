@@ -3,10 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use phpDocumentor\Reflection\Types\Integer;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -16,13 +15,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    public function __toString()
-    {
-        return $this->getBadgenumbe() . " " . $this->getLastName() . " " . $this->getFirstName();
-    }
     /**
+     * @var int
      * @ORM\Id
-     * @ORM\GeneratedValue
+     * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -42,11 +38,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string")
      */
     private $password;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $userID;
 
     /**
      * @ORM\Column(type="integer")
@@ -76,7 +67,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="date")
      */
-    private $debutTravaille;
+    private $debuteA;
 
     /**
      * @ORM\Column(type="date", nullable=true)
@@ -84,69 +75,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $demission;
 
     /**
-     * @ORM\OneToMany(targetEntity=Pointage::class,cascade={"persist"}, mappedBy="employer", orphanRemoval=true, fetch="EAGER")
-     */
-    private $pointages;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Conger::class, mappedBy="employer", cascade={"persist"}, orphanRemoval=true, fetch="EAGER")
-     */
-    private $congers;
-
-    /**
-     * @ORM\OneToMany(targetEntity=AutorisationSortie::class, mappedBy="employer",cascade={"persist"}, orphanRemoval=true, fetch="EAGER")
-     */
-    private $autorisationSorties;
-
-    /**
-     * @ORM\Column(type="time")
-     */
-    private $soldAutorisationSortie;
-
-    /**
-     * @ORM\Column(type="float")
-     */
-    private $soldConger;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $isVerified = false;
 
-    /**
-     * @ORM\OneToMany(targetEntity=WorkTime::class, mappedBy="employer", orphanRemoval=true, fetch="EAGER")
-     */
-    private $workTimes;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Dbf::class,cascade={"persist"}, mappedBy="employer", orphanRemoval=true, fetch="EAGER")
-     */
-    private $dbfs;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Absence::class, mappedBy="employer",cascade={"persist"}, orphanRemoval=true, fetch="EAGER")
-     */
-    private $absences;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Xlsx::class, cascade={"persist"}, orphanRemoval=true, mappedBy="employer")
-     */
-    private $xlsxes;
-
-    public function __construct()
-    {
-        $this->pointages = new ArrayCollection();
-        $this->congers = new ArrayCollection();
-        $this->autorisationSorties = new ArrayCollection();
-        $this->workTimes = new ArrayCollection();
-        $this->dbfs = new ArrayCollection();
-        $this->absences = new ArrayCollection();
-        $this->xlsxes = new ArrayCollection();
-    }
-
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    /**
+     * Set the value of id
+     *
+     * @param  int  $id
+     *
+     * @return  self
+     */
+    public function setId(int $id)
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getEmail(): ?string
@@ -233,18 +182,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getUserID(): ?int
-    {
-        return $this->userID;
-    }
-
-    public function setUserID(?int $userID): self
-    {
-        $this->userID = $userID;
-
-        return $this;
-    }
-
     public function getBadgenumbe(): ?int
     {
         return $this->badgenumbe;
@@ -305,14 +242,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getDebutTravaille(): ?\DateTimeInterface
+    public function getDebuteA(): ?\DateTimeInterface
     {
-        return $this->debutTravaille;
+        return $this->debuteA;
     }
 
-    public function setDebutTravaille(\DateTimeInterface $debutTravaille): self
+    public function setDebuteA(\DateTimeInterface $debuteA): self
     {
-        $this->debutTravaille = $debutTravaille;
+        $this->debuteA = $debuteA;
 
         return $this;
     }
@@ -329,120 +266,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection|Pointage[]
-     */
-    public function getPointages(): Collection
-    {
-        return $this->pointages;
-    }
-
-    public function addPointage(Pointage $pointage): self
-    {
-        if (!$this->pointages->contains($pointage)) {
-            $this->pointages[] = $pointage;
-            $pointage->setEmployer($this);
-        }
-
-        return $this;
-    }
-
-    public function removePointage(Pointage $pointage): self
-    {
-        if ($this->pointages->removeElement($pointage)) {
-            // set the owning side to null (unless already changed)
-            if ($pointage->getEmployer() === $this) {
-                $pointage->setEmployer(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Conger[]
-     */
-    public function getCongers(): Collection
-    {
-        return $this->congers;
-    }
-
-    public function addConger(Conger $conger): self
-    {
-        if (!$this->congers->contains($conger)) {
-            $this->congers[] = $conger;
-            $conger->setEmployer($this);
-        }
-
-        return $this;
-    }
-
-    public function removeConger(Conger $conger): self
-    {
-        if ($this->congers->removeElement($conger)) {
-            // set the owning side to null (unless already changed)
-            if ($conger->getEmployer() === $this) {
-                $conger->setEmployer(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|AutorisationSortie[]
-     */
-    public function getAutorisationSorties(): Collection
-    {
-        return $this->autorisationSorties;
-    }
-
-    public function addAutorisationSorties(AutorisationSortie $autorisationSorties): self
-    {
-        if (!$this->autorisationSorties->contains($autorisationSorties)) {
-            $this->autorisationSorties[] = $autorisationSorties;
-            $autorisationSorties->setEmployer($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAutorisationSorties(AutorisationSortie $autorisationSorties): self
-    {
-        if ($this->autorisationSorties->removeElement($autorisationSorties)) {
-            // set the owning side to null (unless already changed)
-            if ($autorisationSorties->getEmployer() === $this) {
-                $autorisationSorties->setEmployer(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getSoldAutorisationSortie(): ?\DateTimeInterface
-    {
-        return $this->soldAutorisationSortie;
-    }
-
-    public function setSoldAutorisationSortie(\DateTimeInterface $soldAutorisationSortie): self
-    {
-        $this->soldAutorisationSortie = $soldAutorisationSortie;
-
-        return $this;
-    }
-
-    public function getSoldConger(): ?float
-    {
-        return $this->soldConger;
-    }
-
-    public function setSoldConger(float $soldConger): self
-    {
-        $this->soldConger = $soldConger;
-
-        return $this;
-    }
-
     public function isVerified(): bool
     {
         return $this->isVerified;
@@ -451,126 +274,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): self
     {
         $this->isVerified = $isVerified;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|WorkTime[]
-     */
-    public function getWorkTimes(): Collection
-    {
-        return $this->workTimes;
-    }
-
-    public function addWorkTime(WorkTime $workTime): self
-    {
-        if (!$this->workTimes->contains($workTime)) {
-            $this->workTimes[] = $workTime;
-            $workTime->setEmployer($this);
-        }
-
-        return $this;
-    }
-
-    public function removeWorkTime(WorkTime $workTime): self
-    {
-        if ($this->workTimes->removeElement($workTime)) {
-            // set the owning side to null (unless already changed)
-            if ($workTime->getEmployer() === $this) {
-                $workTime->setEmployer(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Dbf[]
-     */
-    public function getDbfs(): Collection
-    {
-        return $this->dbfs;
-    }
-
-    public function addDbf(Dbf $dbf): self
-    {
-        if (!$this->dbfs->contains($dbf)) {
-            $this->dbfs[] = $dbf;
-            $dbf->setEmployer($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDbf(Dbf $dbf): self
-    {
-        if ($this->dbfs->removeElement($dbf)) {
-            // set the owning side to null (unless already changed)
-            if ($dbf->getEmployer() === $this) {
-                $dbf->setEmployer(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Absence[]
-     */
-    public function getAbsences(): Collection
-    {
-        return $this->absences;
-    }
-
-    public function addAbsence(Absence $absence): self
-    {
-        if (!$this->absences->contains($absence)) {
-            $this->absences[] = $absence;
-            $absence->setEmployer($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAbsence(Absence $absence): self
-    {
-        if ($this->absences->removeElement($absence)) {
-            // set the owning side to null (unless already changed)
-            if ($absence->getEmployer() === $this) {
-                $absence->setEmployer(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Xlsx[]
-     */
-    public function getXlsxes(): Collection
-    {
-        return $this->xlsxes;
-    }
-
-    public function addXlsx(Xlsx $xlsx): self
-    {
-        if (!$this->xlsxes->contains($xlsx)) {
-            $this->xlsxes[] = $xlsx;
-            $xlsx->setEmployer($this);
-        }
-
-        return $this;
-    }
-
-    public function removeXlsx(Xlsx $xlsx): self
-    {
-        if ($this->xlsxes->removeElement($xlsx)) {
-            // set the owning side to null (unless already changed)
-            if ($xlsx->getEmployer() === $this) {
-                $xlsx->setEmployer(null);
-            }
-        }
 
         return $this;
     }

@@ -19,21 +19,21 @@
 
 		<!-- Site wrapper -->
 		<div class="wrapper">
-			{% use "navbar.html.twig" %}
+			{% use "_base/_navbar.html.twig" %}
 			{% block navbar %}
 				{{ parent() }}
 			{% endblock %}
-			{% use "sidebar.html.twig" %}
+			{% use "_base/_sidebar.html.twig" %}
 			{% block sidebar %}
 				{{ parent() }}
 			{% endblock %}
 			<!-- Content Wrapper. Contains page content -->
 			<div class="content-wrapper">
-				{% use "contentheader.html.twig" %}
+				{% use "_base/_contentheader.html.twig" %}
 				{% block contentheader %}
 					{{ parent() }}
 				{% endblock %}
-				{% use "content.html.twig" %}
+				{% use "_base/_content.html.twig" %}
 				{% block content %}
 					{{ parent() }}
 				{% endblock %}
@@ -41,7 +41,7 @@
 			<!-- /.content-wrapper -->
 
 			<footer class="main-footer">
-				{% use "footer.html.twig" %}
+				{% use "_base/_footer.html.twig" %}
 				{% block footer %}
 					{{ parent() }}
 				{% endblock %}

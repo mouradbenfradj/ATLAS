@@ -6,32 +6,29 @@ use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
-use App\Service\ConfigService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Annotation\Route;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 class RegistrationController extends AbstractController
 {
-    private $emailVerifier;
-    private $configService;
+    private EmailVerifier $emailVerifier;
 
-    public function __construct(EmailVerifier $emailVerifier, ConfigService $configService)
+    public function __construct(EmailVerifier $emailVerifier)
     {
         $this->emailVerifier = $emailVerifier;
-        $this->configService = $configService;
     }
 
     /**
-     * @Route("/{_locale}/register", name="app_register")
+     * @Route("/register", name="app_register")
      */
-    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder): Response
+    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
@@ -40,22 +37,17 @@ class RegistrationController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // encode the plain password
             $user->setPassword(
-                $passwordEncoder->encodePassword(
+            $userPasswordHasher->hashPassword(
                     $user,
                     $form->get('plainPassword')->getData()
                 )
             );
 
-            $entityManager = $this->getDoctrine()->getManager();
-            $user->setSoldConger($this->configService->getConfig()->getDebutSoldConger());
-            $user->setSoldAutorisationSortie($this->configService->getConfig()->getDebutSoldAS());
             $entityManager->persist($user);
             $entityManager->flush();
 
             // generate a signed url and email it to the user
-            $this->emailVerifier->sendEmailConfirmation(
-                'app_verify_email',
-                $user,
+            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
                 (new TemplatedEmail())
                     ->from(new Address('mourad.benfradj.atlas@gmail.com', 'ATLAS'))
                     ->to($user->getEmail())
@@ -73,7 +65,7 @@ class RegistrationController extends AbstractController
     }
 
     /**
-     * @Route("/{_locale}/verify/email", name="app_verify_email")
+     * @Route("/verify/email", name="app_verify_email")
      */
     public function verifyUserEmail(Request $request, UserRepository $userRepository): Response
     {

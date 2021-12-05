@@ -1,167 +1,20 @@
 {% extends 'base.html.twig' %}
-{% block linkheader %}{% endblock %}
-{% macro secondsToMinutes(seconds) %}
-	{# set hours minus minutes/seconds #}
-	{% set hours = (seconds / 60)  // 60 %}
 
-	{% if hours  < 1 %}
-		{# set hours to nothing #}
-		{% set hours = null %}
-	{% else %}
-		{# output hours with a colon: #}
-		{% set hours = hours ~ ':' %}
-	{% endif %}
+{% block title %}Hello DefaultController!{% endblock %}
 
-	{# set minutes remain but no seconds and with a colon #}
-	{% set minutes = (seconds / 60)  % 60   ~ ':' %}
-
-	{# set seconds but no minutes or hours #}
-	{% set seconds = seconds % 60 %}
-	{% if seconds < 10 %}
-		{# add a leading zero if seconds are less than 10 #}
-		{% set seconds = '0' ~ seconds %}
-	{% endif %}
-
-	{{ hours }}{{ minutes}}{{ seconds }}
-
-{% endmacro %}
-{% block titleheader %}
-	Bilan General
-{% endblock %}
-{% block body_title %}bilan General
-{% endblock %}
 {% block body %}
-	<table id="example1" class="table table-bordered table-striped">
-		<thead>
-			<tr>
-				<th>Date</th>
-				<th>Horaire</th>
-				<th>Entrer</th>
-				<th>Sortie</th>
-				<th>Nbr Heures Travaillées</th>
-				<th>Retard en MIN</th>
-				<th>Départ anticipé</th>
-				<th>Retard midi</th>
-				<th>Total Retard</th>
-				<th>AS</th>
-				<th>CP</th>
-				<th>ABS</th>
-				<th>HT Normalement travaillées</th>
-				<th>Diff</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for pointage in bilan %}
-				{% if pointage.background is defined  %}
-					<tr style="background-color:{{ pointage.background }}">
-					{% else %}
-						<tr>
-						{% endif %}
-						<td colspan="{{pointage.colspan }}">{{ pointage.date }}</td>
-						{% if pointage.colspan == 1 %}
-							<td>{{ pointage.horaire }}</td>
-							<td>{{ pointage.entrer }}</td>
-							<td>{{ pointage.sortie }}</td>
-						{% endif %}
-						<td>
-							{% if pointage.colspan == 1 %}
-								{{ pointage.nbrHeurTravailler }}
-							{% else %}
-								{{ _self.secondsToMinutes(pointage.nbrHeurTravailler)  }}
-							{% endif %}
-						</td>
-						<td>
-							{% if pointage.colspan == 1 %}
-								{{ pointage.retardEnMinute }}
-							{% else %}
-								{{ _self.secondsToMinutes(pointage.retardEnMinute)  }}
-							{% endif %}
-						</td>
-						<td>
-							{% if pointage.colspan == 1 %}
-								{{ pointage.departAnticiper }}
-							{% else %}
-								{{ _self.secondsToMinutes(pointage.departAnticiper) }}
-							{% endif %}
-						</td>
-						<td>
-							{% if pointage.colspan == 1 %}
-								{{ pointage.retardMidi }}
-							{% else %}
-								{{ _self.secondsToMinutes( pointage.retardMidi)  }}
-							{% endif %}
-						</td>
-						<td>
-							{% if pointage.colspan == 1 %}
-								{{ pointage.totalRetard }}
-							{% else %}
-								{{ _self.secondsToMinutes(pointage.totalRetard)  }}
-							{% endif %}
-						</td>
-						<td>
-							{% if pointage.colspan == 1 %}
-								{{ pointage.autorisationSortie }}
-							{% else %}
-								{{ _self.secondsToMinutes(pointage.autorisationSortie)  }}
-							{% endif %}
-						</td>
-						<td>{{ pointage.congerPayer }}</td>
-						<td>{{ pointage.absence }}</td>
-						<td>
-							{% if pointage.colspan == 1 %}
-								{{ pointage.heurNormalementTravailler }}
-							{% else %}
-								{{ _self.secondsToMinutes(pointage.heurNormalementTravailler) }}
-							{% endif %}
-						</td>
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
 
-						{% if pointage.nbrHeurTravailler <= pointage.heurNormalementTravailler  %}
-							<td bgcolor="red">
-							{% else %}
-								<td bgcolor="green">
-								{% endif %}
+<div class="example-wrapper">
+    <h1>Hello {{ controller_name }}! ✅</h1>
 
-								{% if pointage.colspan == 1 %}
-									{{ pointage.diff }}
-								{% else %}
-									{{ _self.secondsToMinutes(pointage.diff)}}
-								{% endif %}<td/>
-							</td>
-						</tr>
-					{% else %}
-						<tr>
-							<td colspan="15">no records found</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</tbody>
-		</tbody>
-		<tfoot>
-			<tr>
-
-				<th>Date</th>
-				<th>Horaire</th>
-				<th>Entrer</th>
-				<th>Sortie</th>
-				<th>Nbr Heures Travaillées</th>
-				<th>Retard en MIN</th>
-				<th>Départ anticipé</th>
-				<th>Retard midi</th>
-				<th>Total Retard</th>
-				<th>AS</th>
-				<th>CP</th>
-				<th>ABS</th>
-				<th>HT Normalement travaillées</th>
-				<th>Diff</th>
-			</tr>
-		</tfoot>
-	</table>
-
-{% endblock %}
-
-{% block stylesheets %}
-	{{ encore_entry_link_tags('data') }}
-{% endblock %}
-{% block javascripts %}
-	{{ encore_entry_script_tags('data') }}
+    This friendly message is coming from:
+    <ul>
+        <li>Your controller at <code><a href="{{ 'C:/mourad/www/ATLAS54/src/Controller/DefaultController.php'|file_link(0) }}">src/Controller/DefaultController.php</a></code></li>
+        <li>Your template at <code><a href="{{ 'C:/mourad/www/ATLAS54/templates/default/index.html.twig'|file_link(0) }}">templates/default/index.html.twig</a></code></li>
+    </ul>
+</div>
 {% endblock %}
