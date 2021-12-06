@@ -71,10 +71,9 @@ class HoraireService
      * @param EntityManagerInterface $manager
      * @param TimeService $timeService
      */
-    public function __construct(EntityManagerInterface $manager, TimeService $timeService, WorkTimeService $workTimeService)
+    public function __construct(EntityManagerInterface $manager, WorkTimeService $workTimeService)
     {
         $this->horaires = $manager->getRepository(Horaire::class)->findAll();
-        $this->timeService = $timeService;
         $this->workTimeService = $workTimeService;
     }
 

@@ -36,7 +36,8 @@ class UserFixtures extends Fixture
     public function load(ObjectManager $manager)
     {
         $user = new User();
-        $user->setEmail("mourad.benfradj.atlas@gmail.com");
+        $user->setEmail("mourad.ben.fradj@gmail.com");
+        $user->setId(100);
         $user->setSoldConger(0);
         $user->setSoldAutorisationSortie(new DateTime("00:00:00"));
         $user->setBadgenumbe(207);
@@ -51,28 +52,7 @@ class UserFixtures extends Fixture
         $user->setIsVerified(true);
         $user->setSoldConger(0);
         $user->setSoldAutorisationSortie(new DateTime('23:00:00'));
-
         $manager->persist($user);
-        $user = new User();
-        $user->setEmail("mourad.benfradj.atlas@gmail.com");
-        $user->setBadgenumbe(302);
-        $user->setSoldConger(0);
-        $user->setSoldAutorisationSortie(new DateTime("00:00:00"));
-        $user->setFirstName("mourad");
-        $user->setLastName("k");
-        $user->setDebutTravaille(new DateTime("2021/01/01"));
-        $user->setRoles(['ROLE_EMPLOYER']);
-        $user->setPassword($this->passwordHasher->hashPassword(
-            $user,
-            'cherif'
-        ));
-
-        $user->setIsVerified(true);
-        $user->setSoldConger(0);
-        $user->setSoldAutorisationSortie(new DateTime('23:00:00'));
-
-        $manager->persist($user);
-
         $manager->flush();
     }
 }

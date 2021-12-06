@@ -29,12 +29,6 @@ class CongerService
 
 
     /**
-     * timeService
-     *
-     * @var TimeService
-     */
-    private $timeService;
-    /**
      * horaireService
      *
      * @var HoraireService
@@ -46,11 +40,10 @@ class CongerService
      *
      * @param EntityManagerInterface $em
      */
-    public function __construct(TimeService $timeService, HoraireService $horaireService)
+    public function __construct(HoraireService $horaireService)
     {
         //EntityManagerInterface $em,
         //$this->em = $em;
-        $this->timeService = $timeService;
         $this->horaireService = $horaireService;
     }
     public function partielConstruct(

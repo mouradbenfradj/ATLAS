@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\User;
 use XBase\TableReader;
 use App\Form\UploadType;
-use App\Service\DateService;
 use App\Service\XlsxService;
 use App\Service\CongerService;
 use App\Service\AbsenceService;
@@ -35,12 +34,7 @@ class XlsxController extends AbstractController
      * @var AdminUrlGenerator
      */
     private $adminUrlGenerator;
-    /**
-     * dateService
-     *
-     * @var DateService
-     */
-    private $dateService;
+
     /**
      * jourFerierService variable
      *
@@ -65,50 +59,14 @@ class XlsxController extends AbstractController
      * @var XlsxService
      */
     private $xlsxService;
-    /**
-     * absenceService variable
-     *
-     * @var AbsenceService
-     */
-    private $absenceService;
-    /**
-     * congerService variable
-     *
-     * @var CongerService
-     */
-    private $congerService;
-    /**
-     * autorisationSortieService variable
-     *
-     * @var AutorisationSortieService
-     */
-    private $autorisationSortieService;
-
 
     public function __construct(
         FlashBagInterface $flash,
-        AdminUrlGenerator $adminUrlGenerator,
-        DateService $dateService,
-        JourFerierService $jourFerierService,
-        PointageService $pointageService,
-        EmployerService $employerService,
-        //HoraireService $horaireService,
-        XlsxService $xlsxService,
-        AbsenceService $absenceService,
-        CongerService $congerService,
-        AutorisationSortieService $autorisationSortieService
+        AdminUrlGenerator $adminUrlGenerator
+
     ) {
         $this->flash = $flash;
         $this->adminUrlGenerator = $adminUrlGenerator;
-        $this->dateService = $dateService;
-        $this->jourFerierService = $jourFerierService;
-        //$this->horaireService = $horaireService;
-        $this->pointageService = $pointageService;
-        $this->employerService = $employerService;
-        $this->xlsxService = $xlsxService;
-        $this->absenceService = $absenceService;
-        $this->congerService = $congerService;
-        $this->autorisationSortieService = $autorisationSortieService;
     }
     /**
      * index
@@ -152,7 +110,7 @@ class XlsxController extends AbstractController
                         true,
                         true
                     );
-                    foreach ($rows as $cols) {
+                    /* foreach ($rows as $cols) {
                         if ($this->dateService->isDate($cols['A']) and $cols['C'] and $cols['D']) {
                             $dateXlsx =  $this->dateService->dateString_d_m_Y_ToDate_Y_m_d($cols['A']);
                             if (!in_array($dateXlsx->format('Y-m-d'), $ignoredDay)) {
@@ -161,7 +119,7 @@ class XlsxController extends AbstractController
                                 $employer->addXlsx($xlsx);
                             }
                         }
-                    }
+                    } */
                 }/* for ($i = 0; $i < $sheetCount; $i++) {
                     $worksheet = $spreadsheet->getSheet($i);
                     $highestRow = $worksheet->getHighestRow();

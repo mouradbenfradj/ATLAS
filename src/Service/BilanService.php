@@ -13,12 +13,7 @@ class BilanService
      * @var array
      */
     private $initBilan;
-    /**
-     * timeService variable
-     *
-     * @var TimeService
-     */
-    private $timeService;
+
     /**
      * pointageService variable
      *
@@ -26,9 +21,8 @@ class BilanService
      */
     private $pointageService;
 
-    public function __construct(TimeService $timeService, PointageService $pointageService)
+    public function __construct(PointageService $pointageService)
     {
-        $this->timeService = $timeService;
         $this->pointageService = $pointageService;
         $this->initBilan = [
             "colspan" => 1,

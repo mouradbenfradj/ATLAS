@@ -3,22 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use XBase\TableReader;
 use App\Form\UploadType;
-use App\Service\DateService;
-use App\Service\JourFerierService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\Admin\PointageCrudController;
-use App\Service\AbsenceService;
-use App\Service\AutorisationSortieService;
-use App\Service\CongerService;
-use App\Service\DbfService;
-use App\Service\EmployerService;
-use App\Service\HoraireService;
-use App\Service\PointageService;
-use DateTime;
+use App\Service\TableReaderService;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -28,216 +18,19 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
  */
 class DbfController extends AbstractController
 {
-    /**
-     * userid
-     *
-     * @var float
-     */
-    private $userid;
 
-    /**
-     * badgenumbe
-     *
-     * @var int
-     */
-    private $badgenumbe;
-
-    /**
-     * ssn
-     *
-     * @var string
-     */
-    private $ssn;
-
-    /**
-     * username
-     *
-     * @var string
-     */
-    private $username;
-
-    /**
-     * autosch
-     *
-     * @var string|null
-     */
-    private $autosch;
-
-    /**
-     * attdate
-     *
-     * @var DateTime
-     */
-    private $attdate;
-
-    /**
-     * schid
-     *
-     * @var float|null
-     */
-    private $schid;
-
-    /**
-     * clockintim
-     *
-     * @var DateTime|null
-     */
-    private $clockintim;
-
-    /**
-     * clockoutti
-     *
-     * @var DateTime|null
-     */
-    private $clockoutti;
-
-    /**
-     * starttime
-     *
-     * @var DateTime|null
-     */
-    private $starttime;
-
-    /**
-     * endtime
-     *
-     * @var DateTime|null
-     */
-    private $endtime;
-
-    /**
-     * workday
-     *
-     * @var float|null
-     */
-    private $workday;
-
-    /**
-     * realworkda
-     *
-     * @var float|null
-     */
-    private $realworkda;
-
-    /**
-     * late
-     *
-     * @var DateTime|null
-     */
-    private $late;
-
-    /**
-     * early
-     *
-     * @var DateTime|null
-     */
-    private $early;
-
-    /**
-     * absent
-     *
-     * @var float|null
-     */
-    private $absent;
-
-    /**
-     * overtime
-     *
-     * @var DateTime|null
-     */
-    private $overtime;
-
-    /**
-     * worktime
-     *
-     * @var DateTime|null
-     */
-    private $worktime;
-
-    /**
-     * exceptioni
-     *
-     * @var string|null
-     */
-    private $exceptioni;
-
-    /**
-     * mustin
-     *
-     * @var string|null
-     */
-    private $mustin;
-
-    /**
-     * mustout
-     *
-     * @var string|null
-     */
-    private $mustout;
-
-    /**
-     * deptid
-     *
-     * @var float|null
-     */
-    private $deptid;
-
-    /**
-     * sspedaynor
-     *
-     * @var float|null
-     */
-    private $sspedaynor;
-
-    /**
-     * sspedaywee
-     *
-     * @var float|null
-     */
-    private $sspedaywee;
-
-    /**
-     * sspedayhol
-     *
-     * @var float|null
-     */
-    private $sspedayhol;
-
-    /**
-     * atttime
-     *
-     * @var DateTime|null
-     */
-    private $atttime;
-
-    /**
-     * attchktime
-     *
-     * @var array|null
-     */
-    private $attchktime = [];
-
-    /**
-     * adminUrlGenerator
-     *
-     * @var AdminUrlGenerator
-     */
-    private $adminUrlGenerator;
     /**
      * dbfService
      *
-     * @var DbfService
+     * @var TableReaderService
      */
-    private $dbfService;
+    private $tableReaderService;
 
-    public function __construct(
-        FlashBagInterface $flash,
-        AdminUrlGenerator $adminUrlGenerator,
-        DbfService $dbfService,
-    ) {
+    public function __construct(FlashBagInterface $flash, AdminUrlGenerator $adminUrlGenerator, TableReaderService $tableReaderService)
+    {
         $this->flash = $flash;
         $this->adminUrlGenerator = $adminUrlGenerator;
-        $this->dbfService = $dbfService;
+        $this->tableReaderService = $tableReaderService;
     }
 
     /**
@@ -267,34 +60,10 @@ class DbfController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $dbf = $form->get('upload')->getData();
             if ($dbf) {
-                $this->dbfService->setEmployer($employer);
-                $ignoredDay = $this->dbfService->ignoredDay();
+                $this->tableReaderService->setEmployer($employer);
+                $this->tableReaderService->installDbfFile($dbf);
+
                 $manager = $this->getDoctrine()->getManager();
-                $dbfs = new TableReader($dbf);
-                while ($record = $dbfs->nextRecord()) {
-                    $dateDbf = $this->dateService->dateString_d_m_Y_ToDateTime($record->attdate);
-                    if (!in_array($dateDbf->format('Y-m-d'), $ignoredDay)) {
-                        $this->dbfService->construct($record->userid, $record->badgenumbe, $record->ssn, $record->username, $record->autosch, $record->attdate, $record->schid, $record->clockintim, $record->clockoutti, $record->starttime, $record->endtime, $record->workday, $record->realworkda, $record->late, $record->early, $record->absent, $record->overtime, $record->worktime, $record->exceptioni, $record->mustin, $record->mustout, $record->deptid, $record->sspedaynor, $record->sspedaywee, $record->sspedayhol, $record->atttime, $record->attchktime, $user);
-                        $dbf = $this->dbfService->createEntity();
-                        $this->absenceService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
-                        $this->congerService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
-                        $this->autorisationSortieService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
-                        if (
-                            !$this->dateService->isWeek($dateDbf)
-                            and (
-                                ($dbf->getStarttime() and $dbf->getEndtime())
-                                or $this->absenceService->estAbscent()
-                                or $this->congerService->estUnConger()
-                                or $this->autorisationSortieService->getAutorisation())
-                        ) {
-                            $this->pointageService->constructFromDbf($dbf);
-                            $pointage = $this->pointageService->createEntity();
-                            $user->addPointage($pointage);
-                        } else {
-                            $user->addDbf($dbf);
-                        }
-                    }
-                }
             }
             $user->setSoldConger($this->employerService->calculerSoldConger($user));
             $user->setSoldAutorisationSortie($this->employerService->calculerAS($user));

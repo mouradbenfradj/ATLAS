@@ -1,4 +1,7 @@
 <?php
+
+namespace App\Service;
+
 interface EmployerInterface
 {
    public function demanderUnConger();

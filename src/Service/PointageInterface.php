@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Interface;
+namespace App\Service;
 
 use App\Entity\Dbf;
 use App\Entity\Xlsx;
