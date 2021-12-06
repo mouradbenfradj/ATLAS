@@ -6,7 +6,6 @@ use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
-use App\Service\ConfigService;
 use DateTime;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,12 +20,10 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 class RegistrationController extends AbstractController
 {
     private $emailVerifier;
-    private $configService;
 
-    public function __construct(EmailVerifier $emailVerifier, ConfigService $configService)
+    public function __construct(EmailVerifier $emailVerifier)
     {
         $this->emailVerifier = $emailVerifier;
-        $this->configService = $configService;
     }
 
     /**

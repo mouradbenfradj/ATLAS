@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Service;
 
 use DateInterval;
 use App\Entity\JourFerier;
 use App\Service\JoursFerierInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-abstract class JourFerierService implements JoursFerierInterface
+class JourFerierService implements JoursFerierInterface
 {
     /**
      * em
@@ -37,7 +36,7 @@ abstract class JourFerierService implements JoursFerierInterface
         $ignoreDay = [];
         foreach ($jourFeriers as $jf) {
             do {
-                array_push($ignoreDay,  $jf->getDebut()->format("Y-m-d"));
+                array_push($ignoreDay, $jf->getDebut()->format("Y-m-d"));
                 $jf->getDebut()->add(new DateInterval('P1D'));
             } while ($jf->getDebut() <= $jf->getFin());
         }

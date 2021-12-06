@@ -1,6 +1,5 @@
 <?php
 
-namespace App\Service;
 
 use App\Entity\User;
 use App\Entity\WorkTime;

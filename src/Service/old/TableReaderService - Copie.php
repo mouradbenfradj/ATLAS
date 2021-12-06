@@ -1,6 +1,5 @@
 <?php
 
-namespace App\Service;
 
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -20,8 +19,14 @@ class TableReaderService extends DbfService
                 $this->setBadgenumbe(intval($record->badgenumbe));
                 $this->setFirstName($record->ssn);
                 $this->setLastName($record->username);
-                $this->constructDbf($record->autosch, $record->schid, $record->clockintim, $record->clockoutti, $record->starttime, $record->endtime, $record->workday, $record->realworkda, $record->late, $record->early, $record->absent, $record->overtime, $record->worktime, $record->exceptioni, $record->mustin, $record->mustout, $record->deptid, $record->sspedaynor, $record->sspedaywee, $record->sspedayhol, $record->atttime, $record->attchktime);
-                $dbf = $this->dbfService->createEntity();
+                $this->setAutosch($record->autosch);
+                $this->setAutosch($record->autosch);
+                $this->setSchid($record->schid);
+                dd($record->schid);
+                /*  $this->getHoraireForDate($this->getDate());
+                 dd($this->getHoraire());
+                 */ $this->setSchid($record->clockintim, $record->clockoutti, $record->starttime, $record->endtime, $record->workday, $record->realworkda, $record->late, $record->early, $record->absent, $record->overtime, $record->worktime, $record->exceptioni, $record->mustin, $record->mustout, $record->deptid, $record->sspedaynor, $record->sspedaywee, $record->sspedayhol, $record->atttime, $record->attchktime);
+                
                 $this->absenceService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
                 $this->congerService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
                 $this->autorisationSortieService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());

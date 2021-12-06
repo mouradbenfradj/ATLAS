@@ -1,175 +1,37 @@
 <?php
-
 namespace App\Service;
 
 use App\Entity\User;
 
-class EmployerService extends DateTimeService implements EmployerInterface
+class EmployerService
 {
-    /**
-     * userid
-     *
-     * @var integer
-     */
-    private $userid;
-
-    /**
-     * badgenumbe
-     *
-     * @var integer
-     */
-    private  $badgenumbe;
-
-    /**
-     * firstName
-     *
-     * @var string
-     */
-    private  $firstName;
-
-    /**
-     * lastName
-     *
-     * @var string
-     */
-    private  $lastName;
-
     /**
      * employer
      *
      * @var User
      */
-    private $employer;
-
-    public function demanderUnConger()
-    {
-    }
-    public function demanderUneAutorisationDeSortie()
-    {
-    }
-    public function modifierWorkTime()
-    {
-    }
-    public function demissionner()
-    {
-    }
+    private $emplyer;
 
     /**
      * Get employer
      *
      * @return  User
-     */
-    public function getEmployer()
+     */ 
+    public function getEmplyer()
     {
-        return $this->employer;
+        return $this->emplyer;
     }
 
     /**
      * Set employer
      *
-     * @param  User  $employer  employer
+     * @param  User  $emplyer  employer
      *
      * @return  self
-     */
-    public function setEmployer(User $employer)
+     */ 
+    public function setEmplyer(User $emplyer)
     {
-        $this->employer = $employer;
-
-        return $this;
-    }
-
-    /**
-     * Get userid
-     *
-     * @return  integer
-     */
-    public function getUserid()
-    {
-        return $this->userid;
-    }
-
-    /**
-     * Set userid
-     *
-     * @param  integer  $userid  userid
-     *
-     * @return  self
-     */
-    public function setUserid($userid)
-    {
-        $this->userid = $userid;
-
-        return $this;
-    }
-
-    /**
-     * Get badgenumbe
-     *
-     * @return  integer
-     */
-    public function getBadgenumbe()
-    {
-        return $this->badgenumbe;
-    }
-
-    /**
-     * Set badgenumbe
-     *
-     * @param  integer  $badgenumbe  badgenumbe
-     *
-     * @return  self
-     */
-    public function setBadgenumbe($badgenumbe)
-    {
-        $this->badgenumbe = $badgenumbe;
-
-        return $this;
-    }
-
-    /**
-     * Get firstName
-     *
-     * @return  string
-     */
-    public function getFirstName()
-    {
-        return $this->firstName;
-    }
-
-    /**
-     * Set firstName
-     *
-     * @param  string  $firstName  firstName
-     *
-     * @return  self
-     */
-    public function setFirstName(string $firstName)
-    {
-        $this->firstName = $firstName;
-
-        return $this;
-    }
-
-    /**
-     * Get lastName
-     *
-     * @return  string
-     */
-    public function getLastName()
-    {
-        return $this->lastName;
-    }
-
-    /**
-     * Set lastName
-     *
-     * @param  string  $lastName  lastName
-     *
-     * @return  self
-     */
-    public function setLastName(string $lastName)
-    {
-        $this->lastName = $lastName;
+        $this->emplyer = $emplyer;
 
         return $this;
     }

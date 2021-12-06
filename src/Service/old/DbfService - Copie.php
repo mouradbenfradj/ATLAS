@@ -1,6 +1,5 @@
 <?php
 
-namespace App\Service;
 
 use App\Entity\Dbf;
 use DateTime;
@@ -196,5 +195,53 @@ class DbfService extends PointageService
         $dbf->setAttchktime($this->attchktime);
         $dbf->setEmployer($this->user);
         return $dbf;
+    }
+
+    /**
+     * Get autosch
+     *
+     * @return  string|null
+     */
+    public function getAutosch()
+    {
+        return $this->autosch;
+    }
+
+    /**
+     * Set autosch
+     *
+     * @param  string|null  $autosch  autosch
+     *
+     * @return  self
+     */
+    public function setAutosch($autosch)
+    {
+        $this->autosch = $autosch;
+
+        return $this;
+    }
+
+    /**
+     * Get schid
+     *
+     * @return  float|null
+     */
+    public function getSchid()
+    {
+        return $this->schid;
+    }
+
+    /**
+     * Set schid
+     *
+     * @param  float|null  $schid  schid
+     *
+     * @return  self
+     */
+    public function setSchid($schid)
+    {
+        $this->schid = $schid;
+
+        return $this;
     }
 }

@@ -1,6 +1,5 @@
 <?php
 
-namespace App\Service;
 
 use DateTime;
 use DateInterval;
@@ -10,7 +9,7 @@ use App\Entity\WorkTime;
 use App\Service\TimeService;
 use Doctrine\ORM\EntityManagerInterface;
 
-class HoraireService
+class HoraireService extends DateTimeService implements HoraireInterface
 {
     /**
      * horaires
@@ -33,12 +32,7 @@ class HoraireService
      */
     private $horaire;
 
-    /**
-     * timeService
-     *
-     * @var TimeService
-     */
-    private $timeService;
+   
     /**
      * workTimeService
      *
@@ -65,17 +59,7 @@ class HoraireService
      */
     private $HeursQuardJournerDeTravaille;
 
-    /**
-     * __construct
-     *
-     * @param EntityManagerInterface $manager
-     * @param TimeService $timeService
-     */
-    public function __construct(EntityManagerInterface $manager, WorkTimeService $workTimeService)
-    {
-        $this->horaires = $manager->getRepository(Horaire::class)->findAll();
-        $this->workTimeService = $workTimeService;
-    }
+
 
     /**
      * getHoraireForDate function
@@ -84,7 +68,7 @@ class HoraireService
      * @param User $employer
      * @return Horaire|null
      */
-    public function getHoraireForDate(DateTime $dateTime, User $employer, string $horaireName = ""): ?Horaire
+    public function getHoraireForDate(DateTime $dateTime): ?Horaire
     {
         reset($this->horaires);
 
@@ -98,39 +82,21 @@ class HoraireService
                 $this->horaire = current($this->horaires);
             }
         } while ($horair = next($this->horaires) and !$this->horaire);
-        if (!$this->horaire and $horaireName != "") {
-            $otherHoraire = $this->getHoraireByHoraireName($horaireName);
-            $this->horaire = new Horaire();
-            $this->horaire->setDateDebut($dateTime);
-            $this->horaire->setDateFin($dateTime);
-            $this->horaire->setHoraire($horaireName);
-            $this->horaire->setDebutPauseMatinal($otherHoraire->getDebutPauseMatinal());
-            $this->horaire->setDebutPauseDejeuner($otherHoraire->getDebutPauseDejeuner());
-            $this->horaire->setDebutPauseMidi($otherHoraire->getDebutPauseMidi());
-            $this->horaire->setHeurDebutTravaille($otherHoraire->getHeurDebutTravaille());
-            $this->horaire->setFinPauseDejeuner($otherHoraire->getFinPauseDejeuner());
-            $this->horaire->setFinPauseMatinal($otherHoraire->getFinPauseMatinal());
-            $this->horaire->setFinPauseMidi($otherHoraire->getFinPauseMidi());
-            $this->horaire->setHeurFinTravaille($otherHoraire->getHeurFinTravaille());
-            $this->horaire->setMargeDuRetard($otherHoraire->getMargeDuRetard());
-            //$this->em->persist($this->horaire);
-        }
-        $this->workTime = $this->workTimeService->getWorkTimeForDate($dateTime, $employer);
 
         if ($this->horaire) {
-            $this->HeursJournerDeTravaille = $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format("H:i:s"));
+            $this->HeursJournerDeTravaille = $this->generateTime($this->horaire->getHeurFinTravaille()->format("H:i:s"));
             $heurDebutTravaille = $this->horaire->getHeurDebutTravaille();
-            $this->HeursJournerDeTravaille->sub($this->timeService->dateTimeToDateInterval($this->sumPause()));
-            $this->HeursJournerDeTravaille = $this->timeService->diffTime($this->HeursJournerDeTravaille, $heurDebutTravaille);
-            $this->HeursJournerDeTravaille = $this->timeService->dateIntervalToDateTime($this->HeursJournerDeTravaille);
+            $this->HeursJournerDeTravaille->sub($this->dateTimeToDateInterval($this->sumPause()));
+            $this->HeursJournerDeTravaille = $this->diffTime($this->HeursJournerDeTravaille, $heurDebutTravaille);
+            $this->HeursJournerDeTravaille = $this->dateIntervalToDateTime($this->HeursJournerDeTravaille);
             $h = (intdiv($this->HeursJournerDeTravaille->format('H'), 2) < 10) ? ('0' . intdiv($this->HeursJournerDeTravaille->format('H'), 2)) : intdiv($this->HeursJournerDeTravaille->format('H'), 2);
             $i = (intdiv($this->HeursJournerDeTravaille->format('i'), 2) < 10) ? ('0' . intdiv($this->HeursJournerDeTravaille->format('i'), 2)) : intdiv($this->HeursJournerDeTravaille->format('i'), 2);
             $s = (intdiv($this->HeursJournerDeTravaille->format('s'), 2) < 10) ? ('0' . intdiv($this->HeursJournerDeTravaille->format('s'), 2)) : intdiv($this->HeursJournerDeTravaille->format('s'), 2);
-            $this->HeursDemiJournerDeTravaille = $this->timeService->generateTime($h . ':' . $i . ':' . $s);
+            $this->HeursDemiJournerDeTravaille = $this->generateTime($h . ':' . $i . ':' . $s);
             $h = (intdiv($this->HeursJournerDeTravaille->format('H'), 4) < 10) ? ('0' . intdiv($this->HeursJournerDeTravaille->format('H'), 4)) : intdiv($this->HeursJournerDeTravaille->format('H'), 4);
             $i = (intdiv($this->HeursJournerDeTravaille->format('i'), 4) < 10) ? ('0' . intdiv($this->HeursJournerDeTravaille->format('i'), 4)) : intdiv($this->HeursJournerDeTravaille->format('i'), 4);
             $s = (intdiv($this->HeursJournerDeTravaille->format('s'), 4) < 10) ? ('0' . intdiv($this->HeursJournerDeTravaille->format('s'), 4)) : intdiv($this->HeursJournerDeTravaille->format('s'), 4);
-            $this->HeursQuardJournerDeTravaille = $this->timeService->generateTime($h . ':' . $i . ':' . $s);
+            $this->HeursQuardJournerDeTravaille = $this->generateTime($h . ':' . $i . ':' . $s);
         }
         return $this->horaire;
     }
@@ -146,13 +112,13 @@ class HoraireService
         //$this->workTime = $this->workTimeService->getWorkTimeForDate($dateTime, $employer);
 
         if ($this->horaire) {
-            $this->HeursJournerDeTravaille = $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format("H:i:s"));
+            $this->HeursJournerDeTravaille = $this->generateTime($this->horaire->getHeurFinTravaille()->format("H:i:s"));
             $heurDebutTravaille = $this->horaire->getHeurDebutTravaille();
-            $this->HeursJournerDeTravaille->sub($this->timeService->dateTimeToDateInterval($this->sumPause()));
-            $this->HeursJournerDeTravaille = $this->timeService->diffTime($this->HeursJournerDeTravaille, $heurDebutTravaille);
-            $this->HeursJournerDeTravaille = $this->timeService->dateIntervalToDateTime($this->HeursJournerDeTravaille);
-            $this->HeursDemiJournerDeTravaille = $this->timeService->generateTime(intdiv($this->HeursJournerDeTravaille->format('H'), 2) . ':' . intdiv($this->HeursJournerDeTravaille->format('i'), 2) . ':' . intdiv($this->HeursJournerDeTravaille->format('s'), 2));
-            $this->HeursQuardJournerDeTravaille = $this->timeService->generateTime(intdiv($this->HeursJournerDeTravaille->format('H'), 4) . ':' . intdiv($this->HeursJournerDeTravaille->format('i'), 4) . ':' . intdiv($this->HeursJournerDeTravaille->format('s'), 4));
+            $this->HeursJournerDeTravaille->sub($this->dateTimeToDateInterval($this->sumPause()));
+            $this->HeursJournerDeTravaille = $this->diffTime($this->HeursJournerDeTravaille, $heurDebutTravaille);
+            $this->HeursJournerDeTravaille = $this->dateIntervalToDateTime($this->HeursJournerDeTravaille);
+            $this->HeursDemiJournerDeTravaille = $this->generateTime(intdiv($this->HeursJournerDeTravaille->format('H'), 2) . ':' . intdiv($this->HeursJournerDeTravaille->format('i'), 2) . ':' . intdiv($this->HeursJournerDeTravaille->format('s'), 2));
+            $this->HeursQuardJournerDeTravaille = $this->generateTime(intdiv($this->HeursJournerDeTravaille->format('H'), 4) . ':' . intdiv($this->HeursJournerDeTravaille->format('i'), 4) . ':' . intdiv($this->HeursJournerDeTravaille->format('s'), 4));
         }
         return $this->horaire;
     }
@@ -168,7 +134,7 @@ class HoraireService
      */
     public function diffPauseMatinalTime(): DateInterval
     {
-        return $this->timeService->diffTime($this->horaire->getFinPauseMatinal(), $this->horaire->getDebutPauseMatinal());
+        return $this->diffTime($this->horaire->getFinPauseMatinal(), $this->horaire->getDebutPauseMatinal());
     }
 
     /**
@@ -178,7 +144,7 @@ class HoraireService
      */
     public function diffPauseDejeunerTime(): DateInterval
     {
-        return  $this->timeService->diffTime($this->horaire->getFinPauseDejeuner(), $this->horaire->getDebutPauseDejeuner());
+        return  $this->diffTime($this->horaire->getFinPauseDejeuner(), $this->horaire->getDebutPauseDejeuner());
     }
 
     /**
@@ -188,7 +154,7 @@ class HoraireService
      */
     public function diffPauseMidiTime(): DateInterval
     {
-        return  $this->timeService->diffTime($this->horaire->getFinPauseMidi(), $this->horaire->getDebutPauseMidi());
+        return  $this->diffTime($this->horaire->getFinPauseMidi(), $this->horaire->getDebutPauseMidi());
     }
 
     public function sumPause()
@@ -207,7 +173,7 @@ class HoraireService
      */
     public function getHeursQuardJournerDeTravaille()
     {
-        return  $this->timeService->generateTime($this->HeursQuardJournerDeTravaille->format('H:i:s'));
+        return  $this->generateTime($this->HeursQuardJournerDeTravaille->format('H:i:s'));
     }
 
     /**
@@ -231,7 +197,7 @@ class HoraireService
      */
     public function getHeursDemiJournerDeTravaille()
     {
-        return $this->timeService->generateTime($this->HeursDemiJournerDeTravaille->format('H:i:s'));
+        return $this->generateTime($this->HeursDemiJournerDeTravaille->format('H:i:s'));
     }
 
     /**
@@ -272,19 +238,6 @@ class HoraireService
         return $this;
     }
 
-    /**
-     * Set horaire
-     *
-     * @param  Horaire  $horaire  horaire
-     *
-     * @return  self
-     */
-    public function setHoraire(Horaire $horaire)
-    {
-        $this->horaire = $horaire;
-
-        return $this;
-    }
 
     /**
      * Set workTime
@@ -296,6 +249,30 @@ class HoraireService
     public function setWorkTime(array $workTime)
     {
         $this->workTime = $workTime;
+
+        return $this;
+    }
+
+    /**
+     * Get horaire
+     *
+     * @return  Horaire
+     */
+    public function getHoraire()
+    {
+        return $this->horaire;
+    }
+
+    /**
+     * Set horaire
+     *
+     * @param  Horaire  $horaire  horaire
+     *
+     * @return  self
+     */
+    public function setHoraire(Horaire $horaire)
+    {
+        $this->horaire = $horaire;
 
         return $this;
     }

@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Service;
 
 use DateTime;
 use DateInterval;
 
-abstract class TimeService
+class TimeServiceCopy
 {
     /**
      * timeStringToDateTime

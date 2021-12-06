@@ -19,18 +19,11 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 class DbfController extends AbstractController
 {
 
-    /**
-     * dbfService
-     *
-     * @var TableReaderService
-     */
-    private $tableReaderService;
-
-    public function __construct(FlashBagInterface $flash, AdminUrlGenerator $adminUrlGenerator, TableReaderService $tableReaderService)
+  
+    public function __construct(FlashBagInterface $flash, AdminUrlGenerator $adminUrlGenerator)
     {
         $this->flash = $flash;
         $this->adminUrlGenerator = $adminUrlGenerator;
-        $this->tableReaderService = $tableReaderService;
     }
 
     /**

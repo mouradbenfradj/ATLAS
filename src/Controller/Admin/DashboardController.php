@@ -47,12 +47,9 @@ class DashboardController extends AbstractDashboardController
         } else {
             $employer = $this->getUser();
         }
+        $this->bilanService->setEmplyer($employer);
         //usort($user->getPointages(), fn ($a, $b) => $a['date'] > $b['date'])
-        if ($employer and property_exists($employer, 'pointages')) {
-            $bilans = $this->bilanService->getBilanGeneral($employer->getPointages()->toArray());
-        } else {
-            $bilans = [];
-        }
+        $bilans = $this->bilanService->getBilanGeneral($employer->getPointages()->toArray());
         return $this->render('admin/dashboard.html.twig', [
             //'users' => $this->getDoctrine()->getRepository(User::class)->findAll(),
             'users' => $this->userRepository->findAll(),

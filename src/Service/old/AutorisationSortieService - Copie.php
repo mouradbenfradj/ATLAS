@@ -1,6 +1,5 @@
 <?php
 
-namespace App\Service;
 
 use App\Entity\AutorisationSortie;
 use App\Entity\Horaire;
@@ -8,7 +7,7 @@ use App\Entity\User;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
-class AutorisationSortieService
+class AutorisationSortieService  extends DateTimeService
 {
     /**
      * employer
@@ -59,12 +58,6 @@ class AutorisationSortieService
      */
     private $attchktime;
 
-    /**
-     * timeService variable
-     *
-     * @var TimeService
-     */
-    private $timeService;
     private $horaireService;
     private $horaire;
     private $entrer;
@@ -82,10 +75,8 @@ class AutorisationSortieService
 
 
 
-    public function __construct(TimeService $timeService, HoraireService $horaireService)
+    public function __construct()
     {
-        $this->timeService = $timeService;
-        $this->horaireService = $horaireService;
     }
     public function requirement(array $attchktime, Horaire $horaire, DateTime $entrer, DateTime $sortie)
     {
@@ -101,14 +92,14 @@ class AutorisationSortieService
             case 3:
                 $this->entrer = $entrer;
                 $this->sortie = $sortie;
-                $this->entrer1 = $attchktime[1] ? $this->timeService->generateTime($attchktime[1]) : null;
-                $this->entrer2 = $attchktime[2] ? $this->timeService->generateTime($attchktime[2]) : null;
+                $this->entrer1 = $attchktime[1] ? $this->generateTime($attchktime[1]) : null;
+                $this->entrer2 = $attchktime[2] ? $this->generateTime($attchktime[2]) : null;
                 break;
             case 4:
                 $this->entrer = $entrer;
                 $this->sortie = $sortie;
-                $this->entrer1 = $attchktime[1] ? $this->timeService->generateTime($attchktime[1]) : null;
-                $this->entrer2 = $attchktime[2] ? $this->timeService->generateTime($attchktime[2]) : null;
+                $this->entrer1 = $attchktime[1] ? $this->generateTime($attchktime[1]) : null;
+                $this->entrer2 = $attchktime[2] ? $this->generateTime($attchktime[2]) : null;
                 break;
             default:
                 $this->entrer = $entrer;
@@ -116,14 +107,14 @@ class AutorisationSortieService
                 break;
         }
 
-        $this->heurDebutTravaille = $this->timeService->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s'));
-        $this->debutPauseMatinal = $this->timeService->generateTime($this->horaire->getDebutPauseMatinal()->format('H:i:s'));
-        $this->finPauseMatinal = $this->timeService->generateTime($this->horaire->getFinPauseMatinal()->format('H:i:s'));
-        $this->debutPauseDejeuner = $this->timeService->generateTime($this->horaire->getDebutPauseDejeuner()->format('H:i:s'));
-        $this->finPauseDejeuner = $this->timeService->generateTime($this->horaire->getFinPauseDejeuner()->format('H:i:s'));
-        $this->debutPauseMidi = $this->timeService->generateTime($this->horaire->getDebutPauseMidi()->format('H:i:s'));
-        $this->finPauseMidi = $this->timeService->generateTime($this->horaire->getFinPauseMidi()->format('H:i:s'));
-        $this->heurFinTravaille = $this->timeService->generateTime($this->horaire->getHeurFinTravaille()->format('H:i:s'));
+        $this->heurDebutTravaille = $this->generateTime($this->horaire->getHeurDebutTravaille()->format('H:i:s'));
+        $this->debutPauseMatinal = $this->generateTime($this->horaire->getDebutPauseMatinal()->format('H:i:s'));
+        $this->finPauseMatinal = $this->generateTime($this->horaire->getFinPauseMatinal()->format('H:i:s'));
+        $this->debutPauseDejeuner = $this->generateTime($this->horaire->getDebutPauseDejeuner()->format('H:i:s'));
+        $this->finPauseDejeuner = $this->generateTime($this->horaire->getFinPauseDejeuner()->format('H:i:s'));
+        $this->debutPauseMidi = $this->generateTime($this->horaire->getDebutPauseMidi()->format('H:i:s'));
+        $this->finPauseMidi = $this->generateTime($this->horaire->getFinPauseMidi()->format('H:i:s'));
+        $this->heurFinTravaille = $this->generateTime($this->horaire->getHeurFinTravaille()->format('H:i:s'));
     }
 
     public function partielConstruct(
