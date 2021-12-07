@@ -62,6 +62,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         if (!($absence instanceof Absence)) {
             return;
         }
+        dd($absence);
         $pointage = current(array_filter(array_map(
             fn ($pointage): ?Pointage => ($absence->getDebut() <= $pointage->getDate() and $pointage->getDate() <= $absence->getFin()) ? $pointage : null,
             $absence->getPointages()->toArray()
@@ -92,6 +93,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         if (!($dbf instanceof Dbf)) {
             return;
         }
+        dd($dbf);
         if (($dbf->getStarttime() and $dbf->getEndtime()) or count($dbf->getAttchktime())==0) {
             $this->pointageService->constructFromDbf($dbf);
             $pointage = $this->pointageService->createEntity();
@@ -108,13 +110,14 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      */
     public function hashPassword(BeforeEntityPersistedEvent $event)
     {
-        $entity = $event->getEntityInstance();
-        if (!($entity instanceof User)) {
+        $user = $event->getEntityInstance();
+        if (!($user instanceof User)) {
             return;
         }
-        $entity->setPassword($this->passwordHasher->hashPassword(
-            $entity,
-            $entity->getPassword()
+        dd($user);
+        $user->setPassword($this->passwordHasher->hashPassword(
+            $user,
+            $user->getPassword()
         ));
       
         /*
@@ -129,10 +132,11 @@ class EasyAdminSubscriber implements EventSubscriberInterface
      */
     public function totaleRetard(BeforeEntityUpdatedEvent $event)
     {
-        $entity = $event->getEntityInstance();
-        if (!($entity instanceof Pointage)) {
+        $pointage = $event->getEntityInstance();
+        if (!($pointage instanceof Pointage)) {
             return;
         }
+        dd($pointage);
 
         /*   dd($entity);
         $this->pointageService->setPointage($entity);

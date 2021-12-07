@@ -47,7 +47,7 @@ class DashboardController extends AbstractDashboardController
         } else {
             $employer = $this->getUser();
         }
-        $this->bilanService->setEmplyer($employer);
+        $this->bilanService->setEmployer($employer);
         //usort($user->getPointages(), fn ($a, $b) => $a['date'] > $b['date'])
         $bilans = $this->bilanService->getBilanGeneral($employer->getPointages()->toArray());
         return $this->render('admin/dashboard.html.twig', [

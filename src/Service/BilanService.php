@@ -39,7 +39,7 @@ class BilanService extends PointageService
      */
     public function getBilanGeneral(): array
     {
-        $pointages = $this->getEmplyer() ? $this->getEmplyer()->getPointages()->toArray() : [];
+        $pointages = $this->getEmployer() ? $this->getEmployer()->getPointages()->toArray() : [];
         usort($pointages, fn ($a, $b) => $a->getDate() > $b->getDate());
         $collectGeneral = [];
         $bilanWeek = $this->initBilan;

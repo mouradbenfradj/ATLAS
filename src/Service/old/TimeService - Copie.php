@@ -15,10 +15,10 @@ abstract class TimeService
     public function timeStringToDateTime(string $timeString): ?DateTime
     {
         $time = null;
-        if (DateTime::createFromFormat('H:i', $timeString)) {
+        if (DateTime::createFromFormat('H:i:s', $timeString)!== false) {
+            $time = DateTime::createFromFormat('H:i:s', $timeString);
+        } elseif (DateTime::createFromFormat('H:i', $timeString)!== false) {
             $time = DateTime::createFromFormat('H:i', $timeString);
-        } elseif (DateTime::createFromFormat('H:i:', $timeString)) {
-            $time = DateTime::createFromFormat('H:i:', $timeString);
         }
         return $time;
     }

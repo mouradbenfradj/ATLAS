@@ -1,37 +1,78 @@
 <?php
 namespace App\Service;
 
+use App\Entity\Absence;
 use App\Entity\User;
+use DateTime;
 
-class EmployerService
+class EmployerService extends DateTimeService
 {
     /**
      * employer
      *
      * @var User
      */
-    private $emplyer;
+    private $employer;
 
     /**
-     * Get employer
+     * absenceService
      *
-     * @return  User
-     */ 
-    public function getEmplyer()
+     * @var AbsenceService
+     */
+    private $absenceService;
+    /**
+     * congerService
+     *
+     * @var CongerService
+     */
+    private $congerService;
+    /**
+     * autorisationSortieService
+     *
+     * @var AutorisationSortieService
+     */
+    private $autorisationSortieService;
+
+    public function __construct(AbsenceService $absenceService, CongerService $congerService, AutorisationSortieService $autorisationSortieService, JourFerierService $jourFerierService)
     {
-        return $this->emplyer;
+        parent::__construct($jourFerierService);
+        $this->absenceService = $absenceService;
+        $this->congerService = $congerService;
+        $this->autorisationSortieService = $autorisationSortieService;
+    }
+    public function estAbsent(DateTime $date):bool
+    {
+        return $this->absenceService->matchAvecUneAbsence($this->employer->getAbsences()->toArray(), $date);
+    }
+    public function aPrisUnConger(DateTime $date):bool
+    {
+        return $this->congerService->matchAvecUnConger($this->employer->getCongers()->toArray(), $date);
+    }
+    public function aPrisUneAutorisationDeSortie(DateTime $date):bool
+    {
+        return $this->autorisationSortieService->matchAvecUneAutorisationDeSortie($this->employer->getAutorisationSorties()->toArray(), $date);
     }
 
     /**
-     * Set employer
+     * getEmployer
      *
-     * @param  User  $emplyer  employer
+     * @return  User
+     */
+    public function getEmployer()
+    {
+        return $this->employer;
+    }
+
+    /**
+     * setEmployer
+     *
+     * @param  User  $employer  employer
      *
      * @return  self
-     */ 
-    public function setEmplyer(User $emplyer)
+     */
+    public function setEmployer(User $employer)
     {
-        $this->emplyer = $emplyer;
+        $this->employer = $employer;
 
         return $this;
     }

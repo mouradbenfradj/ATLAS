@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Admin\DbfCrudController;
 use App\Entity\User;
 use App\Form\UploadType;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,14 +13,13 @@ use App\Service\TableReaderService;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use XBase\TableReader;
 
 /**
  * @Route("/dbf")
  */
 class DbfController extends AbstractController
 {
-
-  
     public function __construct(FlashBagInterface $flash, AdminUrlGenerator $adminUrlGenerator)
     {
         $this->flash = $flash;
@@ -46,26 +46,27 @@ class DbfController extends AbstractController
      * @param User $employer
      * @return Response
      */
-    public function upload(Request $request, User $employer): Response
+    public function upload(Request $request, User $employer, TableReaderService $tableReaderService): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $dbf = $form->get('upload')->getData();
             if ($dbf) {
-                $this->tableReaderService->setEmployer($employer);
-                $this->tableReaderService->installDbfFile($dbf);
-
+                $tableReaderService->setEmployer($employer);
+                $user= $tableReaderService->installDbfFile($dbf);
+                dd($user);
+                $user->setSoldConger($this->employerService->calculerSoldConger($user));
+                $user->setSoldAutorisationSortie($this->employerService->calculerAS($user));
                 $manager = $this->getDoctrine()->getManager();
+                $manager->persist($user);
+                $manager->flush();
             }
-            $user->setSoldConger($this->employerService->calculerSoldConger($user));
-            $user->setSoldAutorisationSortie($this->employerService->calculerAS($user));
-            $manager->persist($user);
-            $manager->flush();
+           
             $this->addFlash('success', 'id.updated_successfully');
 
             $url = $this->adminUrlGenerator
-                ->setController(PointageCrudController::class)
+                ->setController(DbfCrudController::class)
                 ->setAction('index')
                 ->generateUrl();
             return $this->redirect($url);
