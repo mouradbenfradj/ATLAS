@@ -2,6 +2,8 @@
 namespace App\Service;
 
 use App\Entity\Absence;
+use App\Entity\AutorisationSortie;
+use App\Entity\Conger;
 use App\Entity\User;
 use DateTime;
 
@@ -33,9 +35,9 @@ class EmployerService extends DateTimeService
      */
     private $autorisationSortieService;
 
-    public function __construct(AbsenceService $absenceService, CongerService $congerService, AutorisationSortieService $autorisationSortieService, JourFerierService $jourFerierService)
+    public function __construct(AbsenceService $absenceService, CongerService $congerService, AutorisationSortieService $autorisationSortieService, JourFerierService $jourFerierService, HoraireService $horaireService)
     {
-        parent::__construct($jourFerierService);
+        parent::__construct($jourFerierService, $horaireService);
         $this->absenceService = $absenceService;
         $this->congerService = $congerService;
         $this->autorisationSortieService = $autorisationSortieService;
@@ -52,6 +54,20 @@ class EmployerService extends DateTimeService
     {
         return $this->autorisationSortieService->matchAvecUneAutorisationDeSortie($this->employer->getAutorisationSorties()->toArray(), $date);
     }
+    public function getAbsence(DateTime $date):?Absence
+    {
+        return $this->absenceService->getAbsence($this->employer->getAbsences()->toArray(), $date);
+    }
+    public function getConger(DateTime $date):?Conger
+    {
+        return $this->congerService->getConger($this->employer->getCongers()->toArray(), $date);
+    }
+    public function getAutorisationSortie(DateTime $date):?AutorisationSortie
+    {
+        return $this->autorisationSortieService->getAutorisation($this->employer->getAutorisationSorties()->toArray(), $date);
+    }
+
+
 
     /**
      * getEmployer

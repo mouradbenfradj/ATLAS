@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Dbf;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -54,5 +55,38 @@ class DbfCrudController extends AbstractCrudController
             TimeField::new('atttime'),
             ArrayField::new('attchktime'),
         ];
+    }
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+        ->add('id')
+        ->add('employer')
+        ->add('userid')
+        ->add('badgenumbe')
+        ->add('ssn')
+        ->add('username')
+        ->add('autosch')
+        ->add('attdate')
+        ->add('schid')
+        ->add('clockintim')
+        ->add('clockoutti')
+        ->add('starttime')
+        ->add('endtime')
+        ->add('workday')
+        ->add('realworkda')
+        ->add('late')
+        ->add('early')
+        ->add('absent')
+        ->add('overtime')
+        ->add('worktime')
+        ->add('exceptioni')
+        ->add('mustin')
+        ->add('mustout')
+        ->add('deptid')
+        ->add('sspedaynor')
+        ->add('sspedaywee')
+        ->add('sspedayhol')
+        ->add('atttime')
+        ->add('attchktime');
     }
 }

@@ -1,15 +1,40 @@
 <?php
 namespace App\Service;
 
+use App\Entity\Horaire;
 use DateInterval;
 use DateTime;
 
 class DateTimeService implements DateInterface, TimeInterface
 {
+    /**
+     * horaire
+     *
+     * @var Horaire|null
+     */
+    private $horaire;
+    /**
+     * jourFerierService
+     *
+     * @var JourFerierService
+     */
     private $jourFerierService;
-    public function __construct(JourFerierService $jourFerierService)
+    /**
+     * horaireService
+     *
+     * @var HoraireService
+     */
+    private $horaireService;
+    /**
+     * __construct
+     *
+     * @param JourFerierService $jourFerierService
+     * @param HoraireService $horaireService
+     */
+    public function __construct(JourFerierService $jourFerierService, HoraireService $horaireService)
     {
         $this->jourFerierService=$jourFerierService;
+        $this->horaireService=$horaireService;
     }
     /**
      * dateString_d_m_Y_ToDateTime
@@ -21,6 +46,18 @@ class DateTimeService implements DateInterface, TimeInterface
     {
         return DateTime::createFromFormat('d/m/Y', $dateString);
     }
+
+    /**
+     * isDate
+     *
+     * @param string|null $dateString
+     * @return boolean
+     */
+    public function isDate(?string $dateString):bool
+    {
+        return DateTime::createFromFormat('d/m/Y', $dateString) !== false;
+    }
+
    
     /**
      * timeStringToDateTime
@@ -56,7 +93,7 @@ class DateTimeService implements DateInterface, TimeInterface
     /**
      * getJourFeriers
      *
-     * @return string[]
+     * @return array
      */
     public function getJourFeriers(): array
     {
@@ -69,5 +106,37 @@ class DateTimeService implements DateInterface, TimeInterface
             } while ($jf->getDebut() <= $jf->getFin());
         }
         return $ignoreDay;
+    }
+
+
+    public function getHoraireForDate(DateTime $date)
+    {
+        $this->horaire = $this->horaireService->getHoraireForDate($date);
+        dd($this->horaire);
+    }
+
+
+    /**
+     * Get horaire
+     *
+     * @return  Horaire|null
+     */
+    public function getHoraire()
+    {
+        return $this->horaire;
+    }
+
+    /**
+     * Set horaire
+     *
+     * @param  Horaire|null  $horaire  horaire
+     *
+     * @return  self
+     */
+    public function setHoraire($horaire)
+    {
+        $this->horaire = $horaire;
+
+        return $this;
     }
 }

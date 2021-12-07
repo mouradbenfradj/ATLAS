@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\Admin\PointageCrudController;
+use App\Service\PhpSpreadsheetService;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -35,35 +36,9 @@ class XlsxController extends AbstractController
      */
     private $adminUrlGenerator;
 
-    /**
-     * jourFerierService variable
-     *
-     * @var JourFerierService
-     */
-    private $jourFerierService;
-    /**
-     * pointageService variable
-     *
-     * @var PointageService
-     */
-    private $pointageService;
-    /**
-     * employerService variable
-     *
-     * @var EmployerService
-     */
-    private $employerService;
-    /**
-     * xlsxService variable
-     *
-     * @var XlsxService
-     */
-    private $xlsxService;
-
     public function __construct(
         FlashBagInterface $flash,
         AdminUrlGenerator $adminUrlGenerator
-
     ) {
         $this->flash = $flash;
         $this->adminUrlGenerator = $adminUrlGenerator;
@@ -89,38 +64,18 @@ class XlsxController extends AbstractController
      * @param User $employer
      * @return Response
      */
-    public function upload(Request $request, User $employer): Response
+    public function upload(Request $request, User $employer, PhpSpreadsheetService $phpSpreadsheetService): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $xlsx = $form->get('upload')->getData();
             if ($xlsx) {
-                $reader = new Xlsx();
-                $spreadsheet = $reader->load($xlsx);
-                $ignoredDay = array_merge($this->xlsxService->dateInDb($employer), $this->pointageService->dateInDB($employer), $this->jourFerierService->jourFerier());
+                $phpSpreadsheetService->setEmployer($employer);
+                $user= $phpSpreadsheetService->installXlsxFile($xlsx);
+                dd($user);
                 $manager = $this->getDoctrine()->getManager();
-                $allSheet = $spreadsheet->getAllSheets();
-                foreach ($allSheet as $worksheet) {
-                    $highestRow = $worksheet->getHighestRow();
-                    $rows = $worksheet->rangeToArray(
-                        'A1:O' . $highestRow,
-                        null,
-                        true,
-                        true,
-                        true
-                    );
-                    /* foreach ($rows as $cols) {
-                        if ($this->dateService->isDate($cols['A']) and $cols['C'] and $cols['D']) {
-                            $dateXlsx =  $this->dateService->dateString_d_m_Y_ToDate_Y_m_d($cols['A']);
-                            if (!in_array($dateXlsx->format('Y-m-d'), $ignoredDay)) {
-                                $this->xlsxService->construct($cols, $employer);
-                                $xlsx = $this->xlsxService->createEntity();
-                                $employer->addXlsx($xlsx);
-                            }
-                        }
-                    } */
-                }/* for ($i = 0; $i < $sheetCount; $i++) {
+                /* for ($i = 0; $i < $sheetCount; $i++) {
                     $worksheet = $spreadsheet->getSheet($i);
                     $highestRow = $worksheet->getHighestRow();
                     dd($highestRow);
@@ -148,10 +103,10 @@ class XlsxController extends AbstractController
                 $employer->setSoldAutorisationSortie($this->employerService->calculerAS($employer));
                 $manager->persist($employer);
                 $manager->flush();
-                $this->addFlash('success', 'updated_successfully');
+                $this->addFlash('success', 'Upload XLSX Successfully');
             }
             $url = $this->adminUrlGenerator
-                ->setController(PointageCrudController::class)
+                ->setController(XlsxController::class)
                 ->setAction('index')
                 ->generateUrl();
             return $this->redirect($url);

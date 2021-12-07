@@ -13,4 +13,15 @@ class CongerService
             $congers
         )));
     }
+    public function getConger(array $congers, DateTime $date): ?Conger
+    {
+        $conger = current(array_filter(array_map(
+            fn ($conger): ?Conger => ($conger->getDebut() <= $date and $date  <= $conger->getFin()) ? $conger : null,
+            $congers
+        )));
+        if ($conger) {
+            return $conger;
+        }
+        return null;
+    }
 }

@@ -55,16 +55,14 @@ class DbfController extends AbstractController
             if ($dbf) {
                 $tableReaderService->setEmployer($employer);
                 $user= $tableReaderService->installDbfFile($dbf);
-                dd($user);
+                /* dd($user);
                 $user->setSoldConger($this->employerService->calculerSoldConger($user));
-                $user->setSoldAutorisationSortie($this->employerService->calculerAS($user));
+                $user->setSoldAutorisationSortie($this->employerService->calculerAS($user)); */
                 $manager = $this->getDoctrine()->getManager();
                 $manager->persist($user);
                 $manager->flush();
+                $this->addFlash('success', 'upload DBF Successfully');
             }
-           
-            $this->addFlash('success', 'id.updated_successfully');
-
             $url = $this->adminUrlGenerator
                 ->setController(DbfCrudController::class)
                 ->setAction('index')

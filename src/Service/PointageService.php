@@ -87,8 +87,7 @@ class PointageService extends EmployerService
      */
     private $diff;
 
-    private $employer;
-    private $horaire;
+
     private $congerPayer;
     private $autorisationSortie;
     private $workTime;
@@ -108,6 +107,28 @@ class PointageService extends EmployerService
             $this->getEmployer()->getPointages()->toArray()
         );
     }
+
+
+    /*
+
+                    $this->absenceService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
+                    $this->congerService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
+                    $this->autorisationSortieService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
+                    if (!$this->dateService->isWeek($this->getDate())
+                        and (
+                            ($dbf->getStarttime() and $dbf->getEndtime())
+                            or $this->absenceService->estAbscent()
+                            or $this->congerService->estUnConger()
+                            or $this->autorisationSortieService->getAutorisation())
+                    ) {
+                        $this->pointageService->constructFromDbf($dbf);
+                        $pointage = $this->pointageService->createEntity();
+                        $this->getEmployer()->addPointage($pointage);
+                    } else {
+                        $this->getEmployer()->addDbf($dbf);
+                    }
+    */
+
     /**
      * Get pointage
      *
@@ -203,25 +224,175 @@ class PointageService extends EmployerService
 
         return $this;
     }
+
+  
+
+
+    /**
+     * Get nbrHeurTravailler
+     *
+     * @return  DateTime|null
+     */
+    public function getNbrHeurTravailler()
+    {
+        return $this->nbrHeurTravailler;
+    }
+
+    /**
+     * Set nbrHeurTravailler
+     *
+     * @param  DateTime|null  $nbrHeurTravailler  nbrHeurTravailler
+     *
+     * @return  self
+     */
+    public function setNbrHeurTravailler($nbrHeurTravailler)
+    {
+        $this->nbrHeurTravailler = $nbrHeurTravailler;
+
+        return $this;
+    }
+
+    /**
+     * Get retardEnMinute
+     *
+     * @return  DateTime|null
+     */
+    public function getRetardEnMinute()
+    {
+        return $this->retardEnMinute;
+    }
+
+    /**
+     * Set retardEnMinute
+     *
+     * @param  DateTime|null  $retardEnMinute  retardEnMinute
+     *
+     * @return  self
+     */
+    public function setRetardEnMinute($retardEnMinute)
+    {
+        $this->retardEnMinute = $retardEnMinute;
+
+        return $this;
+    }
+
+    /**
+     * Get departAnticiper
+     *
+     * @return  DateTime|null
+     */
+    public function getDepartAnticiper()
+    {
+        return $this->departAnticiper;
+    }
+
+    /**
+     * Set departAnticiper
+     *
+     * @param  DateTime|null  $departAnticiper  departAnticiper
+     *
+     * @return  self
+     */
+    public function setDepartAnticiper($departAnticiper)
+    {
+        $this->departAnticiper = $departAnticiper;
+
+        return $this;
+    }
+
+    /**
+     * Get retardMidi
+     *
+     * @return  DateTime|null
+     */
+    public function getRetardMidi()
+    {
+        return $this->retardMidi;
+    }
+
+    /**
+     * Set retardMidi
+     *
+     * @param  DateTime|null  $retardMidi  retardMidi
+     *
+     * @return  self
+     */
+    public function setRetardMidi($retardMidi)
+    {
+        $this->retardMidi = $retardMidi;
+
+        return $this;
+    }
+
+    /**
+     * Get totaleRetard
+     *
+     * @return  DateTime
+     */
+    public function getTotaleRetard()
+    {
+        return $this->totaleRetard;
+    }
+
+    /**
+     * Set totaleRetard
+     *
+     * @param  DateTime  $totaleRetard  totaleRetard
+     *
+     * @return  self
+     */
+    public function setTotaleRetard(DateTime $totaleRetard)
+    {
+        $this->totaleRetard = $totaleRetard;
+
+        return $this;
+    }
+
+    /**
+     * Get heurNormalementTravailler
+     *
+     * @return  DateTime
+     */
+    public function getHeurNormalementTravailler()
+    {
+        return $this->heurNormalementTravailler;
+    }
+
+    /**
+     * Set heurNormalementTravailler
+     *
+     * @param  DateTime  $heurNormalementTravailler  heurNormalementTravailler
+     *
+     * @return  self
+     */
+    public function setHeurNormalementTravailler(DateTime $heurNormalementTravailler)
+    {
+        $this->heurNormalementTravailler = $heurNormalementTravailler;
+
+        return $this;
+    }
+
+    /**
+     * Get diff
+     *
+     * @return  DateTime
+     */
+    public function getDiff()
+    {
+        return $this->diff;
+    }
+
+    /**
+     * Set diff
+     *
+     * @param  DateTime  $diff  diff
+     *
+     * @return  self
+     */
+    public function setDiff(DateTime $diff)
+    {
+        $this->diff = $diff;
+
+        return $this;
+    }
 }
-
-
-/*
-
-                $this->absenceService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
-                $this->congerService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
-                $this->autorisationSortieService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
-                if (!$this->dateService->isWeek($this->getDate())
-                    and (
-                        ($dbf->getStarttime() and $dbf->getEndtime())
-                        or $this->absenceService->estAbscent()
-                        or $this->congerService->estUnConger()
-                        or $this->autorisationSortieService->getAutorisation())
-                ) {
-                    $this->pointageService->constructFromDbf($dbf);
-                    $pointage = $this->pointageService->createEntity();
-                    $this->getEmployer()->addPointage($pointage);
-                } else {
-                    $this->getEmployer()->addDbf($dbf);
-                }
-*/

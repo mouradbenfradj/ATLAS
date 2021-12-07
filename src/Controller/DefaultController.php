@@ -23,7 +23,6 @@ class DefaultController extends AbstractController
      */
     public function index(BilanService $bilanService): Response
     {
-        dd($this->getUser());
         $bilanService->setEmployer($this->getUser());
         $bilans = $bilanService->getBilanGeneral();
         return $this->render('default/index.html.twig', [
