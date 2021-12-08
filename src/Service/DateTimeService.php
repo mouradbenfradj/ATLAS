@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service;
 
 use App\Entity\Horaire;
@@ -10,7 +11,7 @@ class DateTimeService implements DateInterface, TimeInterface
     /**
      * horaire
      *
-     * @var Horaire|null
+     * @var Horaire
      */
     private $horaire;
     /**
@@ -33,8 +34,8 @@ class DateTimeService implements DateInterface, TimeInterface
      */
     public function __construct(JourFerierService $jourFerierService, HoraireService $horaireService)
     {
-        $this->jourFerierService=$jourFerierService;
-        $this->horaireService=$horaireService;
+        $this->jourFerierService = $jourFerierService;
+        $this->horaireService = $horaireService;
     }
     /**
      * dateString_d_m_Y_ToDateTime
@@ -44,8 +45,10 @@ class DateTimeService implements DateInterface, TimeInterface
      */
     public function dateString_d_m_Y_ToDateTime(string $dateString): DateTime
     {
+        //convert strint to date
         return DateTime::createFromFormat('d/m/Y', $dateString);
     }
+
 
     /**
      * isDate
@@ -53,12 +56,12 @@ class DateTimeService implements DateInterface, TimeInterface
      * @param string|null $dateString
      * @return boolean
      */
-    public function isDate(?string $dateString):bool
+    public function isDate(?string $dateString): bool
     {
         return DateTime::createFromFormat('d/m/Y', $dateString) !== false;
     }
 
-   
+
     /**
      * timeStringToDateTime
      *
@@ -68,9 +71,9 @@ class DateTimeService implements DateInterface, TimeInterface
     public function timeStringToDateTime(string $timeString): ?DateTime
     {
         $time = null;
-        if (DateTime::createFromFormat('H:i:s', $timeString)!== false) {
+        if (DateTime::createFromFormat('H:i:s', $timeString) !== false) {
             $time = DateTime::createFromFormat('H:i:s', $timeString);
-        } elseif (DateTime::createFromFormat('H:i', $timeString)!== false) {
+        } elseif (DateTime::createFromFormat('H:i', $timeString) !== false) {
             $time = DateTime::createFromFormat('H:i', $timeString);
         }
         return $time;
@@ -115,11 +118,10 @@ class DateTimeService implements DateInterface, TimeInterface
         dd($this->horaire);
     }
 
-
     /**
      * Get horaire
      *
-     * @return  Horaire|null
+     * @return  Horaire
      */
     public function getHoraire()
     {
@@ -129,11 +131,11 @@ class DateTimeService implements DateInterface, TimeInterface
     /**
      * Set horaire
      *
-     * @param  Horaire|null  $horaire  horaire
+     * @param  Horaire  $horaire  horaire
      *
      * @return  self
      */
-    public function setHoraire($horaire)
+    public function setHoraire(Horaire $horaire)
     {
         $this->horaire = $horaire;
 
