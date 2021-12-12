@@ -2,9 +2,9 @@ name: PHP Composer
 
 on:
   push:
-    branches: [ATLAS5.3]
+    branches: [modificationDeService5.3]
   pull_request:
-    branches: [ATLAS5.3]
+    branches: [modificationDeService5.3]
 
 jobs:
   build:

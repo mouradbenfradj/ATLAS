@@ -19,13 +19,13 @@ class DateTimeService implements DateInterface, TimeInterface
      */
     private $horaire;
     /**
-     * jourFerierService
+     * JourFerierService
      *
      * @var JourFerierService
      */
     private $jourFerierService;
     /**
-     * horaireService
+     * HoraireService
      *
      * @var HoraireService
      */
@@ -83,9 +83,10 @@ class DateTimeService implements DateInterface, TimeInterface
     }
 
     /**
-     * generateTime
+     * GenerateTime
      *
-     * @param string $timeString
+     * @param string $timeString date generer du dbf 
+     * 
      * @return DateTime
      */
     public function generateTime(string $timeString): DateTime
@@ -97,7 +98,7 @@ class DateTimeService implements DateInterface, TimeInterface
         }
     }
     /**
-     * getJourFeriers
+     * GetJourFeriers
      *
      * @return array
      */
