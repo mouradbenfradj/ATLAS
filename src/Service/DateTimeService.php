@@ -8,6 +8,10 @@ use DateTime;
 
 class DateTimeService implements DateInterface, TimeInterface
 {
+    const FORMATTIMEHI = 'H:i';
+    const FORMATTIMEHIS = self::FORMATTIMEHI . ':s';
+
+
     /**
      * horaire
      *
@@ -45,7 +49,6 @@ class DateTimeService implements DateInterface, TimeInterface
      */
     public function dateString_d_m_Y_ToDateTime(string $dateString): DateTime
     {
-        //convert strint to date
         return DateTime::createFromFormat('d/m/Y', $dateString);
     }
 
@@ -71,10 +74,10 @@ class DateTimeService implements DateInterface, TimeInterface
     public function timeStringToDateTime(string $timeString): ?DateTime
     {
         $time = null;
-        if (DateTime::createFromFormat('H:i:s', $timeString) !== false) {
-            $time = DateTime::createFromFormat('H:i:s', $timeString);
-        } elseif (DateTime::createFromFormat('H:i', $timeString) !== false) {
-            $time = DateTime::createFromFormat('H:i', $timeString);
+        if (DateTime::createFromFormat(self::FORMATTIMEHIS, $timeString) !== false) {
+            $time = DateTime::createFromFormat(self::FORMATTIMEHIS, $timeString);
+        } elseif (DateTime::createFromFormat(self::FORMATTIMEHI, $timeString) !== false) {
+            $time = DateTime::createFromFormat(self::FORMATTIMEHI, $timeString);
         }
         return $time;
     }
@@ -87,7 +90,7 @@ class DateTimeService implements DateInterface, TimeInterface
      */
     public function generateTime(string $timeString): DateTime
     {
-        if ($timeString != "" and (DateTime::createFromFormat('H:i:s', $timeString) !== false or DateTime::createFromFormat('H:i', $timeString) !== false)) {
+        if ($timeString != "" && (DateTime::createFromFormat(self::FORMATTIMEHIS, $timeString) !== false || DateTime::createFromFormat(self::FORMATTIMEHI, $timeString) !== false)) {
             return new DateTime($timeString);
         } else {
             return new DateTime("00:00:00");
@@ -105,7 +108,11 @@ class DateTimeService implements DateInterface, TimeInterface
         foreach ($jourFeriers as $jf) {
             do {
                 array_push($ignoreDay, $jf->getDebut()->format("Y-m-d"));
-                $jf->getDebut()->add(new DateInterval('P1D'));
+                /**
+                 * @var DateTime
+                 */
+                $debut = $jf->getDebut();
+                $debut->add(new DateInterval('P1D'));
             } while ($jf->getDebut() <= $jf->getFin());
         }
         return $ignoreDay;
