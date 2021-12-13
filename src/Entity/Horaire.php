@@ -110,6 +110,13 @@ class Horaire
         return $this->id;
     }
 
+    public function setIdANull(): self
+    {
+        $this->id = null;
+
+        return $this;
+    }
+
     public function getHoraire(): ?string
     {
         return $this->horaire;

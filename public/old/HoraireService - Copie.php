@@ -32,7 +32,7 @@ class HoraireService extends DateTimeService implements HoraireInterface
      */
     private $horaire;
 
-   
+
     /**
      * workTimeService
      *

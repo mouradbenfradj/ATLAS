@@ -13,11 +13,20 @@ class DateTimeService implements DateInterface, TimeInterface
 
 
     /**
-     * horaire
+     * Horaire
+     *
+     * @var Horaire
+     */
+    private $lastHoraire;
+    /**
+     * Horaire
      *
      * @var Horaire
      */
     private $horaire;
+
+
+    private $horaireName = null;
     /**
      * JourFerierService
      *
@@ -36,10 +45,9 @@ class DateTimeService implements DateInterface, TimeInterface
      * @param JourFerierService $jourFerierService
      * @param HoraireService $horaireService
      */
-    public function __construct(JourFerierService $jourFerierService, HoraireService $horaireService)
+    public function __construct(JourFerierService $jourFerierService)
     {
         $this->jourFerierService = $jourFerierService;
-        $this->horaireService = $horaireService;
     }
     /**
      * dateString_d_m_Y_ToDateTime
@@ -65,13 +73,8 @@ class DateTimeService implements DateInterface, TimeInterface
     }
 
 
-    /**
-     * timeStringToDateTime
-     *
-     * @param string $timeString
-     * @return DateTime|null
-     */
-    public function timeStringToDateTime(string $timeString): ?DateTime
+
+    public function timeStringToDateTime(?string $timeString): ?DateTime
     {
         $time = null;
         if (DateTime::createFromFormat(self::FORMATTIMEHIS, $timeString) !== false) {
@@ -89,13 +92,21 @@ class DateTimeService implements DateInterface, TimeInterface
      * 
      * @return DateTime
      */
-    public function generateTime(string $timeString): DateTime
+    public function generateTime(?string $timeString): DateTime
     {
         if ($timeString != "" && (DateTime::createFromFormat(self::FORMATTIMEHIS, $timeString) !== false || DateTime::createFromFormat(self::FORMATTIMEHI, $timeString) !== false)) {
             return new DateTime($timeString);
         } else {
             return new DateTime("00:00:00");
         }
+    }
+    public function diffTime(DateTime $timeMax, DateTime $timeMin): DateTime
+    {
+        $timeMax = new DateTime(date('H:i:s', strtotime($timeMax->format("H:i:s"))));
+        $timeMin = new DateTime(date('H:i:s', strtotime($timeMin->format("H:i:s"))));
+
+        $diff =  date_diff($timeMax, $timeMin);
+        return new DateTime($diff->h . ':' . $diff->i . ':' . $diff->s);
     }
     /**
      * GetJourFeriers
@@ -120,10 +131,30 @@ class DateTimeService implements DateInterface, TimeInterface
     }
 
 
-    public function getHoraireForDate(DateTime $date)
+    public function getHoraireByDateOrName(DateTime $date, string $horaireName): Horaire
     {
         $this->horaire = $this->horaireService->getHoraireForDate($date);
-        dd($this->horaire);
+        if (!$this->horaire) {
+            $this->horaire =  $this->horaireService->getHoraireByHoraireName($horaireName);
+            if (!$this->horaire) {
+                dd($this->horaire);
+            } else {
+                $this->horaire = clone $this->horaireService->getHoraireByHoraireName($horaireName);
+                $this->horaire->setIdANull();
+                $this->horaire->setDateDebut($date);
+                $this->horaire->setDateFin(null);
+                $this->horaireService->addHoraireForDate($this->horaire);
+            }
+        }
+        if ($this->lastHoraire && $this->lastHoraire->getHoraire() != $horaireName) {
+            $fin = clone $date;
+            $this->lastHoraire->setDateFin(date_modify($fin, '-1 day'));
+            dd($horaireName, $this->horaireService->addHoraireForDate($this->horaire), $this->lastHoraire, $this->horaire);
+        }
+        $this->lastHoraire = $this->horaire;
+
+
+        return  $this->horaire;
     }
 
     /**

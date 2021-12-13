@@ -7,7 +7,7 @@ use App\Repository\HoraireRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
-class HoraireService
+class HoraireService extends EmployerService
 {
     /**
      * horaire
@@ -24,11 +24,18 @@ class HoraireService
 
 
     /**
-     * em
+     * Listhoraires
      *
      * @var Horaire[]
      */
     private $listhoraires;
+
+    /**
+     * DateTime
+     *
+     * @var DateTime
+     */
+    private $dateTime;
 
     /**
      * __construct
@@ -50,30 +57,52 @@ class HoraireService
         $this->newHoraire->setHeurFinTravaille($time);
         $this->newHoraire->setMargeDuRetard($time);
     }
-    private $dateTime;
 
-    public function getHoraireForDate(DateTime $dateTime): Horaire
+    public function getHoraireForDate(DateTime $dateTime): ?Horaire
     {
         $this->dateTime = $dateTime;
-        $this->horaire = current(array_filter(array_map(
-            function (Horaire $horaire): ?Horaire {
-                if ($horaire->getDateFin()) {
-                    return ($horaire->getDateDebut() <= $this->dateTime and $this->dateTime  <= $horaire->getDateFin()) ? $horaire : null;
-                } else {
-                    $nowDateTime = new DateTime();
-                    return ($horaire->getDateDebut() <= $this->dateTime and $nowDateTime  <= $horaire->getDateFin()) ? $horaire : null;
-                }
-                //  ($horaire->getDateDebut() <= $dateTime and $dateTime  <= $horaire->getDateFin()) ? $horaire : null : ($horaire->getDateDebut() <= $dateTime and $dateTime  <= $nowDateTime) ? $horaire : null,
-            },
-            $this->listhoraires
-        )));
+        $this->horaire = current(
+            array_filter(
+                array_map(
+                    function (Horaire $horaire): ?Horaire {
+                        if ($horaire->getDateFin()) {
+                            return ($horaire->getDateDebut() <= $this->dateTime and $this->dateTime  <= $horaire->getDateFin()) ? $horaire : null;
+                        } else {
+                            $nowDateTime = new DateTime();
+                            return ($horaire->getDateDebut() <= $this->dateTime and $nowDateTime  <= $horaire->getDateFin()) ? $horaire : null;
+                        }
+                        //  ($horaire->getDateDebut() <= $dateTime and $dateTime  <= $horaire->getDateFin()) ? $horaire : null : ($horaire->getDateDebut() <= $dateTime and $dateTime  <= $nowDateTime) ? $horaire : null,
+                    },
+                    $this->listhoraires
+                )
+            )
+        );
         if ($this->horaire) {
             return $this->horaire;
         }
-        if (!$this->newHoraire->getDateDebut()) {
-            $this->newHoraire->setHoraire("new Horaire");
-            $this->newHoraire->setDateDebut($dateTime);
+        return  null;
+    }
+    public function addHoraireForDate(Horaire $horaire)
+    {
+        array_push(
+            $this->listhoraires,
+            $horaire
+        );
+        return    $this->listhoraires;
+    }
+    public function getHoraireByHoraireName(string $horaireName): ?Horaire
+    {
+        $this->horaire = current(
+            array_filter(
+                array_map(
+                    fn ($horaire): ?Horaire => ($horaire->getHoraire() == $horaireName) ? $horaire : null,
+                    $this->listhoraires
+                )
+            )
+        );
+        if ($this->horaire) {
+            return $this->horaire;
         }
-        return  $this->newHoraire;
+        return  null;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service;
 
 use App\Entity\User;
@@ -28,37 +29,19 @@ class PhpSpreadsheetService extends XlsxService
                         dd($cols['A'], $cols['C'], $cols['D'], $this->isDate($cols['A']));
                     }
                     $this->setDate($this->dateString_d_m_Y_ToDateTime($cols['A']));
-                    $this->setHoraire($this->getHoraireForDate($this->getDate()));
-                    $this->setEntrer($cols['C']);
-                    $this->setSortie($cols['D']);
-                    dd(
-                        $cols['A'],
-                        $this->getDate(),
-                        $cols['B'],
-                        $this->getHoraire($this->getDate()),
-                        $cols['C'],
-                        $this->getEntrer(),
-                        $cols['D'],
-                        $this->getSortie()
-                    );
-                    $this->setNbrHeursTravailler($cols['E']);
-                    $this->setRetardEnMinute($cols['F']);
-                    $this->setDepartAnticiper($cols['G']);
-                    $this->setRetardMidi($cols['H']);
-                    $this->setTotalRetard($cols['I']);
-                    $this->setAutorisationSortie($cols['J']);
-                    $this->setCongerPayer($cols['K']);
-                    $this->setAbsence($cols['L']);
-                    $this->setHeurNormalementTravailler($cols['M']);
-                    $this->setDiff($cols['N']);
-                  
-                  
-                    dd($this->getDate());
-                   
-                   
                     if (!in_array($this->getDate()->format('Y-m-d'), $ignoredDay)) {
-                        $this->xlsxService->construct($cols, $this->getEmployer());
-                        $xlsx = $this->xlsxService->createEntity();
+                        $this->setHoraire($this->getHoraireByDateOrName($this->getDate(), $cols['B']));
+                        $this->setEntrer($this->timeStringToDateTime($cols['C']));
+                        $this->setSortie($this->timeStringToDateTime($cols['D']));
+                        $this->setNbrHeurTravailler($this->generateTime($cols['E']));
+                        $this->setRetardEnMinute($this->timeStringToDateTime($cols['F']));
+                        $this->setDepartAnticiper($this->timeStringToDateTime($cols['G']));
+                        $this->setRetardMidi($cols['H']);
+                        $this->setTotaleRetard($this->generateTime($cols['I']));
+                        $this->setHeurNormalementTravailler($this->generateTime($cols['M']));
+                        $this->setDiff($this->diffTime($this->getHeurNormalementTravailler(), $this->getNbrHeurTravailler()));
+                        //$this->xlsxService->construct($cols, $this->getEmployer());
+                        $xlsx = $this->createXlsxEntity();
                         $this->getEmployer()->addXlsx($xlsx);
                     }
                 }

@@ -72,38 +72,12 @@ class XlsxController extends AbstractController
             $xlsx = $form->get('upload')->getData();
             if ($xlsx) {
                 $phpSpreadsheetService->setEmployer($employer);
-                $user= $phpSpreadsheetService->installXlsxFile($xlsx);
-                dd($user);
+                $employer = $phpSpreadsheetService->installXlsxFile($xlsx);
                 $manager = $this->getDoctrine()->getManager();
-                /* for ($i = 0; $i < $sheetCount; $i++) {
-                    $worksheet = $spreadsheet->getSheet($i);
-                    $highestRow = $worksheet->getHighestRow();
-                    dd($highestRow);
-                    $cols = $worksheet->rangeToArray(
-                        'A1:O'.$highestRow,
-                        null,
-                        true,
-                        true,
-                        true
-                    );
-                    foreach ($cols as $col) {
-                        if ($this->dateService->isDate($col['A']) and $col['C'] and $col['D']) {
-                            $this->xlsxService->construct($col, $employer);
-                            $xlsx = $this->xlsxService->createEntity();
-                            $employer->addXlsx($xlsx);
-                        }
-                        $employer->setSoldConger($this->employerService->calculerSoldConger($employer));
-                        $employer->setSoldAutorisationSortie($this->employerService->calculerAS($employer));
-                        $manager->persist($employer);
-                        $manager->flush();
-                    }
-                } */
 
-                $employer->setSoldConger($this->employerService->calculerSoldConger($employer));
-                $employer->setSoldAutorisationSortie($this->employerService->calculerAS($employer));
                 $manager->persist($employer);
                 $manager->flush();
-                $this->addFlash('success', 'Upload XLSX Successfully');
+                $this->addFlash('success', 'upload DBF Successfully');
             }
             $url = $this->adminUrlGenerator
                 ->setController(XlsxController::class)

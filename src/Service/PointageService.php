@@ -1,10 +1,11 @@
 <?php
+
 namespace App\Service;
 
 use App\Entity\Pointage;
 use DateTime;
 
-class PointageService extends EmployerService
+class PointageService extends HoraireService
 {
     /**
      * pointage
@@ -55,7 +56,7 @@ class PointageService extends EmployerService
      */
     private $departAnticiper;
 
-    
+
     /**
      * retardMidi
      *
@@ -63,7 +64,7 @@ class PointageService extends EmployerService
      */
     private $retardMidi;
 
-    
+
     /**
      * totaleRetard
      *
@@ -71,7 +72,7 @@ class PointageService extends EmployerService
      */
     private $totaleRetard;
 
-    
+
     /**
      * heurNormalementTravailler
      *
@@ -79,7 +80,7 @@ class PointageService extends EmployerService
      */
     private $heurNormalementTravailler;
 
-    
+
     /**
      * diff
      *
@@ -93,13 +94,13 @@ class PointageService extends EmployerService
     private $workTime;
     private $absence;
 
-    
+
 
     /**
-         * dateInDB
-         *
-         * @return array
-         */
+     * dateInDB
+     *
+     * @return array
+     */
     public function getPointageDateInDB(): array
     {
         return array_map(
@@ -225,7 +226,7 @@ class PointageService extends EmployerService
         return $this;
     }
 
-  
+
 
 
     /**

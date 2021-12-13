@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service;
 
 use App\Entity\Absence;
@@ -55,7 +56,7 @@ class XlsxService extends PointageService
     public function getXlsxDateInDB()
     {
         return array_map(
-            fn ($date): string => $date->getAttdate()->format('Y-m-d'),
+            fn ($date): string => $date->getDate()->format('Y-m-d'),
             $this->getEmployer()->getXlsxes()->toArray()
         );
     }

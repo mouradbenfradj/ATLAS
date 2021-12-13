@@ -54,12 +54,12 @@ class DbfController extends AbstractController
             $dbf = $form->get('upload')->getData();
             if ($dbf) {
                 $tableReaderService->setEmployer($employer);
-                $user= $tableReaderService->installDbfFile($dbf);
+                $employer = $tableReaderService->installDbfFile($dbf);
                 /* dd($user);
                 $user->setSoldConger($this->employerService->calculerSoldConger($user));
                 $user->setSoldAutorisationSortie($this->employerService->calculerAS($user)); */
                 $manager = $this->getDoctrine()->getManager();
-                $manager->persist($user);
+                $manager->persist($employer);
                 $manager->flush();
                 $this->addFlash('success', 'upload DBF Successfully');
             }
