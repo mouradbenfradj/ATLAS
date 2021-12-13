@@ -1,68 +1,44 @@
 <?php
-
 namespace App\Service;
 
-use App\Entity\Horaire;
-use DateInterval;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
-class DateTimeService implements DateInterface, TimeInterface
+class DateTimeService extends ConfigService implements DateInterface, TimeInterface
 {
     const FORMATTIMEHI = 'H:i';
     const FORMATTIMEHIS = self::FORMATTIMEHI . ':s';
 
-
-    /**
-     * Horaire
-     *
-     * @var Horaire
-     */
-    private $lastHoraire;
-    /**
-     * Horaire
-     *
-     * @var Horaire
-     */
-    private $horaire;
-
-
-    private $horaireName = null;
-    /**
-     * JourFerierService
-     *
-     * @var JourFerierService
-     */
-    private $jourFerierService;
-    /**
-     * HoraireService
-     *
-     * @var HoraireService
-     */
-    private $horaireService;
-    /**
-     * __construct
-     *
-     * @param JourFerierService $jourFerierService
-     * @param HoraireService $horaireService
-     */
-    public function __construct(JourFerierService $jourFerierService)
+    public function __construct(EntityManagerInterface $manager)
     {
-        $this->jourFerierService = $jourFerierService;
+        parent::__construct($manager)        ;
     }
     /**
-     * dateString_d_m_Y_ToDateTime
+     * DateString_d_m_Y_ToDateTime
      *
      * @param string $dateString
      * @return DateTime
      */
     public function dateString_d_m_Y_ToDateTime(string $dateString): DateTime
     {
-        return DateTime::createFromFormat('d/m/Y', $dateString);
+        if (DateTime::createFromFormat('d/m/Y', $dateString) !== false) {
+            return DateTime::createFromFormat('d/m/Y', $dateString);
+        }
+        return null;
+    }/**
+     * DateString_m_d_Y_ToDateTime
+     *
+     * @param string $dateString
+     * @return DateTime
+     */
+    public function dateString_m_d_Y_ToDateTime(string $dateString): DateTime
+    {
+        return DateTime::createFromFormat('m/d/Y', $dateString);
     }
 
-
     /**
-     * isDate
+     * IsDate
      *
      * @param string|null $dateString
      * @return boolean
@@ -72,8 +48,12 @@ class DateTimeService implements DateInterface, TimeInterface
         return DateTime::createFromFormat('d/m/Y', $dateString) !== false;
     }
 
-
-
+    /**
+     * TimeStringToDateTime
+     *
+     * @param string|null $timeString
+     * @return DateTime|null
+     */
     public function timeStringToDateTime(?string $timeString): ?DateTime
     {
         $time = null;
@@ -88,8 +68,8 @@ class DateTimeService implements DateInterface, TimeInterface
     /**
      * GenerateTime
      *
-     * @param string $timeString date generer du dbf 
-     * 
+     * @param string $timeString date generer du dbf
+     *
      * @return DateTime
      */
     public function generateTime(?string $timeString): DateTime
@@ -100,6 +80,14 @@ class DateTimeService implements DateInterface, TimeInterface
             return new DateTime("00:00:00");
         }
     }
+    
+    /**
+     * DiffTime
+     *
+     * @param DateTime $timeMax
+     * @param DateTime $timeMin
+     * @return DateTime
+     */
     public function diffTime(DateTime $timeMax, DateTime $timeMin): DateTime
     {
         $timeMax = new DateTime(date('H:i:s', strtotime($timeMax->format("H:i:s"))));
@@ -107,77 +95,5 @@ class DateTimeService implements DateInterface, TimeInterface
 
         $diff =  date_diff($timeMax, $timeMin);
         return new DateTime($diff->h . ':' . $diff->i . ':' . $diff->s);
-    }
-    /**
-     * GetJourFeriers
-     *
-     * @return array
-     */
-    public function getJourFeriers(): array
-    {
-        $jourFeriers = $this->jourFerierService->getAllJourFeriers();
-        $ignoreDay = [];
-        foreach ($jourFeriers as $jf) {
-            do {
-                array_push($ignoreDay, $jf->getDebut()->format("Y-m-d"));
-                /**
-                 * @var DateTime
-                 */
-                $debut = $jf->getDebut();
-                $debut->add(new DateInterval('P1D'));
-            } while ($jf->getDebut() <= $jf->getFin());
-        }
-        return $ignoreDay;
-    }
-
-
-    public function getHoraireByDateOrName(DateTime $date, string $horaireName): Horaire
-    {
-        $this->horaire = $this->horaireService->getHoraireForDate($date);
-        if (!$this->horaire) {
-            $this->horaire =  $this->horaireService->getHoraireByHoraireName($horaireName);
-            if (!$this->horaire) {
-                dd($this->horaire);
-            } else {
-                $this->horaire = clone $this->horaireService->getHoraireByHoraireName($horaireName);
-                $this->horaire->setIdANull();
-                $this->horaire->setDateDebut($date);
-                $this->horaire->setDateFin(null);
-                $this->horaireService->addHoraireForDate($this->horaire);
-            }
-        }
-        if ($this->lastHoraire && $this->lastHoraire->getHoraire() != $horaireName) {
-            $fin = clone $date;
-            $this->lastHoraire->setDateFin(date_modify($fin, '-1 day'));
-            dd($horaireName, $this->horaireService->addHoraireForDate($this->horaire), $this->lastHoraire, $this->horaire);
-        }
-        $this->lastHoraire = $this->horaire;
-
-
-        return  $this->horaire;
-    }
-
-    /**
-     * Get horaire
-     *
-     * @return  Horaire
-     */
-    public function getHoraire()
-    {
-        return $this->horaire;
-    }
-
-    /**
-     * Set horaire
-     *
-     * @param  Horaire  $horaire  horaire
-     *
-     * @return  self
-     */
-    public function setHoraire(Horaire $horaire)
-    {
-        $this->horaire = $horaire;
-
-        return $this;
     }
 }

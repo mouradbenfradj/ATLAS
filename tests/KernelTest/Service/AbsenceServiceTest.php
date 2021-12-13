@@ -5,8 +5,6 @@ namespace App\Tests\KernelTest\Service;
 use App\Repository\AbsenceRepository;
 use App\Repository\UserRepository;
 use App\Service\AbsenceService;
-use App\Service\CongerService;
-use DateTime;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class AbsenceServiceTest extends KernelTestCase

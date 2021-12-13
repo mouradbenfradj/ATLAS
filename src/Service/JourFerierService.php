@@ -1,37 +1,35 @@
 <?php
 namespace App\Service;
 
-use DateInterval;
 use App\Entity\JourFerier;
-use App\Service\JoursFerierInterface;
+use DateInterval;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
-class JourFerierService
+class JourFerierService extends DateTimeService
 {
-    /**
-     * em
-     *
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    /**
-     * __construct
-     *
-     * @param EntityManagerInterface $em
-     */
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $manager)
     {
-        $this->em = $em;
+        parent::__construct($manager)        ;
     }
-
     /**
-     * getJourFeriers
+     * GetJourFeriers
      *
-     * @return JourFerier[]
+     * @return array
      */
-    public function getAllJourFeriers(): array
+    public function getJourFeriers(): array
     {
-        return $this->em->getRepository(JourFerier::class)->findAll();
+        $ignoreDay = [];
+        foreach ($this->getManager()->getRepository(JourFerier::class)->findAll() as $jf) {
+            do {
+                array_push($ignoreDay, $jf->getDebut()->format("Y-m-d"));
+                /**
+                 * @var DateTime
+                 */
+                $debut = $jf->getDebut();
+                $debut->add(new DateInterval('P1D'));
+            } while ($jf->getDebut() <= $jf->getFin());
+        }
+        return $ignoreDay;
     }
 }

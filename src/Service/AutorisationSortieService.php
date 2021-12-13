@@ -3,9 +3,21 @@ namespace App\Service;
 
 use App\Entity\AutorisationSortie;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 
-class AutorisationSortieService
+class AutorisationSortieService extends CongerService
 {
+    public function __construct(EntityManagerInterface $manager)
+    {
+        parent::__construct($manager);
+    }
+    /**
+     * matchAvecUneAutorisationDeSortie
+     *
+     * @param array $autorisationSorties
+     * @param DateTime $date
+     * @return boolean
+     */
     public function matchAvecUneAutorisationDeSortie(array $autorisationSorties, DateTime $date): bool
     {
         return current(array_filter(array_map(
@@ -13,11 +25,19 @@ class AutorisationSortieService
             $autorisationSorties
         )));
     }
-    public function getAutorisation(array $autorisationSorties, DateTime $date): ?AutorisationSortie
+
+    /**
+     * getAutorisation
+     *
+     * @param array $autorisationSorties
+     * @param DateTime $date
+     * @return AutorisationSortie|null
+     */
+    public function getAutorisation(DateTime $date): ?AutorisationSortie
     {
         $autorisationSortie =  current(array_filter(array_map(
             fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $date and $date <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
-            $autorisationSorties
+            $this->getEmployer()->getAutorisationSorties()->toArray()
         )));
         if ($autorisationSortie) {
             return $autorisationSortie;

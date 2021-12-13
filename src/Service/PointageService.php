@@ -4,8 +4,9 @@ namespace App\Service;
 
 use App\Entity\Pointage;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 
-class PointageService extends HoraireService
+class PointageService extends AutorisationSortieService
 {
     /**
      * pointage
@@ -56,14 +57,12 @@ class PointageService extends HoraireService
      */
     private $departAnticiper;
 
-
     /**
      * retardMidi
      *
      * @var DateTime|null
      */
     private $retardMidi;
-
 
     /**
      * totaleRetard
@@ -72,14 +71,12 @@ class PointageService extends HoraireService
      */
     private $totaleRetard;
 
-
     /**
      * heurNormalementTravailler
      *
      * @var DateTime
      */
     private $heurNormalementTravailler;
-
 
     /**
      * diff
@@ -88,13 +85,10 @@ class PointageService extends HoraireService
      */
     private $diff;
 
-
-    private $congerPayer;
-    private $autorisationSortie;
-    private $workTime;
-    private $absence;
-
-
+    public function __construct(EntityManagerInterface $manager)
+    {
+        parent::__construct($manager);
+    }
 
     /**
      * dateInDB
@@ -108,27 +102,6 @@ class PointageService extends HoraireService
             $this->getEmployer()->getPointages()->toArray()
         );
     }
-
-
-    /*
-
-                    $this->absenceService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
-                    $this->congerService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
-                    $this->autorisationSortieService->partielConstruct($dbf->getEmployer(), $dbf->getAttdate());
-                    if (!$this->dateService->isWeek($this->getDate())
-                        and (
-                            ($dbf->getStarttime() and $dbf->getEndtime())
-                            or $this->absenceService->estAbscent()
-                            or $this->congerService->estUnConger()
-                            or $this->autorisationSortieService->getAutorisation())
-                    ) {
-                        $this->pointageService->constructFromDbf($dbf);
-                        $pointage = $this->pointageService->createEntity();
-                        $this->getEmployer()->addPointage($pointage);
-                    } else {
-                        $this->getEmployer()->addDbf($dbf);
-                    }
-    */
 
     /**
      * Get pointage

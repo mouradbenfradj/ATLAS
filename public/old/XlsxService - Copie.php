@@ -7,13 +7,10 @@ use App\Entity\Conger;
 use DateTime;
 use App\Entity\User;
 use App\Entity\Horaire;
-use App\Entity\Pointage;
 use App\Entity\Xlsx;
 use App\Service\DateService;
 use App\Service\JourFerierService;
 use Doctrine\ORM\EntityManagerInterface;
-use PhpOffice\PhpSpreadsheet\Worksheet\Col;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 class XlsxService
 {
@@ -197,15 +194,7 @@ class XlsxService
      * @var RetardService
      */
     private $retardService;
-    /**
-     * flash
-     *
-     * @var FlashBagInterface
-     */
-    private $flash;
-
-
-
+   
     /**
      * autorisationSortieService variable
      *
@@ -220,7 +209,6 @@ class XlsxService
         DateService $dateService,
         TimeService $timeService,
         HoraireService $horaireService,
-        FlashBagInterface $flash,
         AutorisationSortieService $autorisationSortieService,
         AbsenceService $absenceService,
         CongerService $congerService,

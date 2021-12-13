@@ -18,41 +18,6 @@ class XlsxService extends PointageService
     private $xlsx;
 
 
-    /**
-     * autorisationSortie
-     *
-     * @var AutorisationSortie
-     */
-    private $autorisationSortie;
-
-    /**
-     * congerPayer
-     *
-     * @var Conger
-     */
-    private $congerPayer;
-
-    /**
-     * absence
-     *
-     * @var Absence
-     */
-    private $absence;
-
-    /**
-     * heurNormalementTravailler
-     *
-     * @var DateTime|null
-     */
-    private $heurNormalementTravailler;
-
-    /**
-     * diff
-     *
-     * @var DateTime|null
-     */
-    private $diff;
-
     public function getXlsxDateInDB()
     {
         return array_map(
@@ -73,7 +38,7 @@ class XlsxService extends PointageService
         $xlsx->setDepartAnticiper($this->getDepartAnticiper());
         $xlsx->setRetardMidi($this->getRetardMidi());
         $xlsx->setTotalRetard($this->getTotaleRetard());
-        $xlsx->setAutorisationSortie($this->getAutorisationSortie($this->getDate()));
+        $xlsx->setAutorisationSortie($this->getAutorisation($this->getDate()));
         $xlsx->setCongerPayer($this->getConger($this->getDate()));
         $xlsx->setAbsence($this->getAbsence($this->getDate()));
         $xlsx->setHeurNormalementTravailler($this->getHeurNormalementTravailler());

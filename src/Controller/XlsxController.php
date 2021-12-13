@@ -2,22 +2,12 @@
 
 namespace App\Controller;
 
+use App\Controller\Admin\XlsxCrudController;
 use App\Entity\User;
-use XBase\TableReader;
 use App\Form\UploadType;
-use App\Service\XlsxService;
-use App\Service\CongerService;
-use App\Service\AbsenceService;
-use App\Service\EmployerService;
-use App\Service\PointageService;
-use App\Service\JourFerierService;
-use App\Service\PointageGeneratorService;
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
-use App\Service\AutorisationSortieService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Controller\Admin\PointageCrudController;
 use App\Service\PhpSpreadsheetService;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -80,7 +70,7 @@ class XlsxController extends AbstractController
                 $this->addFlash('success', 'upload DBF Successfully');
             }
             $url = $this->adminUrlGenerator
-                ->setController(XlsxController::class)
+                ->setController(XlsxCrudController::class)
                 ->setAction('index')
                 ->generateUrl();
             return $this->redirect($url);

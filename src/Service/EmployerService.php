@@ -1,13 +1,10 @@
 <?php
 namespace App\Service;
 
-use App\Entity\Absence;
-use App\Entity\AutorisationSortie;
-use App\Entity\Conger;
 use App\Entity\User;
-use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 
-class EmployerService extends DateTimeService
+class EmployerService extends HoraireService
 {
     /**
      * employer
@@ -16,59 +13,10 @@ class EmployerService extends DateTimeService
      */
     private $employer;
 
-    /**
-     * absenceService
-     *
-     * @var AbsenceService
-     */
-    private $absenceService;
-    /**
-     * congerService
-     *
-     * @var CongerService
-     */
-    private $congerService;
-    /**
-     * autorisationSortieService
-     *
-     * @var AutorisationSortieService
-     */
-    private $autorisationSortieService;
-
-    public function __construct(AbsenceService $absenceService, CongerService $congerService, AutorisationSortieService $autorisationSortieService, JourFerierService $jourFerierService, HoraireService $horaireService)
+    public function __construct(EntityManagerInterface $manager)
     {
-        parent::__construct($jourFerierService, $horaireService);
-        $this->absenceService = $absenceService;
-        $this->congerService = $congerService;
-        $this->autorisationSortieService = $autorisationSortieService;
+        parent::__construct($manager);
     }
-    public function estAbsent(DateTime $date):bool
-    {
-        return $this->absenceService->matchAvecUneAbsence($this->employer->getAbsences()->toArray(), $date);
-    }
-    public function aPrisUnConger(DateTime $date):bool
-    {
-        return $this->congerService->matchAvecUnConger($this->employer->getCongers()->toArray(), $date);
-    }
-    public function aPrisUneAutorisationDeSortie(DateTime $date):bool
-    {
-        return $this->autorisationSortieService->matchAvecUneAutorisationDeSortie($this->employer->getAutorisationSorties()->toArray(), $date);
-    }
-    public function getAbsence(DateTime $date):?Absence
-    {
-        return $this->absenceService->getAbsence($this->employer->getAbsences()->toArray(), $date);
-    }
-    public function getConger(DateTime $date):?Conger
-    {
-        return $this->congerService->getConger($this->employer->getCongers()->toArray(), $date);
-    }
-    public function getAutorisationSortie(DateTime $date):?AutorisationSortie
-    {
-        return $this->autorisationSortieService->getAutorisation($this->employer->getAutorisationSorties()->toArray(), $date);
-    }
-
-
-
     /**
      * getEmployer
      *
