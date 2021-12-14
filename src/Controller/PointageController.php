@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Controller\Admin\PointageCrudController;
 use App\Entity\Pointage;
 use App\Form\PointageType;
+use App\Repository\DbfRepository;
 use App\Repository\PointageRepository;
 use App\Service\BilanService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,6 +27,37 @@ class PointageController extends AbstractController
         return $this->render('pointage/index.html.twig', [
             'pointages' => $pointageRepository->findAll(),
         ]);
+    }
+
+    /**
+     * upload function
+     * @Route("/upload", name="xlsx_upload_from_dbf", methods={"GET","POST"})
+     *
+     * @param Request $request
+     * @param User $employer
+     * @return Response
+     */
+    public function upload(Request $request, DbfRepository $dbfRepository): Response
+    {
+        foreach ($dbfRepository->findAll() as $dbf) {
+        }
+               
+        /* dd($user);
+        $user->setSoldConger($this->employerService->calculerSoldConger($user));
+        $user->setSoldAutorisationSortie($this->employerService->calculerAS($user)); */
+        /*     $manager = $this->getDoctrine()->getManager();
+            $manager->persist($employer);
+            $manager->flush(); */
+        $this->addFlash('success', 'upload DBF Successfully');
+        $url = $this->adminUrlGenerator
+                ->setController(PointageCrudController::class)
+                ->setAction('index')
+                ->generateUrl();
+        return $this->redirect($url);
+
+        /*  return $this->render('dbf/upload.html.twig', [
+             'form' => $form->createView(),
+         ]); */
     }
 
     /**

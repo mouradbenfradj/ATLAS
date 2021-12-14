@@ -3,11 +3,14 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Pointage;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
@@ -19,6 +22,23 @@ class PointageCrudController extends AbstractCrudController
     }
 
 
+
+    
+    public function configureActions(Actions $actions): Actions
+    {
+        $updateFromDbf = Action::new('updateFromDbf', 'Update from Dbf')
+            ->setIcon('fa fa-download')
+            ->linkToRoute('default')
+            ->setCssClass('btn')
+            ->createAsGlobalAction();
+        $updateFromXlsx = Action::new('updateFromXlsx', 'Update from Dbf')
+            ->setIcon('fa fa-download')
+            ->linkToRoute('default')
+            ->setCssClass('btn')
+            ->createAsGlobalAction();
+
+        return $actions->add(Crud::PAGE_INDEX, $updateFromDbf)->add(Crud::PAGE_INDEX, $updateFromXlsx);
+    }
     public function configureFields(string $pageName): iterable
     {
         return [

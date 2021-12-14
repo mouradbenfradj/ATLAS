@@ -18,21 +18,17 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
  */
 class DbfController extends AbstractController
 {
-    /**
-     * Flash
-     *
-     * @var FlashBagInterface
-     */
-    private $flash;
+    
+    //private $flash;
     /**
      * AdminUrlGenerator
      *
      * @var AdminUrlGenerator
      */
     private $adminUrlGenerator;
-    public function __construct(FlashBagInterface $flash, AdminUrlGenerator $adminUrlGenerator)
+    public function __construct(/*FlashBagInterface $flash, */AdminUrlGenerator $adminUrlGenerator)
     {
-        $this->flash = $flash;
+        //$this->flash = $flash;
         $this->adminUrlGenerator = $adminUrlGenerator;
     }
 

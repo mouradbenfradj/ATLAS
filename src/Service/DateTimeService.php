@@ -10,11 +10,10 @@ class DateTimeService extends ConfigService implements DateInterface, TimeInterf
     const FORMATTIMEHI = 'H:i';
     const FORMATTIMEHIS = self::FORMATTIMEHI . ':s';
 
-    /* public function __construct(EntityManagerInterface $manager)
+    public function __construct(EntityManagerInterface $manager)
     {
         parent::__construct($manager)        ;
-    } */
-    
+    }
     /**
      * DateString_d_m_Y_ToDateTime
      *
