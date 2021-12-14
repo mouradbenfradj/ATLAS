@@ -64,8 +64,6 @@ class DbfService extends PointageService
      * @var DateTime|null
      */
     private $clockoutti;
-    //private $starttime;
-    //private $endtime;
 
     /**
      * workday
@@ -194,36 +192,36 @@ class DbfService extends PointageService
      */
     public function createDbfEntity(): Dbf
     {
-        $dbf = new Dbf();
-        $dbf->setUserid($this->userid);
-        $dbf->setBadgenumbe($this->badgenumbe);
-        $dbf->setSsn($this->ssn);
-        $dbf->setUsername($this->username);
-        $dbf->setAutosch($this->autosch);
-        $dbf->setAttdate($this->getDate());
-        $dbf->setSchid($this->schid);
-        $dbf->setClockintim($this->clockintim);
-        $dbf->setClockoutti($this->clockoutti);
-        $dbf->setStarttime($this->getEntrer());
-        $dbf->setEndtime($this->getSortie());
-        $dbf->setWorkday($this->workday);
-        $dbf->setRealworkda($this->realworkda);
-        $dbf->setLate($this->late);
-        $dbf->setEarly($this->early);
-        $dbf->setAbsent($this->absent);
-        $dbf->setOvertime($this->overtime);
-        $dbf->setWorktime($this->worktime);
-        $dbf->setExceptioni($this->exceptioni);
-        $dbf->setMustin($this->mustin);
-        $dbf->setMustout($this->mustout);
-        $dbf->setDeptid($this->deptid);
-        $dbf->setSspedaynor($this->sspedaynor);
-        $dbf->setSspedaywee($this->sspedaywee);
-        $dbf->setSspedayhol($this->sspedayhol);
-        $dbf->setAtttime($this->atttime);
-        $dbf->setAttchktime($this->attchktime);
-        $dbf->setEmployer($this->getEmployer());
-        return $dbf;
+        $this->dbf = new Dbf();
+        $this->dbf->setUserid($this->userid);
+        $this->dbf->setBadgenumbe($this->badgenumbe);
+        $this->dbf->setSsn($this->ssn);
+        $this->dbf->setUsername($this->username);
+        $this->dbf->setAutosch($this->autosch);
+        $this->dbf->setAttdate($this->getDate());
+        $this->dbf->setSchid($this->schid);
+        $this->dbf->setClockintim($this->clockintim);
+        $this->dbf->setClockoutti($this->clockoutti);
+        $this->dbf->setStarttime($this->getEntrer());
+        $this->dbf->setEndtime($this->getSortie());
+        $this->dbf->setWorkday($this->workday);
+        $this->dbf->setRealworkda($this->realworkda);
+        $this->dbf->setLate($this->late);
+        $this->dbf->setEarly($this->early);
+        $this->dbf->setAbsent($this->absent);
+        $this->dbf->setOvertime($this->overtime);
+        $this->dbf->setWorktime($this->worktime);
+        $this->dbf->setExceptioni($this->exceptioni);
+        $this->dbf->setMustin($this->mustin);
+        $this->dbf->setMustout($this->mustout);
+        $this->dbf->setDeptid($this->deptid);
+        $this->dbf->setSspedaynor($this->sspedaynor);
+        $this->dbf->setSspedaywee($this->sspedaywee);
+        $this->dbf->setSspedayhol($this->sspedayhol);
+        $this->dbf->setAtttime($this->atttime);
+        $this->dbf->setAttchktime($this->attchktime);
+        $this->dbf->setEmployer($this->getEmployer());
+        return $this->dbf;
     }
 
     /**
