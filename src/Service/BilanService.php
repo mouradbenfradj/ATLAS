@@ -6,11 +6,14 @@ use DateTime;
 class BilanService extends PointageService
 {
     /**
-     * initBilan
+     * InitBilan
      *
      * @var array
      */
     private $initBilan;
+    /**
+     * Undocumented function
+     */
     public function __construct()
     {
         $this->initBilan = [
@@ -50,7 +53,7 @@ class BilanService extends PointageService
         $countWeek = 1;
         $nextWeek = new DateTime("0000-00-00");
         foreach ($pointages as $index => $pointage) {
-            if ($pointage->getDate() >= $nextWeek and $index) {
+            if ($pointage->getDate() >= $nextWeek && $index) {
                 $bilanWeek["date"] = $countWeek;
                 $bilanWeek["background"] = "Orange";
                 $bilanWeek["colspan"] = 4;
@@ -59,16 +62,16 @@ class BilanService extends PointageService
                 $bilanWeek = $this->initBilan;
                 $countWeek++;
             }
-            if ($thisYear . '-' . $thisMonth !=  $pointage->getDate()->format('Y-m') and $index) {
+            if ($thisYear . '-' . $thisMonth !=  $pointage->getDate()->format('Y-m') && $index) {
                 $bilanMonth["date"] =   $thisYear . '-' . $thisMonth;
                 $bilanMonth["background"] = "DodgerBlue";
                 $bilanMonth["colspan"] = 4;
-                if ($thisYear and  $thisMonth) {
+                if ($thisYear &&  $thisMonth) {
                     array_push($collectGeneral, $bilanMonth);
                 }
                 $bilanMonth = $this->initBilan;
             }
-            if ($thisYear !=  $pointage->getDate()->format('Y') and $index) {
+            if ($thisYear !=  $pointage->getDate()->format('Y') && $index) {
                 $bilanYear["date"] =     $thisYear;
                 $bilanYear["background"] = "MediumSeaGreen";
                 $bilanMonth["colspan"] = 4;
@@ -86,18 +89,18 @@ class BilanService extends PointageService
                 "colspan" => 1,
                 "date" =>   $pointage->getDate()->format('Y-m-d'),
                 "horaire" =>  $pointage->getHoraire(),
-                "entrer" =>  $pointage->getEntrer() ? $pointage->getEntrer()->format('H:i:s') : "",
-                "sortie" =>  $pointage->getSortie() ? $pointage->getSortie()->format('H:i:s') : "",
-                "nbrHeurTravailler" => $pointage->getNbrHeurTravailler() ? $pointage->getNbrHeurTravailler()->format('H:i:s') : "",
-                "retardEnMinute" => $pointage->getRetardEnMinute() ? $pointage->getRetardEnMinute()->format('H:i:s') : "",
-                "departAnticiper" => $pointage->getDepartAnticiper() ? $pointage->getDepartAnticiper()->format('H:i:s') : "",
-                "retardMidi" => $pointage->getRetardMidi() ? $pointage->getRetardMidi()->format('H:i:s') : "",
-                "totalRetard" => $pointage->getTotaleRetard() ? $pointage->getTotaleRetard()->format('H:i:s') : "",
-                "autorisationSortie" => $pointage->getAutorisationSortie() ? $pointage->getAutorisationSortie()->getHeurAutoriser()->format('H:i:s') : "",
+                "entrer" =>  $pointage->getEntrer() ? $pointage->getEntrer()->format(self::FORMATTIMEHIS) : "",
+                "sortie" =>  $pointage->getSortie() ? $pointage->getSortie()->format(self::FORMATTIMEHIS) : "",
+                "nbrHeurTravailler" => $pointage->getNbrHeurTravailler() ? $pointage->getNbrHeurTravailler()->format(self::FORMATTIMEHIS) : "",
+                "retardEnMinute" => $pointage->getRetardEnMinute() ? $pointage->getRetardEnMinute()->format(self::FORMATTIMEHIS) : "",
+                "departAnticiper" => $pointage->getDepartAnticiper() ? $pointage->getDepartAnticiper()->format(self::FORMATTIMEHIS) : "",
+                "retardMidi" => $pointage->getRetardMidi() ? $pointage->getRetardMidi()->format(self::FORMATTIMEHIS) : "",
+                "totalRetard" => $pointage->getTotaleRetard() ? $pointage->getTotaleRetard()->format(self::FORMATTIMEHIS) : "",
+                "autorisationSortie" => $pointage->getAutorisationSortie() ? $pointage->getAutorisationSortie()->getHeurAutoriser()->format(self::FORMATTIMEHIS) : "",
                 "congerPayer" =>  $pointage->getCongerPayer(),
                 "absence" => $pointage->getAbsence(),
-                "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format('H:i:s') : "",
-                "diff" => $pointage->getDiff() ? $pointage->getDiff()->format('H:i:s') : "",
+                "heurNormalementTravailler" => $pointage->getHeurNormalementTravailler() ? $pointage->getHeurNormalementTravailler()->format(self::FORMATTIMEHIS) : "",
+                "diff" => $pointage->getDiff() ? $pointage->getDiff()->format(self::FORMATTIMEHIS) : "",
             ]);
             $thisMonth =   $pointage->getDate()->format('m');
             $thisYear =   $pointage->getDate()->format('Y');

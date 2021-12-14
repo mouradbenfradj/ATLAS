@@ -15,10 +15,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class DefaultController extends AbstractController
 {
     /**
-     * index
-     * @Route("/")
+     * Index
+     * @Route("/", name="default")
      *
-     * @param PointageService $pointageService
+     * @param BilanService $bilanService
      * @return Response
      */
     public function index(BilanService $bilanService): Response
@@ -29,20 +29,12 @@ class DefaultController extends AbstractController
             'bilan' => $bilans
         ]);
     }
-    /**
-     * default
-     * @Route("/", name="default")
-     *
-     * @param PointageService $pointageService
-     * @return Response
-     */
+
+    /*
     public function default(BilanService $bilanService): Response
     {
-        /**
-         * @var User $employer
-         */
         $employer = $this->getUser();
-        if ($employer and property_exists($employer, 'pointages')) {
+        if ($employer && property_exists($employer, 'pointages')) {
             $bilans = $bilanService->getBilanGeneral($employer->getPointages()->toArray());
         } else {
             $bilans = [];
@@ -50,5 +42,5 @@ class DefaultController extends AbstractController
         return $this->render('default/index.html.twig', [
             'bilan' => $bilans
         ]);
-    }
+    } */
 }

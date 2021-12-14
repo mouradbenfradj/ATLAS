@@ -29,41 +29,37 @@ class PointageController extends AbstractController
 
     /**
      * @Route("/bilanSemestiriel", name="bilan_semestiriel", methods={"GET"})
-     * 
-     * @param Security $security
+     *
      * @param BilanService $bilanService
      * @return Response
      */
-    public function bilanSemestiriel(Security $security, BilanService $bilanService): Response
+    public function bilanSemestiriel(BilanService $bilanService): Response
     {
         return $this->render('pointage/bilanSemestiriel.html.twig', [
-            'bilan' => $bilanService->getBilanSemestriel($security->getUser()->getPointages()->toArray()),
+            'bilan' => $bilanService->getBilanSemestriel($this->getUser()->getPointages()->toArray()),
         ]);
     }
     /**
      * @Route("/bilanMensuel", name="bilan_mensuel", methods={"GET"})
      *
-     * @param Security $security
      * @param BilanService $bilanService
      * @return Response
      */
-    public function bilanMensuel(Security $security, BilanService $bilanService): Response
+    public function bilanMensuel(BilanService $bilanService): Response
     {
-
         return $this->render('pointage/bilanMensuel.html.twig', [
-            'bilan' =>  $bilanService->getBilanMensuel($security->getUser()->getPointages()->toArray()),
+            'bilan' =>  $bilanService->getBilanMensuel($this->getUser()->getPointages()->toArray()),
         ]);
     }
     /**
      * @Route("/bilanAnnuel", name="bilan_annuel", methods={"GET"})
-     * @param Security $security
      * @param BilanService $bilanService
      * @return Response
      */
-    public function bilanAnnuel(Security $security, BilanService $bilanService): Response
+    public function bilanAnnuel(BilanService $bilanService): Response
     {
         return $this->render('pointage/bilanAnnuel.html.twig', [
-            'bilan' =>  $bilanService->getBilanAnnuel($security->getUser()->getPointages()->toArray()),
+            'bilan' =>  $bilanService->getBilanAnnuel($this->getUser()->getPointages()->toArray()),
         ]);
     }
 
