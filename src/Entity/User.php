@@ -11,16 +11,34 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
+ * User
+ *
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @UniqueEntity(fields={"email"}, message="There is already an account with this email")
+ * @UniqueEntity(
+ * fields={"email"},
+ * message="There is already an account with this email"
+ * )
+ *
+ * @category User
+ * @package  Entity
+ * @author   Mourad <mourad.ben.fradj@gmail.com>
+ * @license  http:// MIT
+ * @link     http://url.com
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    /**
+     * __toString function
+     *
+     * @return string
+     */
     public function __toString()
     {
         return $this->getBadgenumbe() . " " . $this->getLastName() . " " . $this->getFirstName();
     }
     /**
+     * Id
+     *
      * @var int
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="NONE")
