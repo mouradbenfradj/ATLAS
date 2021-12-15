@@ -14,16 +14,20 @@ class AutorisationSortieService extends CongerService
     /**
      * matchAvecUneAutorisationDeSortie
      *
-     * @param array $autorisationSorties
+     * @param AutorisationSortie[] $autorisationSorties
      * @param DateTime $date
-     * @return boolean
+     * @return bool
      */
     public function matchAvecUneAutorisationDeSortie(array $autorisationSorties, DateTime $date): bool
     {
-        return current(array_filter(array_map(
-            fn ($autorisationSortie): bool => ($autorisationSortie->getDebut() <=  $date and  $date  <= $autorisationSortie->getFin()) ? true : false,
-            $autorisationSorties
-        )));
+        return current(
+            array_filter(
+                array_map(
+                    fn ($autorisationSortie): bool => ($autorisationSortie->getDateAutorisation() <=  $date &&  $date  <= $autorisationSortie->getDateAutorisation()) ? true : false,
+                    $autorisationSorties
+                )
+            )
+        );
     }
 
     /**
@@ -35,10 +39,14 @@ class AutorisationSortieService extends CongerService
      */
     public function getAutorisation(DateTime $date): ?AutorisationSortie
     {
-        $autorisationSortie =  current(array_filter(array_map(
-            fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $date and $date <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
-            $this->getEmployer()->getAutorisationSorties()->toArray()
-        )));
+        $autorisationSortie =  current(
+            array_filter(
+                array_map(
+                    fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $date and $date <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
+                    $this->getEmployer()->getAutorisationSorties()->toArray()
+                )
+            )
+        );
         if ($autorisationSortie) {
             return $autorisationSortie;
         }

@@ -3,8 +3,8 @@ namespace App\Service;
 
 use App\Entity\JourFerier;
 use DateInterval;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 class JourFerierService extends DateTimeService
 {

@@ -21,6 +21,12 @@ class HoraireService extends JourFerierService
      * @var Horaire
      */
     private $newHoraire;
+    /**
+     * LastHoraire
+     *
+     * @var Horaire
+     */
+    private $lastHoraire;
    
 
     /**

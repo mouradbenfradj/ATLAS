@@ -9,6 +9,7 @@ class DateTimeService extends ConfigService implements DateInterface, TimeInterf
 {
     const FORMATTIMEHI = 'H:i';
     const FORMATTIMEHIS = self::FORMATTIMEHI . ':s';
+    const FORMATDATEDMY = 'd/m/Y';
 
     public function __construct(EntityManagerInterface $manager)
     {
@@ -18,12 +19,12 @@ class DateTimeService extends ConfigService implements DateInterface, TimeInterf
      * DateString_d_m_Y_ToDateTime
      *
      * @param string $dateString
-     * @return DateTime
+     * @return DateTime|null
      */
-    public function dateString_d_m_Y_ToDateTime(string $dateString): DateTime
+    public function dateString_d_m_Y_ToDateTime(string $dateString): ?DateTime
     {
-        if (DateTime::createFromFormat('d/m/Y', $dateString) !== false) {
-            return DateTime::createFromFormat('d/m/Y', $dateString);
+        if (DateTime::createFromFormat(self::FORMATDATEDMY, $dateString) !== false) {
+            return DateTime::createFromFormat(self::FORMATDATEDMY, $dateString);
         }
         return null;
     }/**
@@ -45,7 +46,7 @@ class DateTimeService extends ConfigService implements DateInterface, TimeInterf
      */
     public function isDate(?string $dateString): bool
     {
-        return DateTime::createFromFormat('d/m/Y', $dateString) !== false;
+        return DateTime::createFromFormat(self::FORMATDATEDMY, $dateString) !== false;
     }
 
     /**

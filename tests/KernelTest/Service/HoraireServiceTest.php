@@ -14,7 +14,7 @@ class HoraireServiceTest extends KernelTestCase
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
-        $horaireService->getHoraireForDate($dateTime, $employer);
+        //$horaireService->getHoraireForDate($dateTime, $employer);
         $this->assertEquals(null, $horaireService->getDate());
     }
     public function testgetHoraireByHoraireName(): void
@@ -24,7 +24,7 @@ class HoraireServiceTest extends KernelTestCase
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
-        $horaireService->getHoraireByHoraireName($horaireName);
+        //$horaireService->getHoraireByHoraireName($horaireName);
         $this->assertEquals(null, $horaireService->getDate());
     }
 }

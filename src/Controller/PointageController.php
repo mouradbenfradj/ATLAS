@@ -8,17 +8,33 @@ use App\Form\PointageType;
 use App\Repository\DbfRepository;
 use App\Repository\PointageRepository;
 use App\Service\BilanService;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Security;
 
 /**
  * @Route("/pointage")
  */
 class PointageController extends AbstractController
 {
+
+  /**
+     * AdminUrlGenerator
+     *
+     * @var AdminUrlGenerator
+     */
+    private $adminUrlGenerator;
+    /**
+     * __construct
+     *
+     * @param AdminUrlGenerator $adminUrlGenerator
+     */
+    public function __construct(AdminUrlGenerator $adminUrlGenerator)
+    {
+        $this->adminUrlGenerator = $adminUrlGenerator;
+    }
     /**
      * @Route("/", name="pointage_index", methods={"GET"})
      */
