@@ -2,6 +2,7 @@
 
 namespace App\Tests\KernelTest\Service;
 
+use App\Service\HoraireService;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class HoraireServiceTest extends KernelTestCase

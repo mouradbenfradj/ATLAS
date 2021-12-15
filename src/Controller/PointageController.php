@@ -34,7 +34,7 @@ class PointageController extends AbstractController
      * @Route("/upload", name="xlsx_upload_from_dbf", methods={"GET","POST"})
      *
      * @param Request $request
-     * @param User $employer
+     * @param DbfRepository $dbfRepository
      * @return Response
      */
     public function upload(Request $request, DbfRepository $dbfRepository): Response

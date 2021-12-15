@@ -108,4 +108,120 @@ class BilanService extends PointageService
         }
         return $collectGeneral;
     }
+    
+
+    public function calculateurBilan(Pointage $pointage, array $bilan)
+    {
+        $bilan["nbrHeurTravailler"] = $this->bilan($pointage->getNbrHeurTravailler(), $bilan["nbrHeurTravailler"]);
+        if ($pointage->getNbrHeurTravailler()) {
+            $bilan["retardEnMinute"] = $this->bilan($pointage->getRetardEnMinute(), $bilan["retardEnMinute"]);
+        }
+        if ($pointage->getDepartAnticiper()) {
+            $bilan["departAnticiper"] = $this->bilan($pointage->getDepartAnticiper(), $bilan["departAnticiper"]);
+        }
+        if ($pointage->getRetardMidi()) {
+            $bilan["retardMidi"] = $this->bilan($pointage->getRetardMidi(), $bilan["retardMidi"]);
+        }
+        $bilan["totalRetard"] = $this->bilan($pointage->getTotaleRetard(), $bilan["totalRetard"]);
+        if ($pointage->getAutorisationSortie()) {
+            $bilan["autorisationSortie"] =
+                $this->bilan(
+                    $pointage->getAutorisationSortie()->getHeurAutoriser(),
+                    $bilan["autorisationSortie"]
+                );
+        }
+        if ($pointage->getCongerPayer()) {
+            if ($pointage->getCongerPayer()->getDemiJourner()) {
+                $bilan["congerPayer"] += 0.5;
+            } else {
+                $bilan["congerPayer"] += 1;
+            }
+        }
+        $bilan["absence"] = $pointage->getAbsence() ? $bilan["absence"] + 1 : $bilan["absence"];
+        $bilan["heurNormalementTravailler"] = $this->bilan($pointage->getHeurNormalementTravailler(), $bilan["heurNormalementTravailler"]);
+        $bilan["diff"] = $this->bilan($pointage->getDiff(), $bilan["diff"]);
+        return $bilan;
+    }
+
+
+    public function bilan(?DateTime $time, int $total)
+    {
+        if (!$time) {
+            return $total;
+        }
+        $total += $time->format('H') * 3600; // Convert the hours to seconds and add to our total
+        $total += $time->format('i') * 60;  // Convert the minutes to seconds and add to our total
+        $total += $time->format('s'); // Add the seconds to our total
+        return $total;
+    }
+    /**
+     * Undocumented function
+     *
+     * @param Pointage[] $pointages
+     * @return array
+     */
+    public function getBilanSemestriel(array $pointages): array
+    {
+        $bilan = $this->initBilan;
+        $thisWeek = 0;
+        $countWeek = 1;
+        $collectSemaine = [];
+        foreach ($pointages as $pointage) {
+            $this->pointageService->constructFromPointage($pointage);
+            if ($thisWeek != $pointage->getDate()->format('W')) {
+                if ($thisWeek) {
+                    array_push($collectSemaine, $bilan);
+                    $countWeek++;
+                }
+                $thisWeek = $pointage->getDate()->format('W');
+                $bilan = $this->initBilan;
+                $bilan["date"] = $countWeek;
+            }
+            $bilan = $this->calculateurBilan($pointage, $bilan);
+        }
+        array_push($collectSemaine, $bilan);
+        return $collectSemaine;
+    }
+    public function getBilanMensuel($pointages)
+    {
+        $bilan = $this->initBilan;
+        $thisYear = 0;
+        $thisMonth = 0;
+        $collectMensuel = [];
+        foreach ($pointages as $pointage) {
+            $this->pointageService->constructFromPointage($pointage);
+            if ($thisYear . '-' . $thisMonth != $pointage->getDate()->format('Y-m')) {
+                if ($thisYear and $thisMonth) {
+                    array_push($collectMensuel, $bilan);
+                }
+                $thisYear =  $pointage->getDate()->format('Y');
+                $thisMonth =  $pointage->getDate()->format('m');
+                $bilan = $this->initBilan;
+                $bilan["date"] =  $pointage->getDate()->format('Y-m');
+            }
+            $bilan = $this->calculateurBilan($pointage, $bilan);
+        }
+        array_push($collectMensuel, $bilan);
+        return $collectMensuel;
+    }
+    public function getBilanAnnuel($pointages)
+    {
+        $bilan = $this->initBilan;
+        $thisYear = 0;
+        $collectAnnuel = [];
+        foreach ($pointages as $pointage) {
+            $this->pointageService->constructFromPointage($pointage);
+            if ($thisYear != $pointage->getDate()->format('Y')) {
+                if ($thisYear) {
+                    array_push($collectAnnuel, $bilan);
+                }
+                $thisYear =  $pointage->getDate()->format('Y');
+                $bilan = $this->initBilan;
+                $bilan["date"] =  $pointage->getDate()->format('Y');
+            }
+            $bilan = $this->calculateurBilan($pointage, $bilan);
+        }
+        array_push($collectAnnuel, $bilan);
+        return $collectAnnuel;
+    }
 }

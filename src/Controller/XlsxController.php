@@ -27,10 +27,8 @@ class XlsxController extends AbstractController
     private $adminUrlGenerator;
 
     public function __construct(
-        FlashBagInterface $flash,
         AdminUrlGenerator $adminUrlGenerator
     ) {
-        $this->flash = $flash;
         $this->adminUrlGenerator = $adminUrlGenerator;
     }
     /**

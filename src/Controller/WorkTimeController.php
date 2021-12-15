@@ -24,27 +24,35 @@ class WorkTimeController extends AbstractController
     {
         $workTime  = [];
         $horaires = $horaireRepository->findAll();
-        $workTimes = $workTimeRepository->findByEmployer($security->getUser());
+        $workTimes = $workTimeRepository->findBy(['employer'=>$security->getUser()]);
         foreach ($horaires as $indexHoraire => $horaire) {
             array_push($workTime, $horaire);
             foreach ($workTimes as $wt) {
                 if ($horaire->getHoraire() == $wt->getHoraire()->getHoraire()) {
-                    if (!$wt->getHeurDebutTravaille())
+                    if (!$wt->getHeurDebutTravaille()) {
                         $wt->setHeurDebutTravaille($horaire->getHeurDebutTravaille());
-                    if (!$wt->getHeurFinTravaille())
+                    }
+                    if (!$wt->getHeurFinTravaille()) {
                         $wt->setHeurFinTravaille($horaire->getHeurFinTravaille());
-                    if (!$wt->getDebutPauseMatinal())
+                    }
+                    if (!$wt->getDebutPauseMatinal()) {
                         $wt->setDebutPauseMatinal($horaire->getDebutPauseMatinal());
-                    if (!$wt->getFinPauseMatinal())
+                    }
+                    if (!$wt->getFinPauseMatinal()) {
                         $wt->setFinPauseMatinal($horaire->getFinPauseMatinal());
-                    if (!$wt->getDebutPauseDejeuner())
+                    }
+                    if (!$wt->getDebutPauseDejeuner()) {
                         $wt->setDebutPauseDejeuner($horaire->getDebutPauseDejeuner());
-                    if (!$wt->getFinPauseDejeuner())
+                    }
+                    if (!$wt->getFinPauseDejeuner()) {
                         $wt->setFinPauseDejeuner($horaire->getFinPauseDejeuner());
-                    if (!$wt->getDebutPauseMidi())
+                    }
+                    if (!$wt->getDebutPauseMidi()) {
                         $wt->setDebutPauseMidi($horaire->getDebutPauseMidi());
-                    if (!$wt->getFinPauseMidi())
+                    }
+                    if (!$wt->getFinPauseMidi()) {
                         $wt->setFinPauseMidi($horaire->getFinPauseMidi());
+                    }
                     array_push($workTime, $wt);
                 }
             }
@@ -58,7 +66,7 @@ class WorkTimeController extends AbstractController
     /**
      * @Route("/new", name="work_time_new", methods={"GET","POST"})
      */
-    public function new(Request $request, Security $security): Response
+    public function new(Request $request): Response
     {
         $workTime = new WorkTime();
         $form = $this->createForm(WorkTimeType::class, $workTime);
@@ -66,7 +74,7 @@ class WorkTimeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
-            $workTime->setEmployer($security->getUser());
+            $workTime->setEmployer($this->getUser());
             $entityManager->persist($workTime);
             $entityManager->flush();
 
