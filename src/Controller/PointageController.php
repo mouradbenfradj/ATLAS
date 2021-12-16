@@ -36,10 +36,6 @@ class PointageController extends AbstractController
      * @Route("/upload", name="pointage_upload_from_dbf", methods={"GET","POST"})
      *
      * @param Request $request
-<<<<<<< HEAD
-     * @param DbfRepository $dbfRepository
-=======
->>>>>>> serviceTrait
      * @return Response
      */
     public function uploadDbf(Request $request, PointageService $pointageService, DbfRepository $dbfRepository): Response
