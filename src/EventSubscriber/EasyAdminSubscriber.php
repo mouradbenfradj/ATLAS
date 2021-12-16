@@ -55,22 +55,13 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         }
         dd($absence);
         $pointage = current(array_filter(array_map(
-            fn ($pointage): ?Pointage => ($absence->getDebut() <= $pointage->getDate() and $pointage->getDate() <= $absence->getFin()) ? $pointage : null,
+            fn ($pointage): ?Pointage => ($absence->getDebut() <= $pointage->getDate() && $pointage->getDate() <= $absence->getFin()) ? $pointage : null,
             $absence->getPointages()->toArray()
         )));
         $pointage->setAbsence(null);
         $this->congerService->constructFromAbsence($absence);
-        //$this->manager->persist($pointage);
-        //$this->manager->persist($this->congerService->createEntity());
+        die('tttt');
         $this->manager->flush();
-        /*  if ($absence->getStarttime() and $absence->getEndtime() /* and !$conger and !$autorisationSortie ) {
-            $this->pointageService->constructFromDbf($absence);
-            $this->pointageService->dbfUpdated($absence);
-        } */
-        return;
-        /*
-        $slug = $this->slugger->slugify($entity->getTitle());
-        $entity->setSlug($slug); */
     }
     /**
      * dbfUpdated
@@ -85,12 +76,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             return;
         }
         dd($dbf);
-        if (($dbf->getStarttime() and $dbf->getEndtime()) or count($dbf->getAttchktime())==0) {
-            $this->pointageService->constructFromDbf($dbf);
-            $pointage = $this->pointageService->createEntity();
-            $this->pointageService->dbfUpdated($pointage, $dbf);
-        }
-        return;
+      
     }
 
     /**
@@ -110,10 +96,6 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             $user,
             $user->getPassword()
         ));
-      
-        /*
-        $slug = $this->slugger->slugify($entity->getTitle());
-        $entity->setSlug($slug); */
     }
     /**
      * totaleRetard

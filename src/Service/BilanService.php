@@ -1,6 +1,7 @@
 <?php
 namespace App\Service;
 
+use App\Entity\Pointage;
 use DateTime;
 
 class BilanService extends PointageService
@@ -191,7 +192,7 @@ class BilanService extends PointageService
         foreach ($pointages as $pointage) {
             $this->pointageService->constructFromPointage($pointage);
             if ($thisYear . '-' . $thisMonth != $pointage->getDate()->format('Y-m')) {
-                if ($thisYear and $thisMonth) {
+                if ($thisYear && $thisMonth) {
                     array_push($collectMensuel, $bilan);
                 }
                 $thisYear =  $pointage->getDate()->format('Y');

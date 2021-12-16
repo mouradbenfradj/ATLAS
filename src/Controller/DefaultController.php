@@ -29,18 +29,4 @@ class DefaultController extends AbstractController
             'bilan' => $bilans
         ]);
     }
-
-    /*
-    public function default(BilanService $bilanService): Response
-    {
-        $employer = $this->getUser();
-        if ($employer && property_exists($employer, 'pointages')) {
-            $bilans = $bilanService->getBilanGeneral($employer->getPointages()->toArray());
-        } else {
-            $bilans = [];
-        }
-        return $this->render('default/index.html.twig', [
-            'bilan' => $bilans
-        ]);
-    } */
 }

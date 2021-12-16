@@ -1,9 +1,5 @@
 <?php
-<<<<<<< HEAD:src/Interfaces/DateInterface.php
 namespace App\Interfaces;
-=======
-namespace App\Service;
->>>>>>> phpspect:src/Service/DateInterface.php
 
 use DateTime;
 

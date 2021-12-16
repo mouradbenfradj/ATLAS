@@ -23,7 +23,9 @@ class AbsenceServiceTest extends KernelTestCase
         $userRepository = $container->get(UserRepository::class);
         $testUser = $userRepository->findOneBy(['email'=>'mourad.benfradj.atlas@gmail.com']);
         $absenceService = $container->get(AbsenceService::class);
-
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
         $this->assertEquals(1, $testUser->getId());
     }
 }

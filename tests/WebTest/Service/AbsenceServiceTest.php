@@ -13,10 +13,6 @@ class AbsenceServiceTest extends WebTestCase
     {
         $client = static::createClient();
         $userRepository = static::getContainer()->get(UserRepository::class);
-<<<<<<< HEAD
-        $absenceService = static::getContainer()->get(AbsenceService::class);
-=======
->>>>>>> serviceTrait
         $testUser = $userRepository->findOneBy(['email'=>'mourad.benfradj.atlas@gmail.com']);
         $this->assertEquals(1, $testUser->getId());
         $client->loginUser($testUser);

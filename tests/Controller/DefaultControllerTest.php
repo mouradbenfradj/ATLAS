@@ -10,7 +10,7 @@ class DefaultControllerTest extends WebTestCase
     public function testFirstConnextionTime(): void
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/');
+        $client->request('GET', '/');
         $crawler = $client->followRedirect();
 
         $this->assertResponseIsSuccessful();
@@ -18,8 +18,9 @@ class DefaultControllerTest extends WebTestCase
         $this->assertSelectorTextContains('p', 'Sign in to start your session');
         $this->assertSelectorTextContains('label', 'Remember Me');
         $this->assertSelectorTextContains('button', 'Sign In');
-        //$this->assertSelectorTextContains('a:contains("/reset-password")', 'I forgot my password');
-        //$this->assertSelectorTextContains('a', 'Register a new membership');
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
         $this->assertCount(3, $crawler->filter('a'));
     }
     public function testVisitingWhileLoggedIn()
@@ -32,7 +33,7 @@ class DefaultControllerTest extends WebTestCase
         // simulate $testUser being logged in
         $client->loginUser($testUser);
 
-        $crawler = $client->request('GET', '/');
+        $client->request('GET', '/');
         $crawler = $client->followRedirect();
 
         $this->assertResponseIsSuccessful();
@@ -40,8 +41,9 @@ class DefaultControllerTest extends WebTestCase
         $this->assertSelectorTextContains('p', 'Sign in to start your session');
         $this->assertSelectorTextContains('label', 'Remember Me');
         $this->assertSelectorTextContains('button', 'Sign In');
-        //$this->assertSelectorTextContains('a:contains("/reset-password")', 'I forgot my password');
-        //$this->assertSelectorTextContains('a', 'Register a new membership');
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
         $this->assertCount(3, $crawler->filter('a'));
     }
 }

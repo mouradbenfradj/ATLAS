@@ -33,47 +33,16 @@ class RegistrationControllerTest extends WebTestCase
         $expected->setDebutTravaille(new DateTime('2021-01-01'));
         $expected->setEmail('mourad.benfradj.atlas@gmail.com');
         $expected->setPassword('mourad');
+        $form->submit($formData);
+        $this->assertTrue($form->isSynchronized());
+        $this->assertEquals($expected, $employer);
+
         $client = static::createClient();
         $crawler = $client->request('GET', '/register');
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('b', 'ATLAS');
-
-        /* $status_code = $client->getResponse()->getStatus();
-        echo $status_code;
-        if ($status_code==200) {
-
-        /*  $form = $crawler->selectButton('Log in')->form();
-         $form['username'] = 'user123';
-         $form['password'] = 'pass123';
-         $crawler = $client->submit($form);
-
-         $crawler->filter('a.gmFkV')->each(function ($node, $i) {
-             print $node->text();
-             echo "<br />";
-         });
-        } else {
-            echo "Error";
-        } */
-
-        /*    $buttonCrawlerNode = $crawler->selectButton('Register');
-
-           // retrieve the Form object for the form belonging to this button
-           $form = $buttonCrawlerNode->form();
-           $form['registration_form[firstName]'] = 'mourad1';
-
-           $crawler = $client->submitForm('Register', [
-               'registration_form[firstName]' => 'mourad1',
-               'registration_form[lastName]' => 'bf',
-               'registration_form[id]' => 102,
-               'registration_form[badgenumbe]' => 102,
-               'registration_form[debutTravaille][day]' => '01',
-               'registration_form[debutTravaille][month]' => '01',
-               'registration_form[debutTravaille][year]' => '2020',
-               'registration_form[email]' => 'mourad.benfradj.atlas@gmail.com',
-               'registration_form[plainPassword]' => 'mourad',
-               'registration_form[agreeTerms]' => true,
-           ]);
-
-           $crawler = $this->client->followRedirect(); */
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
     }
 }
