@@ -10,6 +10,7 @@ use App\Repository\PointageRepository;
 use App\Service\BilanService;
 use App\Service\DbfService;
 use App\Service\PointageService;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

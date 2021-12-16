@@ -31,21 +31,10 @@ trait AutorisationSortieTrait
      */
     public function getAutorisation(DateTime $date): ?AutorisationSortie
     {
-<<<<<<< HEAD:src/Traits/AutorisationSortieTrait.php
         $autorisationSortie =  current(array_filter(array_map(
             fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $date && $date <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
             $this->getEmployer()->getAutorisationSorties()->toArray()
         )));
-=======
-        $autorisationSortie =  current(
-            array_filter(
-                array_map(
-                    fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $date and $date <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
-                    $this->getEmployer()->getAutorisationSorties()->toArray()
-                )
-            )
-        );
->>>>>>> phpspect:src/Service/AutorisationSortieService.php
         if ($autorisationSortie) {
             return $autorisationSortie;
         }
