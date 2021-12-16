@@ -24,23 +24,23 @@ class XlsxService extends PointageService
 
     public function createXlsxEntity(): Xlsx
     {
-        $xlsx = new Xlsx();
-        $xlsx->setDate($this->getDate());
-        $xlsx->setHoraire($this->getHoraire());
-        $xlsx->setEntrer($this->getEntrer());
-        $xlsx->setSortie($this->getSortie());
-        $xlsx->setNbrHeurTravailler($this->getNbrHeurTravailler());
-        $xlsx->setRetardEnMinute($this->getRetardEnMinute());
-        $xlsx->setDepartAnticiper($this->getDepartAnticiper());
-        $xlsx->setRetardMidi($this->getRetardMidi());
-        $xlsx->setTotalRetard($this->getTotaleRetard());
-        $xlsx->setAutorisationSortie($this->getAutorisation($this->getDate()));
-        $xlsx->setCongerPayer($this->getConger($this->getDate()));
-        $xlsx->setAbsence($this->getAbsence($this->getDate()));
-        $xlsx->setHeurNormalementTravailler($this->getHeurNormalementTravailler());
-        $xlsx->setDiff($this->getDiff());
-        $xlsx->setEmployer($this->getEmployer());
-        return $xlsx;
+        $this->xlsx = new Xlsx();
+        $this->xlsx->setDate($this->getDate());
+        $this->xlsx->setHoraire($this->getHoraire());
+        $this->xlsx->setEntrer($this->getEntrer());
+        $this->xlsx->setSortie($this->getSortie());
+        $this->xlsx->setNbrHeurTravailler($this->getNbrHeurTravailler());
+        $this->xlsx->setRetardEnMinute($this->getRetardEnMinute());
+        $this->xlsx->setDepartAnticiper($this->getDepartAnticiper());
+        $this->xlsx->setRetardMidi($this->getRetardMidi());
+        $this->xlsx->setTotalRetard($this->getTotaleRetard());
+        $this->xlsx->setAutorisationSortie($this->getAutorisation($this->getDate()));
+        $this->xlsx->setCongerPayer($this->getConger($this->getDate()));
+        $this->xlsx->setAbsence($this->getAbsence($this->getDate()));
+        $this->xlsx->setHeurNormalementTravailler($this->getHeurNormalementTravailler());
+        $this->xlsx->setDiff($this->getDiff());
+        $this->xlsx->setEmployer($this->getEmployer());
+        return $this->xlsx;
     }
 
 

@@ -161,6 +161,14 @@ trait DbfEntityTrait
      * @var DateTime
      */
     private $atttime;
+
+    
+    /**
+     * attchktime
+     *
+     * @var string[]
+     */
+    private $attchktime = [];
     /**
      * Get userid
      *

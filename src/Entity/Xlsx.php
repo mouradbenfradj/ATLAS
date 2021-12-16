@@ -89,6 +89,11 @@ class Xlsx
      */
     private $employer;
 
+    /**
+     * @ORM\Column(type="time", nullable=true)
+     */
+    private $nbrHeurTravailler;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -260,6 +265,18 @@ class Xlsx
     public function setEmployer(?User $employer): self
     {
         $this->employer = $employer;
+
+        return $this;
+    }
+
+    public function getNbrHeurTravailler(): ?\DateTimeInterface
+    {
+        return $this->nbrHeurTravailler;
+    }
+
+    public function setNbrHeurTravailler(?\DateTimeInterface $nbrHeurTravailler): self
+    {
+        $this->nbrHeurTravailler = $nbrHeurTravailler;
 
         return $this;
     }

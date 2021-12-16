@@ -17,16 +17,17 @@ class PointageService extends EmployerService
          */
     private $pointage;
     
+    public function __construct(EntityManagerInterface $manager)
+    {
+        parent::__construct($manager);
+    }
+    
     public function calculeNbrHeurTravailler($dbf)
     {
         dd($dbf, $this->pointage);
     }
     
 
-    public function __construct(EntityManagerInterface $manager)
-    {
-        parent::__construct($manager);
-    }
 
     /**
      * dateInDB

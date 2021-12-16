@@ -3,12 +3,14 @@ namespace App\Service;
 
 use App\Interfaces\DateInterface;
 use App\Interfaces\TimeInterface;
+use App\Traits\JourFerierTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 class DateTimeService extends ConfigService implements DateInterface, TimeInterface
 {
+    use JourFerierTrait;
     const FORMATTIMEHI = 'H:i';
     const FORMATTIMEHIS = self::FORMATTIMEHI . ':s';
     const FORMATDATEDMY = 'd/m/Y';

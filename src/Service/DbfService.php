@@ -17,14 +17,13 @@ class DbfService extends PointageService
      */
     private $dbf;
 
-    /**
-     * attchktime
-     *
-     * @var string[]
-     */
-    private $attchktime = [];
 
-    public function getDbfDateInDB()
+    /**
+     * GetDbfDateInDB
+     *
+     * @return string[]
+     */
+    public function getDbfDateInDB():array
     {
         return array_map(
             fn ($date): string => $date->getAttdate()->format('Y-m-d'),
@@ -69,29 +68,5 @@ class DbfService extends PointageService
         $this->dbf->setAttchktime($this->attchktime);
         $this->dbf->setEmployer($this->getEmployer());
         return $this->dbf;
-    }
-
-    /**
-     * Get dbf
-     *
-     * @return  Dbf
-     */
-    public function getDbf()
-    {
-        return $this->dbf;
-    }
-
-    /**
-     * Set dbf
-     *
-     * @param  Dbf  $dbf  dbf
-     *
-     * @return  self
-     */
-    public function setDbf(Dbf $dbf)
-    {
-        $this->dbf = $dbf;
-
-        return $this;
     }
 }

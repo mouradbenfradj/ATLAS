@@ -7,7 +7,7 @@ use App\Traits\HoraireTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
-class HoraireService extends JourFerierService
+class HoraireService extends DateTimeService
 {
     use HoraireTrait;
 
