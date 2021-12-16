@@ -4,13 +4,19 @@ namespace App\Service;
 
 use App\Entity\Dbf;
 use App\Entity\Pointage;
-use DateTime;
+use App\Traits\PointageEntityTrait;
 use Doctrine\ORM\EntityManagerInterface;
 
-class PointageService extends AutorisationSortieService
+class PointageService extends EmployerService
 {
     use PointageEntityTrait;
-
+    /**
+         * pointage
+         *
+         * @var Pointage
+         */
+    private $pointage;
+    
     public function calculeNbrHeurTravailler($dbf)
     {
         dd($dbf, $this->pointage);
@@ -56,7 +62,4 @@ class PointageService extends AutorisationSortieService
         dd($this->pointage, $dbf);
         return $this->pointage;
     }
-
-
-    
 }

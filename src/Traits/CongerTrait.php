@@ -1,16 +1,11 @@
 <?php
-namespace App\Service;
+namespace App\Traits;
 
 use App\Entity\Conger;
 use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
 
-class CongerService extends AbsenceService
+trait CongerTrait
 {
-    public function __construct(EntityManagerInterface $manager)
-    {
-        parent::__construct($manager);
-    }
     /**
      * matchAvecUnConger
      *
@@ -20,7 +15,7 @@ class CongerService extends AbsenceService
     public function matchAvecUnConger(DateTime $date): bool
     {
         return current(array_filter(array_map(
-            fn ($conger): bool => ($conger->getDebut() <=  $date and  $date  <= $conger->getFin()) ? true : false,
+            fn ($conger): bool => ($conger->getDebut() <=  $date &&  $date  <= $conger->getFin()) ? true : false,
             $this->getEmployer()->getCongers()->toArray()
         )));
     }
@@ -33,7 +28,7 @@ class CongerService extends AbsenceService
     public function getConger(DateTime $date): ?Conger
     {
         $conger = current(array_filter(array_map(
-            fn ($conger): ?Conger => ($conger->getDebut() <= $date and $date  <= $conger->getFin()) ? $conger : null,
+            fn ($conger): ?Conger => ($conger->getDebut() <= $date && $date  <= $conger->getFin()) ? $conger : null,
             $this->getEmployer()->getCongers()->toArray()
         )));
         if ($conger) {

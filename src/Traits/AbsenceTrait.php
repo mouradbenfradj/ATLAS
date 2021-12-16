@@ -1,16 +1,11 @@
 <?php
-namespace App\Service;
+namespace App\Traits;
 
 use App\Entity\Absence;
 use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
 
-class AbsenceService extends EmployerService
+trait AbsenceTrait
 {
-    public function __construct(EntityManagerInterface $manager)
-    {
-        parent::__construct($manager);
-    }
     /**
      * matchAvecUneAbsence
      *
@@ -20,7 +15,7 @@ class AbsenceService extends EmployerService
     public function matchAvecUneAbsence(DateTime $date): bool
     {
         return current(array_filter(array_map(
-            fn ($absence): bool => ($absence->getDebut() <=  $date and  $date  <= $absence->getFin()) ? true : false,
+            fn ($absence): bool => ($absence->getDebut() <=  $date &&  $date  <= $absence->getFin()) ? true : false,
             $this->getEmployer()->getAbsences()->toArray()
         )));
     }
@@ -33,7 +28,7 @@ class AbsenceService extends EmployerService
     public function getAbsence(DateTime $date): ?Absence
     {
         $absence =  current(array_filter(array_map(
-            fn ($absence): ?Absence => ($absence->getDebut() <= $date and $date <= $absence->getFin()) ? $absence : null,
+            fn ($absence): ?Absence => ($absence->getDebut() <= $date && $date <= $absence->getFin()) ? $absence : null,
             $this->getEmployer()->getAbsences()->toArray()
         )));
         if ($absence) {

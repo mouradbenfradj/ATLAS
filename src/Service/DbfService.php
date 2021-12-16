@@ -2,6 +2,8 @@
 namespace App\Service;
 
 use App\Entity\Dbf;
+use App\Traits\DbfEntityTrait;
+use App\Traits\TableReaderTrait;
 use DateTime;
 
 class DbfService extends PointageService

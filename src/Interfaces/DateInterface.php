@@ -1,6 +1,5 @@
 <?php
-namespace App\Service;
-
+namespace App\Interfaces;
 
 use DateTime;
 

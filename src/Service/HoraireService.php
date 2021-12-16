@@ -3,15 +3,14 @@
 namespace App\Service;
 
 use App\Entity\Horaire;
+use App\Traits\HoraireTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Query\Expr\Func;
-use PhpParser\Builder\Function_;
 
 class HoraireService extends JourFerierService
 {
     use HoraireTrait;
-    
+
     /**
      * Listhoraires
      *

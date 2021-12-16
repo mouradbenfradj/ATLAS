@@ -1,16 +1,11 @@
 <?php
-namespace App\Service;
+namespace App\Traits;
 
 use DateTime;
 
 trait PointageEntityTrait
 {
-    /**
-     * pointage
-     *
-     * @var Pointage
-     */
-    private $pointage;
+    
 
     /**
      * date

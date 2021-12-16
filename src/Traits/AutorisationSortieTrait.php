@@ -1,16 +1,12 @@
 <?php
-namespace App\Service;
+namespace App\Traits;
 
 use App\Entity\AutorisationSortie;
 use DateTime;
-use Doctrine\ORM\EntityManagerInterface;
 
-class AutorisationSortieService extends CongerService
+trait AutorisationSortieTrait
 {
-    public function __construct(EntityManagerInterface $manager)
-    {
-        parent::__construct($manager);
-    }
+  
     /**
      * matchAvecUneAutorisationDeSortie
      *
@@ -21,7 +17,7 @@ class AutorisationSortieService extends CongerService
     public function matchAvecUneAutorisationDeSortie(array $autorisationSorties, DateTime $date): bool
     {
         return current(array_filter(array_map(
-            fn ($autorisationSortie): bool => ($autorisationSortie->getDebut() <=  $date and  $date  <= $autorisationSortie->getFin()) ? true : false,
+            fn ($autorisationSortie): bool => ($autorisationSortie->getDebut() <=  $date &&  $date  <= $autorisationSortie->getFin()) ? true : false,
             $autorisationSorties
         )));
     }
@@ -36,7 +32,7 @@ class AutorisationSortieService extends CongerService
     public function getAutorisation(DateTime $date): ?AutorisationSortie
     {
         $autorisationSortie =  current(array_filter(array_map(
-            fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $date and $date <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
+            fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $date && $date <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
             $this->getEmployer()->getAutorisationSorties()->toArray()
         )));
         if ($autorisationSortie) {
