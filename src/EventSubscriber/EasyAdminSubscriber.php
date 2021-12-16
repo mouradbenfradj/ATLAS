@@ -137,12 +137,5 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             return;
         }
         dd($pointage);
-
-        /*   dd($entity);
-        $this->pointageService->setPointage($entity);
-        $entity->setTotaleRetard($this->pointageService->totalRetard()); */
-        /*
-        $slug = $this->slugger->slugify($entity->getTitle());
-        $entity->setSlug($slug); */
     }
 }

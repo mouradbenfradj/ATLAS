@@ -9,6 +9,7 @@ class DateTimeService extends ConfigService implements DateInterface, TimeInterf
 {
     const FORMATTIMEHI = 'H:i';
     const FORMATTIMEHIS = self::FORMATTIMEHI . ':s';
+    const FORMATDATEDMY = 'd/m/Y';
 
     public function __construct(EntityManagerInterface $manager)
     {
@@ -22,8 +23,8 @@ class DateTimeService extends ConfigService implements DateInterface, TimeInterf
      */
     public function dateString_d_m_Y_ToDateTime(string $dateString): DateTime
     {
-        if (DateTime::createFromFormat('d/m/Y', $dateString) !== false) {
-            return DateTime::createFromFormat('d/m/Y', $dateString);
+        if (DateTime::createFromFormat(self::FORMATDATEDMY, $dateString) !== false) {
+            return DateTime::createFromFormat(self::FORMATDATEDMY, $dateString);
         }
         return null;
     }/**
@@ -45,7 +46,7 @@ class DateTimeService extends ConfigService implements DateInterface, TimeInterf
      */
     public function isDate(?string $dateString): bool
     {
-        return DateTime::createFromFormat('d/m/Y', $dateString) !== false;
+        return DateTime::createFromFormat(self::FORMATDATEDMY, $dateString) !== false;
     }
 
     /**
@@ -90,8 +91,8 @@ class DateTimeService extends ConfigService implements DateInterface, TimeInterf
      */
     public function diffTime(DateTime $timeMax, DateTime $timeMin): DateTime
     {
-        $timeMax = new DateTime(date('H:i:s', strtotime($timeMax->format("H:i:s"))));
-        $timeMin = new DateTime(date('H:i:s', strtotime($timeMin->format("H:i:s"))));
+        $timeMax = new DateTime(date(self::FORMATTIMEHIS, strtotime($timeMax->format(self::FORMATTIMEHIS))));
+        $timeMin = new DateTime(date(self::FORMATTIMEHIS, strtotime($timeMin->format(self::FORMATTIMEHIS))));
 
         $diff =  date_diff($timeMax, $timeMin);
         return new DateTime($diff->h . ':' . $diff->i . ':' . $diff->s);

@@ -38,10 +38,6 @@ class Xlsx
      */
     private $sortie;
 
-    /**
-     * @ORM\Column(type="time", nullable=true)
-     */
-    private $nbrHeursTravailler;
 
     /**
      * @ORM\Column(type="time", nullable=true)
@@ -146,17 +142,7 @@ class Xlsx
         return $this;
     }
 
-    public function getNbrHeursTravailler(): ?\DateTimeInterface
-    {
-        return $this->nbrHeursTravailler;
-    }
-
-    public function setNbrHeursTravailler(?\DateTimeInterface $nbrHeursTravailler): self
-    {
-        $this->nbrHeursTravailler = $nbrHeursTravailler;
-
-        return $this;
-    }
+ 
 
     public function getRetardEnMinute(): ?\DateTimeInterface
     {

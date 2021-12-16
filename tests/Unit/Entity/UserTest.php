@@ -5,6 +5,7 @@ namespace App\Tests\Unit\Entity;
 use App\Entity\User;
 use DateTime;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 /**
  * UserTest class
@@ -22,18 +23,35 @@ class UserTest extends TestCase
     const PRENOM = 'Mourad';
     const QUALIFICATION = 'Ingenieur Informatique';
 
-    /**
-     * TestIsTrue function
-     *
-     * @return void
-     */
+    private $employer;
+
+    protected function setUp(): void
+    {
+        $this->employer = new User();
+    }
+    public function testFailure1(): void
+    {
+        $this->assertContainsOnlyInstancesOf(
+            User::class,
+            [new User]
+        );
+    }
+    public function testAttribute(): void
+    {
+        $this->assertClassHasAttribute('id', User::class);
+        $this->assertClassHasAttribute('firstName', User::class);
+        $this->assertClassHasAttribute('lastName', User::class);
+        $this->assertClassHasAttribute('email', User::class);
+        $this->assertClassHasAttribute('password', User::class);
+    }
+
+
     public function testIsTrue(): void
     {
         $date = new DateTime("2021-11-30");
         $time = new DateTime("23:00:00");
-        $user = new User();
         $sconger = 10.040;
-        $user->setEmail(self::EMAIL)
+        $this->employer->setEmail(self::EMAIL)
             ->setRoles(array('ROLE_USER'))
             ->setPassword("mourad")
             ->setId(127)
@@ -47,20 +65,20 @@ class UserTest extends TestCase
             ->setSoldAutorisationSortie($time)
             ->setSoldConger($sconger)
             ->setIsVerified(true);
-        $this->assertSame(self::EMAIL, $user->getEmail());
-        $this->assertSame(array('ROLE_USER'), $user->getRoles());
-        $this->assertSame("mourad", $user->getPassword());
-        $this->assertSame(127, $user->getId());
-        $this->assertSame(207, $user->getBadgenumbe());
-        $this->assertSame(self::PRENOM, $user->getFirstName());
-        $this->assertSame(self::NOM, $user->getLastName());
-        $this->assertSame(self::QUALIFICATION, $user->getQualification());
-        $this->assertSame(502, $user->getMatricule());
-        $this->assertSame($date, $user->getDebutTravaille());
-        $this->assertSame($date, $user->getDemission());
-        $this->assertSame($time, $user->getSoldAutorisationSortie());
-        $this->assertSame($sconger, $user->getSoldConger());
-        $this->assertSame(true, $user->isVerified());
+        $this->assertSame(self::EMAIL, $this->employer->getEmail());
+        $this->assertSame(array('ROLE_USER'), $this->employer->getRoles());
+        $this->assertSame("mourad", $this->employer->getPassword());
+        $this->assertSame(127, $this->employer->getId());
+        $this->assertSame(207, $this->employer->getBadgenumbe());
+        $this->assertSame(self::PRENOM, $this->employer->getFirstName());
+        $this->assertSame(self::NOM, $this->employer->getLastName());
+        $this->assertSame(self::QUALIFICATION, $this->employer->getQualification());
+        $this->assertSame(502, $this->employer->getMatricule());
+        $this->assertSame($date, $this->employer->getDebutTravaille());
+        $this->assertSame($date, $this->employer->getDemission());
+        $this->assertSame($time, $this->employer->getSoldAutorisationSortie());
+        $this->assertSame($sconger, $this->employer->getSoldConger());
+        $this->assertSame(true, $this->employer->isVerified());
     }
     /**
      * TestIsFalse function
@@ -73,9 +91,8 @@ class UserTest extends TestCase
         $date2 = new DateTime("2020-11-30");
         $time = new DateTime("23:00:00");
         $time2 = new DateTime("23:23:23");
-        $user = new User();
         $sconger = 10.040;
-        $user->setEmail(self::EMAIL)
+        $this->employer->setEmail(self::EMAIL)
             ->setRoles(array('ROLE_USER'))
             ->setPassword("mourad")
             ->setId(127)
@@ -89,20 +106,20 @@ class UserTest extends TestCase
             ->setSoldAutorisationSortie($time)
             ->setSoldConger($sconger)
             ->setIsVerified(true);
-        $this->assertNotSame("false@gmail.com", $user->getEmail());
-        $this->assertNotSame(["false"], $user->getRoles());
-        $this->assertNotSame("false", $user->getPassword());
-        $this->assertNotSame(0, $user->getBadgenumbe());
-        $this->assertNotSame("false", $user->getFirstName());
-        $this->assertNotSame(0, $user->getId());
-        $this->assertNotSame("false", $user->getQualification());
-        $this->assertNotSame("false", $user->getLastName());
-        $this->assertNotSame(0, $user->getMatricule());
-        $this->assertNotSame($date2, $user->getDebutTravaille());
-        $this->assertNotSame($date2, $user->getDemission());
-        $this->assertNotSame($time2, $user->getSoldAutorisationSortie());
-        $this->assertNotSame(1, $user->getSoldConger());
-        $this->assertNotSame(false, $user->isVerified());
+        $this->assertNotSame("false@gmail.com", $this->employer->getEmail());
+        $this->assertNotSame(["false"], $this->employer->getRoles());
+        $this->assertNotSame("false", $this->employer->getPassword());
+        $this->assertNotSame(0, $this->employer->getBadgenumbe());
+        $this->assertNotSame("false", $this->employer->getFirstName());
+        $this->assertNotSame(0, $this->employer->getId());
+        $this->assertNotSame("false", $this->employer->getQualification());
+        $this->assertNotSame("false", $this->employer->getLastName());
+        $this->assertNotSame(0, $this->employer->getMatricule());
+        $this->assertNotSame($date2, $this->employer->getDebutTravaille());
+        $this->assertNotSame($date2, $this->employer->getDemission());
+        $this->assertNotSame($time2, $this->employer->getSoldAutorisationSortie());
+        $this->assertNotSame(1, $this->employer->getSoldConger());
+        $this->assertNotSame(false, $this->employer->isVerified());
     }
     /**
      * TestIsEmpty function
@@ -111,18 +128,17 @@ class UserTest extends TestCase
      */
     public function testIsEmpty(): void
     {
-        $user = new User();
-        $this->assertEmpty($user->getEmail());
-        $this->assertEmpty($user->getId());
-        $this->assertEmpty($user->getBadgenumbe());
-        $this->assertEmpty($user->getFirstName());
-        $this->assertEmpty($user->getLastName());
-        $this->assertEmpty($user->getQualification());
-        $this->assertEmpty($user->getMatricule());
-        $this->assertEmpty($user->getDebutTravaille());
-        $this->assertEmpty($user->getDemission());
-        $this->assertEmpty($user->getSoldAutorisationSortie());
-        $this->assertEmpty($user->getSoldConger());
-        $this->assertEmpty($user->isVerified());
+        $this->assertEmpty($this->employer->getEmail());
+        $this->assertEmpty($this->employer->getId());
+        $this->assertEmpty($this->employer->getBadgenumbe());
+        $this->assertEmpty($this->employer->getFirstName());
+        $this->assertEmpty($this->employer->getLastName());
+        $this->assertEmpty($this->employer->getQualification());
+        $this->assertEmpty($this->employer->getMatricule());
+        $this->assertEmpty($this->employer->getDebutTravaille());
+        $this->assertEmpty($this->employer->getDemission());
+        $this->assertEmpty($this->employer->getSoldAutorisationSortie());
+        $this->assertEmpty($this->employer->getSoldConger());
+        $this->assertEmpty($this->employer->isVerified());
     }
 }

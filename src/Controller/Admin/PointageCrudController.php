@@ -8,7 +8,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -28,10 +27,10 @@ class PointageCrudController extends AbstractCrudController
     {
         $updateFromDbf = Action::new('updateFromDbf', 'Update from Dbf')
             ->setIcon('fa fa-download')
-            ->linkToRoute('default')
+            ->linkToRoute('pointage_upload_from_dbf')
             ->setCssClass('btn')
             ->createAsGlobalAction();
-        $updateFromXlsx = Action::new('updateFromXlsx', 'Update from Dbf')
+        $updateFromXlsx = Action::new('updateFromXlsx', 'Update from Xlsx')
             ->setIcon('fa fa-download')
             ->linkToRoute('default')
             ->setCssClass('btn')

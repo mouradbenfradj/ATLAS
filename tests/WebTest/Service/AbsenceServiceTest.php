@@ -13,11 +13,9 @@ class AbsenceServiceTest extends WebTestCase
     {
         $client = static::createClient();
         $userRepository = static::getContainer()->get(UserRepository::class);
-        $absenceService = static::getContainer()->get(AbsenceService::class);
-        $testUser = $userRepository->findOneByEmail('mourad.benfradj.atlas@gmail.com');
+        $testUser = $userRepository->findOneBy(['email'=>'mourad.benfradj.atlas@gmail.com']);
         $this->assertEquals(1, $testUser->getId());
         $client->loginUser($testUser);
-        $absenceService = static::getContainer()->get(AbsenceService::class);
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );

@@ -8,6 +8,8 @@ use App\Form\PointageType;
 use App\Repository\DbfRepository;
 use App\Repository\PointageRepository;
 use App\Service\BilanService;
+use App\Service\DbfService;
+use App\Service\PointageService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,16 +32,17 @@ class PointageController extends AbstractController
     }
 
     /**
-     * upload function
-     * @Route("/upload", name="xlsx_upload_from_dbf", methods={"GET","POST"})
+     * UploadDbf
+     * @Route("/upload", name="pointage_upload_from_dbf", methods={"GET","POST"})
      *
      * @param Request $request
-     * @param User $employer
      * @return Response
      */
-    public function upload(Request $request, DbfRepository $dbfRepository): Response
+    public function uploadDbf(Request $request, PointageService $pointageService, DbfRepository $dbfRepository): Response
     {
         foreach ($dbfRepository->findAll() as $dbf) {
+            $pointage = $pointageService->dbfConvertToPointage($dbf);
+            dd($pointage);
         }
                
         /* dd($user);

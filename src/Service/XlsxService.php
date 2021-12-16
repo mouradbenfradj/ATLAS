@@ -2,11 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\Absence;
-use App\Entity\AutorisationSortie;
-use App\Entity\Conger;
 use App\Entity\Xlsx;
-use DateTime;
 
 class XlsxService extends PointageService
 {
@@ -33,7 +29,7 @@ class XlsxService extends PointageService
         $xlsx->setHoraire($this->getHoraire());
         $xlsx->setEntrer($this->getEntrer());
         $xlsx->setSortie($this->getSortie());
-        $xlsx->setNbrHeursTravailler($this->getNbrHeurTravailler());
+        $xlsx->setNbrHeurTravailler($this->getNbrHeurTravailler());
         $xlsx->setRetardEnMinute($this->getRetardEnMinute());
         $xlsx->setDepartAnticiper($this->getDepartAnticiper());
         $xlsx->setRetardMidi($this->getRetardMidi());

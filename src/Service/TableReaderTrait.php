@@ -5,7 +5,7 @@ use App\Entity\User;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use XBase\TableReader;
 
-class TableReaderService extends DbfService
+trait TableReaderTrait
 {
     public function installDbfFile(UploadedFile $fileDbf): User
     {
