@@ -20,9 +20,6 @@ class PointageCrudController extends AbstractCrudController
     {
         return Pointage::class;
     }
-
-
-
     
     public function configureActions(Actions $actions): Actions
     {
