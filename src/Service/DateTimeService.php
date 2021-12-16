@@ -23,9 +23,9 @@ class DateTimeService extends ConfigService implements DateInterface, TimeInterf
      * DateString_d_m_Y_ToDateTime
      *
      * @param string $dateString
-     * @return DateTime
+     * @return DateTime|null
      */
-    public function dateString_d_m_Y_ToDateTime(string $dateString): DateTime
+    public function dateString_d_m_Y_ToDateTime(string $dateString): ?DateTime
     {
         if (DateTime::createFromFormat(self::FORMATDATEDMY, $dateString) !== false) {
             return DateTime::createFromFormat(self::FORMATDATEDMY, $dateString);

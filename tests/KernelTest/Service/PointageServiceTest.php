@@ -15,7 +15,7 @@ class PointageServiceTest extends KernelTestCase
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
-        $employer = new User;
+        $employer = new User();
         $pointageService->getPointageDateInDB($employer);
         $this->assertEquals(null, $pointageService->getDate());
     }

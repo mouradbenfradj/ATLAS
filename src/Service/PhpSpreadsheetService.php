@@ -25,9 +25,6 @@ class PhpSpreadsheetService extends XlsxService
             );
             foreach ($rows as $cols) {
                 if ($this->isDate($cols['A']) and $cols['C'] and $cols['D']) {
-                    if (!$cols['C'] or  !$cols['D']) {
-                        dd($cols['A'], $cols['C'], $cols['D'], $this->isDate($cols['A']));
-                    }
                     $this->setDate($this->dateString_d_m_Y_ToDateTime($cols['A']));
                     if (!in_array($this->getDate()->format('Y-m-d'), $ignoredDay)) {
                         $horaire = $this->getHoraireForDate($this->getDate());
