@@ -41,8 +41,7 @@ class PointageController extends AbstractController
     public function uploadDbf(Request $request, PointageService $pointageService, DbfRepository $dbfRepository): Response
     {
         foreach ($dbfRepository->findAll() as $dbf) {
-            $pointage = $pointageService->dbfConvertToPointage($dbf);
-            dd($pointage);
+            dd($dbf);
         }
                
         /* dd($user);
