@@ -177,45 +177,7 @@ class AutorisationSortieService  extends DateTimeService
         return $this;
     }
 
-    /**
-     * Get the value of sortie
-     */
-    public function getSortie()
-    {
-        return $this->sortie;
-    }
-
-    /**
-     * Set the value of sortie
-     *
-     * @return  self
-     */
-    public function setSortie($sortie)
-    {
-        $this->sortie = $sortie;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of entrer
-     */
-    public function getEntrer()
-    {
-        return $this->entrer;
-    }
-
-    /**
-     * Set the value of entrer
-     *
-     * @return  self
-     */
-    public function setEntrer($entrer)
-    {
-        $this->entrer = $entrer;
-
-        return $this;
-    }
+    
 
     /**
      * Get de

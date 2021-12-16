@@ -197,26 +197,8 @@ class AutorisationSortieService  extends DateTimeService
         return $this;
     }
 
-    /**
-     * Get the value of entrer
-     */
-    public function getEntrer()
-    {
-        return $this->entrer;
-    }
-
-    /**
-     * Set the value of entrer
-     *
-     * @return  self
-     */
-    public function setEntrer($entrer)
-    {
-        $this->entrer = $entrer;
-
-        return $this;
-    }
-
+    
+    
     /**
      * Get de
      *

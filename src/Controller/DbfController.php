@@ -5,10 +5,10 @@ namespace App\Controller;
 use App\Controller\Admin\DbfCrudController;
 use App\Entity\User;
 use App\Form\UploadType;
+use App\Service\DbfService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\TableReaderService;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -52,18 +52,15 @@ class DbfController extends AbstractController
      * @param User $employer
      * @return Response
      */
-    public function upload(Request $request, User $employer, TableReaderService $tableReaderService): Response
+    public function upload(Request $request, User $employer, DbfService $dbfService): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $dbf = $form->get('upload')->getData();
             if ($dbf) {
-                $tableReaderService->setEmployer($employer);
-                $employer = $tableReaderService->installDbfFile($dbf);
-                /* dd($user);
-                $user->setSoldConger($this->employerService->calculerSoldConger($user));
-                $user->setSoldAutorisationSortie($this->employerService->calculerAS($user)); */
+                $dbfService->setEmployer($employer);
+                $employer = $dbfService->installDbfFile($dbf);
                 $manager = $this->getDoctrine()->getManager();
                 $manager->persist($employer);
                 $manager->flush();

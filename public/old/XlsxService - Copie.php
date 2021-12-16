@@ -42,12 +42,6 @@ class XlsxService
      */
     private $sortie;
 
-    /**
-     * nbrHeursTravailler variable
-     *
-     * @var DateTime
-     */
-    private $nbrHeursTravailler;
 
     /**
      * retardEnMinute variable
@@ -111,13 +105,6 @@ class XlsxService
      * @var DateTime
      */
     private $diff;
-
-    /**
-     * nbrHeurTravailler variable
-     *
-     * @var DateTime
-     */
-    private $nbrHeurTravailler;
 
     /**
      * employer variable

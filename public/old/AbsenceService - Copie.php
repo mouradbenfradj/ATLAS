@@ -38,12 +38,6 @@ class AbsenceService
      */
     private $pointages;
 
-    /**
-     * congerService
-     *
-     * @var CongerService
-     */
-    private $congerService;
 
     /**
      * absenceDays
@@ -52,11 +46,6 @@ class AbsenceService
      */
     private $absenceDays;
 
-    public function __construct(CongerService $congerService)
-    {
-        $this->absenceDays = [];
-        $this->congerService = $congerService;
-    }
 
     /**
      * partielConstruct function
@@ -84,7 +73,7 @@ class AbsenceService
         return $absence;
     }
 
-    public function findOrCreate(?DateTime $entrer, ?DateTime $sortie): ?Absence
+    /* public function findOrCreate(?DateTime $entrer, ?DateTime $sortie): ?Absence
     {
         $this->congerService->partielConstruct($this->employer, $this->debut, $this->fin);
         $absence =  current(array_filter(array_map(
@@ -98,7 +87,7 @@ class AbsenceService
             return  $this->constructEntity();
         }
         return null;
-    }
+    } */
 
 
 

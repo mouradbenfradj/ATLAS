@@ -1,17 +1,11 @@
 <?php
-namespace App\Service;
+namespace App\Traits;
 
 use App\Entity\JourFerier;
 use DateInterval;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
-class JourFerierService extends DateTimeService
+trait JourFerierTrait
 {
-    public function __construct(EntityManagerInterface $manager)
-    {
-        parent::__construct($manager)        ;
-    }
     /**
      * GetJourFeriers
      *

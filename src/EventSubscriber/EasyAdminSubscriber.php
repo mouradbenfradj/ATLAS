@@ -7,13 +7,13 @@ use App\Entity\User;
 use App\Entity\Absence;
 use App\Entity\Pointage;
 use App\Service\PointageService;
-use App\Service\CongerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityUpdatedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityDeletedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityUpdatedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
+use EmployerService;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class EasyAdminSubscriber implements EventSubscriberInterface
@@ -21,23 +21,14 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     private $manager;
     private $passwordHasher;
     private $pointageService;
-    private $congerService;
 
-    /**
-     * __construct
-     * @param UserPasswordHasherInterface $passwordHasher
-     * @param PointageService $pointageService
-     * @param CongerService $congerService
-     */
     public function __construct(
         UserPasswordHasherInterface $passwordHasher,
         PointageService $pointageService,
-        CongerService $congerService,
         EntityManagerInterface $manager
     ) {
         $this->passwordHasher = $passwordHasher;
         $this->pointageService = $pointageService;
-        $this->congerService = $congerService;
         $this->manager = $manager;
     }
 
@@ -70,7 +61,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         $pointage->setAbsence(null);
         $this->congerService->constructFromAbsence($absence);
         //$this->manager->persist($pointage);
-        $this->manager->persist($this->congerService->createEntity());
+        //$this->manager->persist($this->congerService->createEntity());
         $this->manager->flush();
         /*  if ($absence->getStarttime() and $absence->getEndtime() /* and !$conger and !$autorisationSortie ) {
             $this->pointageService->constructFromDbf($absence);
@@ -137,12 +128,5 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             return;
         }
         dd($pointage);
-
-        /*   dd($entity);
-        $this->pointageService->setPointage($entity);
-        $entity->setTotaleRetard($this->pointageService->totalRetard()); */
-        /*
-        $slug = $this->slugger->slugify($entity->getTitle());
-        $entity->setSlug($slug); */
     }
 }

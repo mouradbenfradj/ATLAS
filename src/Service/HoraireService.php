@@ -3,25 +3,13 @@
 namespace App\Service;
 
 use App\Entity\Horaire;
+use App\Traits\HoraireTrait;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
-class HoraireService extends JourFerierService
+class HoraireService extends DateTimeService
 {
-    /**
-    * Horaire
-    *
-    * @var Horaire
-    */
-    private $horaire;
-
-    /**
-     * NewHoraire
-     *
-     * @var Horaire
-     */
-    private $newHoraire;
-   
+    use HoraireTrait;
 
     /**
      * Listhoraires
@@ -36,6 +24,7 @@ class HoraireService extends JourFerierService
      * @var DateTime
      */
     private $dateTime;
+
     /**
      * HoraireName
      *
@@ -45,23 +34,26 @@ class HoraireService extends JourFerierService
 
     public function __construct(EntityManagerInterface $manager)
     {
-        parent::__construct($manager)        ;
-        $time = new DateTime("00:00:00");
+        parent::__construct($manager);
         $this->listhoraires = $this->getManager()->getRepository(Horaire::class)->findAll();
-        $this->newHoraire = new Horaire();
-        $this->newHoraire->setDebutPauseDejeuner($time);
-        $this->newHoraire->setDebutPauseMatinal($time);
-        $this->newHoraire->setDebutPauseMidi($time);
-        $this->newHoraire->setFinPauseDejeuner($time);
-        $this->newHoraire->setFinPauseMatinal($time);
-        $this->newHoraire->setFinPauseMidi($time);
-        $this->newHoraire->setHeurDebutTravaille($time);
-        $this->newHoraire->setHeurFinTravaille($time);
-        $this->newHoraire->setMargeDuRetard($time);
     }
 
+    public function notExistHoraire()
+    {
+        $time = new DateTime("00:00:00");
+        $this->horaire = new Horaire();
+        $this->horaire->setDebutPauseDejeuner($time);
+        $this->horaire->setDebutPauseMatinal($time);
+        $this->horaire->setDebutPauseMidi($time);
+        $this->horaire->setFinPauseDejeuner($time);
+        $this->horaire->setFinPauseMatinal($time);
+        $this->horaire->setFinPauseMidi($time);
+        $this->horaire->setHeurDebutTravaille($time);
+        $this->horaire->setHeurFinTravaille($time);
+        $this->horaire->setMargeDuRetard($time);
+    }
     /**
-     * getHoraireForDate
+     * GetHoraireForDate
      *
      * @param DateTime $date
      * @return Horaire|null
@@ -74,12 +66,12 @@ class HoraireService extends JourFerierService
                 array_map(
                     function (Horaire $horaire): ?Horaire {
                         if ($horaire->getDateFin()) {
-                            return ($horaire->getDateDebut() <= $this->dateTime and $this->dateTime  <= $horaire->getDateFin()) ? $horaire : null;
+                            return ($horaire->getDateDebut() <= $this->dateTime && $this->dateTime  <= $horaire->getDateFin()) ? $horaire : null;
                         } else {
                             $nowDateTime = new DateTime();
-                            return ($horaire->getDateDebut() <= $this->dateTime and $nowDateTime  <= $horaire->getDateFin()) ? $horaire : null;
+                            return ($horaire->getDateDebut() <= $this->dateTime && $this->dateTime <= $nowDateTime) ? $horaire : null;
                         }
-                        //  ($horaire->getDateDebut() <= $dateTime and $dateTime  <= $horaire->getDateFin()) ? $horaire : null : ($horaire->getDateDebut() <= $dateTime and $dateTime  <= $nowDateTime) ? $horaire : null,
+                        //  ($horaire->getDateDebut() <= $dateTime && $dateTime  <= $horaire->getDateFin()) ? $horaire : null : ($horaire->getDateDebut() <= $dateTime and $dateTime  <= $nowDateTime) ? $horaire : null,
                     },
                     $this->listhoraires
                 )
@@ -91,6 +83,11 @@ class HoraireService extends JourFerierService
         return  null;
     }
     
+    /**
+     * GetHoraireByHoraireName
+     *
+     * @return Horaire|null
+     */
     public function getHoraireByHoraireName(): ?Horaire
     {
         $this->horaire = current(
@@ -106,6 +103,13 @@ class HoraireService extends JourFerierService
         }
         return  null;
     }
+    /**
+     * GetHoraireByDateOrName
+     *
+     * @param DateTime $date
+     * @param string $horaireName
+     * @return Horaire
+     */
     protected function getHoraireByDateOrName(DateTime $date, string $horaireName): Horaire
     {
         $this->dateTime = $date;
@@ -132,30 +136,6 @@ class HoraireService extends JourFerierService
 
 
         return  $this->horaire;
-    }
-
-    /**
-     * Get horaire
-     *
-     * @return  Horaire
-     */
-    public function getHoraire()
-    {
-        return $this->horaire;
-    }
-
-    /**
-     * Set horaire
-     *
-     * @param  Horaire  $horaire  horaire
-     *
-     * @return  self
-     */
-    public function setHoraire(Horaire $horaire)
-    {
-        $this->horaire = $horaire;
-
-        return $this;
     }
 
     

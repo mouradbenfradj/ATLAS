@@ -2,10 +2,16 @@
 namespace App\Service;
 
 use App\Entity\User;
+use App\Traits\AbsenceTrait;
+use App\Traits\AutorisationSortieTrait;
+use App\Traits\CongerTrait;
 use Doctrine\ORM\EntityManagerInterface;
 
 class EmployerService extends HoraireService
 {
+    use AbsenceTrait;
+    use CongerTrait;
+    use AutorisationSortieTrait;
     /**
      * employer
      *

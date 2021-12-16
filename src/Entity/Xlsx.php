@@ -38,10 +38,6 @@ class Xlsx
      */
     private $sortie;
 
-    /**
-     * @ORM\Column(type="time", nullable=true)
-     */
-    private $nbrHeursTravailler;
 
     /**
      * @ORM\Column(type="time", nullable=true)
@@ -92,6 +88,11 @@ class Xlsx
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="xlsxes")
      */
     private $employer;
+
+    /**
+     * @ORM\Column(type="time", nullable=true)
+     */
+    private $nbrHeurTravailler;
 
     public function getId(): ?int
     {
@@ -146,17 +147,7 @@ class Xlsx
         return $this;
     }
 
-    public function getNbrHeursTravailler(): ?\DateTimeInterface
-    {
-        return $this->nbrHeursTravailler;
-    }
-
-    public function setNbrHeursTravailler(?\DateTimeInterface $nbrHeursTravailler): self
-    {
-        $this->nbrHeursTravailler = $nbrHeursTravailler;
-
-        return $this;
-    }
+ 
 
     public function getRetardEnMinute(): ?\DateTimeInterface
     {
@@ -274,6 +265,18 @@ class Xlsx
     public function setEmployer(?User $employer): self
     {
         $this->employer = $employer;
+
+        return $this;
+    }
+
+    public function getNbrHeurTravailler(): ?\DateTimeInterface
+    {
+        return $this->nbrHeurTravailler;
+    }
+
+    public function setNbrHeurTravailler(?\DateTimeInterface $nbrHeurTravailler): self
+    {
+        $this->nbrHeurTravailler = $nbrHeurTravailler;
 
         return $this;
     }
