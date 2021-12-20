@@ -5,12 +5,6 @@ use App\Entity\Horaire;
 
 trait HoraireTrait
 {
-    /**
-    * Horaire
-    *
-    * @var Horaire
-    */
-    private $horaire;
 
     /**
      * Get horaire

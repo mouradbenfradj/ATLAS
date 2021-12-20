@@ -4,12 +4,20 @@ namespace App\Service;
 
 use App\Entity\Horaire;
 use App\Traits\HoraireTrait;
+use DateInterval;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
 class HoraireService extends DateTimeService
 {
     use HoraireTrait;
+
+    /**
+    * Horaire
+    *
+    * @var Horaire
+    */
+    private $horaire;
 
     /**
      * Listhoraires
@@ -146,5 +154,18 @@ class HoraireService extends DateTimeService
             $horaire
         );
         return    $this->listhoraires;
+    }
+
+    /**
+     * SumPause
+     *
+     * @return int
+     */
+    public function sumPauseInSecond():int
+    {
+        $e = $this->diffTime($this->horaire->getFinPauseMatinal(), $this->horaire->getDebutPauseMatinal());
+        $e +=$this->diffTime($this->horaire->getFinPauseDejeuner(), $this->horaire->getDebutPauseDejeuner());
+        $e += $this->diffTime($this->horaire->getFinPauseMidi(), $this->horaire->getDebutPauseMidi());
+        return $e;
     }
 }

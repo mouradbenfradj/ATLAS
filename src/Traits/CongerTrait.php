@@ -2,6 +2,7 @@
 namespace App\Traits;
 
 use App\Entity\Conger;
+use App\Entity\User;
 use DateTime;
 
 trait CongerTrait
@@ -25,11 +26,11 @@ trait CongerTrait
      * @param DateTime $date
      * @return Conger|null
      */
-    public function getConger(DateTime $date): ?Conger
+    public function getConger(User $employer, DateTime $date): ?Conger
     {
         $conger = current(array_filter(array_map(
             fn ($conger): ?Conger => ($conger->getDebut() <= $date && $date  <= $conger->getFin()) ? $conger : null,
-            $this->getEmployer()->getCongers()->toArray()
+            $employer->getCongers()->toArray()
         )));
         if ($conger) {
             return $conger;

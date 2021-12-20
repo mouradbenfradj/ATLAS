@@ -2,6 +2,7 @@
 namespace App\Traits;
 
 use App\Entity\AutorisationSortie;
+use App\Entity\User;
 use DateTime;
 
 trait AutorisationSortieTrait
@@ -29,11 +30,11 @@ trait AutorisationSortieTrait
      * @param DateTime $date
      * @return AutorisationSortie|null
      */
-    public function getAutorisation(DateTime $date): ?AutorisationSortie
+    public function getAutorisation(User $employer, DateTime $date): ?AutorisationSortie
     {
         $autorisationSortie =  current(array_filter(array_map(
             fn ($autorisationSortie): ?AutorisationSortie => ($autorisationSortie->getDateAutorisation() <= $date && $date <= $autorisationSortie->getDateAutorisation()) ? $autorisationSortie : null,
-            $this->getEmployer()->getAutorisationSorties()->toArray()
+            $employer->getAutorisationSorties()->toArray()
         )));
         if ($autorisationSortie) {
             return $autorisationSortie;

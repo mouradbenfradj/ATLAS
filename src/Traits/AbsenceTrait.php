@@ -2,6 +2,7 @@
 namespace App\Traits;
 
 use App\Entity\Absence;
+use App\Entity\User;
 use DateTime;
 
 trait AbsenceTrait
@@ -25,11 +26,11 @@ trait AbsenceTrait
      * @param DateTime $date
      * @return Absence|null
      */
-    public function getAbsence(DateTime $date): ?Absence
+    public function getAbsence(User $employer, DateTime $date): ?Absence
     {
         $absence =  current(array_filter(array_map(
             fn ($absence): ?Absence => ($absence->getDebut() <= $date && $date <= $absence->getFin()) ? $absence : null,
-            $this->getEmployer()->getAbsences()->toArray()
+            $employer->getAbsences()->toArray()
         )));
         if ($absence) {
             return  $absence;

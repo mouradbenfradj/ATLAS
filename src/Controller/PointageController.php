@@ -54,12 +54,14 @@ class PointageController extends AbstractController
      * @param Request $request
      * @return Response
      */
-    public function uploadDbf(Request $request, PointageService $pointageService, DbfRepository $dbfRepository): Response
+    public function uploadDbf(DbfService $dbfService, DbfRepository $dbfRepository): Response
     {
+        $employer = null;
         foreach ($dbfRepository->findAll() as $dbf) {
-            dd($dbf);
+            $employer = $dbf->getEmployer();
+            $employer->addPointage($dbfService->dbfConvertToPointage($dbf));
         }
-               
+        dd($employer);
         /* dd($user);
         $user->setSoldConger($this->employerService->calculerSoldConger($user));
         $user->setSoldAutorisationSortie($this->employerService->calculerAS($user)); */

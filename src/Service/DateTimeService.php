@@ -91,14 +91,18 @@ class DateTimeService extends ConfigService implements DateInterface, TimeInterf
      *
      * @param DateTime $timeMax
      * @param DateTime $timeMin
-     * @return DateTime
+     * @return int
      */
-    public function diffTime(DateTime $timeMax, DateTime $timeMin): DateTime
+    public function diffTime(DateTime $timeMax, DateTime $timeMin): int
     {
-        $timeMax = new DateTime(date(self::FORMATTIMEHIS, strtotime($timeMax->format(self::FORMATTIMEHIS))));
-        $timeMin = new DateTime(date(self::FORMATTIMEHIS, strtotime($timeMin->format(self::FORMATTIMEHIS))));
-
-        $diff =  date_diff($timeMax, $timeMin);
-        return new DateTime($diff->h . ':' . $diff->i . ':' . $diff->s);
+        $max = (($timeMax->format('H')*60)*60) + ($timeMax->format('i')*60) + $timeMax->format('s');
+        $min = (($timeMin->format('H')*60)*60) + ($timeMin->format('i')*60) + $timeMin->format('s');
+        return  $max -  $min;
+    }
+    public function dateIntervalToSeconds($interval)
+    {
+        $seconds = $interval->h*3600
+       + $interval->i*60 + $interval->s;
+        return $seconds;
     }
 }
