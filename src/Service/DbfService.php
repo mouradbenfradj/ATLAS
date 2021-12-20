@@ -82,6 +82,14 @@ class DbfService extends PointageService
         $this->pointage->setHeurNormalementTravailler($this->heurNormalementTravailler($dbf));
         $this->pointage->setRetardEnMinute($this->retardEnMinute($dbf->getLate()->getTimestamp()));
         $this->pointage->setDepartAnticiper($this->departAnticiper($dbf));
+        $date = new DateTime();
+        dump($date->setTimestamp(0));
+        dump($date->getTimestamp());
+        
+        dump(date('H:i', strtotime($dbf->getAttchktime()[0])));
+        dump($dbf->getAttchktime()[1]);
+        dump($dbf->getAttchktime()[2]);
+        dump($dbf->getAttchktime()[3]);
         $this->pointage->setRetardMidi($this->retardMidi(strtotime($dbf->getAttchktime()[0]), strtotime($dbf->getAttchktime()[1]), strtotime($dbf->getAttchktime()[2]), strtotime($dbf->getAttchktime()[3])));
         $this->pointage->setTotaleRetard($this->totaleRetard());
         $this->pointage->setAutorisationSortie($this->getAutorisation($dbf->getEmployer(), $this->pointage->getDate()));
