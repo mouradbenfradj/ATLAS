@@ -5,8 +5,6 @@ namespace App\Service;
 use App\Entity\Dbf;
 use App\Entity\Pointage;
 use App\Traits\PointageEntityTrait;
-use DateInterval;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
 class PointageService extends EmployerService
@@ -23,6 +21,13 @@ class PointageService extends EmployerService
     {
         parent::__construct($manager);
     }
+    
+    public function calculeNbrHeurTravailler($dbf)
+    {
+        dd($dbf, $this->pointage);
+    }
+    
+
 
     /**
      * dateInDB
@@ -36,6 +41,4 @@ class PointageService extends EmployerService
             $this->getEmployer()->getPointages()->toArray()
         );
     }
-
-    
 }

@@ -59,7 +59,14 @@ class PointageController extends AbstractController
         $employer = null;
         foreach ($dbfRepository->findAll() as $dbf) {
             $employer = $dbf->getEmployer();
-            $employer->addPointage($dbfService->dbfConvertToPointage($dbf));
+            $absence = $dbfService->getAbsence($employer, $dbf->getAttdate());
+            $conger = $dbfService->getConger($employer, $dbf->getAttdate());
+            $autorisationSortie = $dbfService->getAutorisation($employer, $dbf->getAttdate());
+            if ($dbf->getStarttime() && $dbf->getEndtime()) {
+                $employer->addPointage($dbfService->dbfConvertToPointage($dbf, $absence, $conger, $autorisationSortie));
+            } else {
+                $this->addFlash('warning', 'DBF de date '.$dbf->getAttdate()->format('Y-m-d').' n\'est pas enregistrer absence d\entrer ou sortie');
+            }
         }
         dd($employer);
         /* dd($user);

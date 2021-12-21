@@ -1,11 +1,15 @@
 <?php
 namespace App\Service;
 
+use App\Entity\Absence;
+use App\Entity\AutorisationSortie;
+use App\Entity\Conger;
 use App\Entity\Dbf;
 use App\Entity\Pointage;
 use App\Traits\DbfEntityTrait;
 use App\Traits\TableReaderTrait;
 use DateTime;
+use PhpParser\Node\Stmt\Break_;
 
 class DbfService extends PointageService
 {
@@ -71,7 +75,7 @@ class DbfService extends PointageService
         return $this->dbf;
     }
 
-    public function dbfConvertToPointage(Dbf $dbf): Pointage
+    public function dbfConvertToPointage(Dbf $dbf, ?Absence $absence, ?Conger $conger, ?AutorisationSortie $autorisationSortie): Pointage
     {
         $this->pointage = new Pointage();
         $this->pointage->setDate($dbf->getAttdate());
@@ -82,19 +86,11 @@ class DbfService extends PointageService
         $this->pointage->setHeurNormalementTravailler($this->heurNormalementTravailler($dbf));
         $this->pointage->setRetardEnMinute($this->retardEnMinute($dbf->getLate()->getTimestamp()));
         $this->pointage->setDepartAnticiper($this->departAnticiper($dbf));
-        $date = new DateTime();
-        dump($date->setTimestamp(0));
-        dump($date->getTimestamp());
-        
-        dump(date('H:i', strtotime($dbf->getAttchktime()[0])));
-        dump($dbf->getAttchktime()[1]);
-        dump($dbf->getAttchktime()[2]);
-        dump($dbf->getAttchktime()[3]);
-        $this->pointage->setRetardMidi($this->retardMidi(strtotime($dbf->getAttchktime()[0]), strtotime($dbf->getAttchktime()[1]), strtotime($dbf->getAttchktime()[2]), strtotime($dbf->getAttchktime()[3])));
+        $this->pointage->setRetardMidi($this->retardMidi($dbf->getAttchktime()));
         $this->pointage->setTotaleRetard($this->totaleRetard());
-        $this->pointage->setAutorisationSortie($this->getAutorisation($dbf->getEmployer(), $this->pointage->getDate()));
-        $this->pointage->setCongerPayer($this->getConger($dbf->getEmployer(), $this->pointage->getDate()));
-        $this->pointage->setAbsence($this->getAbsence($dbf->getEmployer(), $this->pointage->getDate()));
+        $this->pointage->setAutorisationSortie($autorisationSortie);
+        $this->pointage->setCongerPayer($conger);
+        $this->pointage->setAbsence($absence);
         $this->pointage->setDiff($this->diff());
         $this->pointage->setEmployer($dbf->getEmployer());
         return $this->pointage;
@@ -104,6 +100,9 @@ class DbfService extends PointageService
     {
         $date = new DateTime();
         $atttime = 0;
+        if (!$this->pointage->getEntrer() ||!$this->pointage->getSortie()) {
+            dd($this->pointage->getEntrer(), $this->pointage->getSortie());
+        }
         $atttime += $this->dateIntervalToSeconds(date_diff($this->pointage->getEntrer(), $this->pointage->getSortie()));
         return $date->setTimestamp($atttime-$this->sumPauseInSecond());
     }
@@ -117,7 +116,7 @@ class DbfService extends PointageService
         $date = new DateTime();
         return $date->setTimestamp($seconds);
     }
-    public function retardEnMinute(int $late):DateTime
+    public function retardEnMinute(int $late):?DateTime
     {
         $date = new DateTime();
         $retard = 0;
@@ -130,23 +129,44 @@ class DbfService extends PointageService
             return null;
         }
     }
-    public function retardMidi(int $entrer, int $dpd, int $fpd, int $sortie):?DateTime
+    public function retardMidi(array $attchktime):?DateTime
     {
+        $entrer = $dpd = $fpd  = $sortie = null;
+        switch (count($attchktime)) {
+            case 4:
+                $entrer =strtotime($attchktime[0]);
+        $dpd =strtotime($attchktime[1]);
+        $fpd =strtotime($attchktime[2]);
+        $sortie =strtotime($attchktime[3]);
+         break;
+            case 3:
+                 $entrer =strtotime($attchktime[0]);
+            $dpd =strtotime($attchktime[1]);
+            $fpd =strtotime($attchktime[2]);
+         break;
+            case 2:
+                $entrer =strtotime($attchktime[0]);
+                $dpd =strtotime($attchktime[1]);
+         break;
+            case 1:
+                dd($attchktime);
+                $entrer =strtotime($attchktime[0]);
+                   break;
+            default:
+            dd($attchktime);
+             break;
+        }
         if (!$entrer || !$dpd || !$fpd || !$sortie) {
-            dd($entrer, $dpd, $fpd, $sortie);
+            dd($this->getHoraire(), $attchktime);
         }
         $intervallePauseDej = $this->getHoraire()->getFinPauseDejeuner()->getTimestamp()- $this->getHoraire()->getDebutPauseDejeuner()->getTimestamp();
-        $date = new DateTime();
         $retardMidi = 0;
         if (($fpd-$dpd)>$intervallePauseDej) {
-            $retardMidi= $fpd-$dpd;
-            dump($date->setTimestamp($entrer), $date->setTimestamp($dpd), $date->setTimestamp($fpd), $date->setTimestamp($sortie));
-            dump($date->setTimestamp($retardMidi));
-            dd($retardMidi);
+            $retardMidi= ($fpd-$dpd)-  $intervallePauseDej;
         }
     
         if ($retardMidi) {
-            return $date->setTimestamp($retardMidi);
+            return new DateTime(date('H:i:s', $retardMidi));
         } else {
             return null;
         }
@@ -159,11 +179,9 @@ class DbfService extends PointageService
             $totaleRetard += $this->pointage->getRetardEnMinute()->getTimestamp();
         }
         if ($this->pointage->getRetardMidi()) {
-            dump($totaleRetard);
             $totaleRetard += $this->pointage->getRetardMidi()->getTimestamp();
         }
         if ($this->pointage->getDepartAnticiper()) {
-            dump($totaleRetard);
             $totaleRetard += $this->pointage->getDepartAnticiper()->getTimestamp();
         }
         return $date->setTimestamp($totaleRetard);
@@ -173,7 +191,6 @@ class DbfService extends PointageService
         $date = new DateTime();
         $diff = 0;
         if ($this->pointage->getHeurNormalementTravailler()->getTimestamp() >= $this->pointage->getNbrHeurTravailler()->getTimestamp()) {
-            dump($diff);
             $diff +=$this->pointage->getHeurNormalementTravailler()->getTimestamp()- $this->pointage->getNbrHeurTravailler()->getTimestamp();
         } else {
             $diff +=$this->pointage->getNbrHeurTravailler()->getTimestamp()- $this->pointage->getHeurNormalementTravailler()->getTimestamp();
