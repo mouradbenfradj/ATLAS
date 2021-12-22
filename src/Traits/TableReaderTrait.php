@@ -10,7 +10,7 @@ trait TableReaderTrait
     public function installDbfFile(UploadedFile $fileDbf): User
     {
         $dbfs = new TableReader($fileDbf);
-        $ignoredDay =  array_merge($this->getDbfDateInDB(), $this->getPointageDateInDB(), $this->getJourFeriers());
+        $ignoredDay =  array_merge($this->getDbfDateInDB(), $this->getPointageDateInDB($this->getEmployer()), $this->getJourFeriers());
         while ($record = $dbfs->nextRecord()) {
             $this->setDate($this->dateString_d_m_Y_ToDateTime($record->get('attdate')));
             if (!in_array($this->getDate()->format('Y-m-d'), $ignoredDay)) {

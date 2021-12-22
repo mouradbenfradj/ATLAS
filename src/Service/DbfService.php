@@ -132,18 +132,27 @@ class DbfService extends PointageService
     public function retardMidi(array $attchktime):?DateTime
     {
         $entrer = $dpd = $fpd  = $sortie = null;
+        $intervallePauseDej = $this->getHoraire()->getFinPauseDejeuner()->getTimestamp()- $this->getHoraire()->getDebutPauseDejeuner()->getTimestamp();
+        $retardMidi = 0;
+      
         switch (count($attchktime)) {
             case 4:
                 $entrer =strtotime($attchktime[0]);
         $dpd =strtotime($attchktime[1]);
         $fpd =strtotime($attchktime[2]);
         $sortie =strtotime($attchktime[3]);
+        if (($fpd-$dpd)>$intervallePauseDej) {
+            $retardMidi= ($fpd-$dpd)-  $intervallePauseDej;
+        }
          break;
             case 3:
                  $entrer =strtotime($attchktime[0]);
             $dpd =strtotime($attchktime[1]);
             $fpd =strtotime($attchktime[2]);
-         break;
+            if (($fpd-$dpd)>$intervallePauseDej) {
+                $retardMidi= ($fpd-$dpd)-  $intervallePauseDej;
+            }
+            break;
             case 2:
                 $entrer =strtotime($attchktime[0]);
                 $dpd =strtotime($attchktime[1]);
@@ -156,15 +165,8 @@ class DbfService extends PointageService
             dd($attchktime);
              break;
         }
-        if (!$entrer || !$dpd || !$fpd || !$sortie) {
-            dd($this->getHoraire(), $attchktime);
-        }
-        $intervallePauseDej = $this->getHoraire()->getFinPauseDejeuner()->getTimestamp()- $this->getHoraire()->getDebutPauseDejeuner()->getTimestamp();
-        $retardMidi = 0;
-        if (($fpd-$dpd)>$intervallePauseDej) {
-            $retardMidi= ($fpd-$dpd)-  $intervallePauseDej;
-        }
-    
+        
+       
         if ($retardMidi) {
             return new DateTime(date('H:i:s', $retardMidi));
         } else {

@@ -57,34 +57,32 @@ class PointageController extends AbstractController
     public function uploadDbf(DbfService $dbfService, DbfRepository $dbfRepository): Response
     {
         $employer = null;
-        foreach ($dbfRepository->findAll() as $dbf) {
+        $manager = $this->getDoctrine()->getManager();
+        $dbfs= [];
+        foreach ($dbfRepository->findAll() as $key => $dbf) {
             $employer = $dbf->getEmployer();
             $absence = $dbfService->getAbsence($employer, $dbf->getAttdate());
             $conger = $dbfService->getConger($employer, $dbf->getAttdate());
             $autorisationSortie = $dbfService->getAutorisation($employer, $dbf->getAttdate());
-            if ($dbf->getStarttime() && $dbf->getEndtime()) {
-                $employer->addPointage($dbfService->dbfConvertToPointage($dbf, $absence, $conger, $autorisationSortie));
+            if (($dbf->getStarttime() && $dbf->getEndtime()) || ((!$dbf->getStarttime() || !$dbf->getEndtime()) && ($absence || $conger || $autorisationSortie))) {
+                $pointage = $dbfService->dbfConvertToPointage($dbf, $absence, $conger, $autorisationSortie);
+                $employer->addPointage($pointage);
+                array_push($dbfs, $dbf);
             } else {
-                $this->addFlash('warning', 'DBF de date '.$dbf->getAttdate()->format('Y-m-d').' n\'est pas enregistrer absence d\entrer ou sortie');
+                $this->addFlash('warning', 'DBF de date '.$dbf->getAttdate()->format('Y-m-d').' n\'est pas enregistrer absence d\entrer ou sortie sans conger ou absence ou autorisation de sortie');
             }
         }
-        dd($employer);
-        /* dd($user);
-        $user->setSoldConger($this->employerService->calculerSoldConger($user));
-        $user->setSoldAutorisationSortie($this->employerService->calculerAS($user)); */
-        /*     $manager = $this->getDoctrine()->getManager();
-            $manager->persist($employer);
-            $manager->flush(); */
+        $manager->persist($employer);
+        foreach ($dbfs as  $dbf) {
+            $manager->remove($dbf);
+        }
+        $manager->flush();
         $this->addFlash('success', 'upload DBF Successfully');
         $url = $this->adminUrlGenerator
                 ->setController(PointageCrudController::class)
                 ->setAction('index')
                 ->generateUrl();
         return $this->redirect($url);
-
-        /*  return $this->render('dbf/upload.html.twig', [
-             'form' => $form->createView(),
-         ]); */
     }
 
     /**

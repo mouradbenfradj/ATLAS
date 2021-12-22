@@ -8,6 +8,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 
 class AutorisationSortieCrudController extends AbstractCrudController
 {
@@ -23,7 +24,9 @@ class AutorisationSortieCrudController extends AbstractCrudController
             IdField::new('id')->onlyOnIndex(),
             AssociationField::new('employer'),
             DateField::new('dateAutorisation'),
-            TimeField::new('heurAutoriser')
+            TimeField::new('heurAutoriser'),
+            BooleanField::new('valider'),
+            BooleanField::new('refuser'),
         ];
     }
 }
