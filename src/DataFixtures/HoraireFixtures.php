@@ -14,7 +14,7 @@ class HoraireFixtures extends Fixture
         $horaire = new Horaire();
         $horaire->setHoraire("NORMAL");
         $horaire->setDateDebut(new DateTime("2018/04/02"));
-        $horaire->setDateFin(new DateTime("2018/05/15"));
+        //$horaire->setDateFin(new DateTime("2018/05/15"));
         $horaire->setHeurDebutTravaille(new DateTime("08:00:00"));
         $horaire->setHeurFinTravaille(new DateTime("17:30:00"));
         $horaire->setDebutPauseMatinal(new DateTime("10:00:00"));

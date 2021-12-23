@@ -73,7 +73,7 @@ class HoraireService extends DateTimeService
             if ($horaire->getDateFin()) {
                 $this->horaire= $horaire->getDateDebut() <=$date && $date  <= $horaire->getDateFin() ? $horaire : $this->horaire;
             } else {
-                $nowDateTime = new DateTime();
+                $nowDateTime = new DateTime('now');
                 $this->horaire= $horaire->getDateDebut() <=$date && $date <= $nowDateTime ? $horaire : $this->horaire;
             }
         }

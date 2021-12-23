@@ -11,6 +11,7 @@ class DefaultControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->request('GET', '/');
+        $this->assertResponseRedirects('/login');
         $crawler = $client->followRedirect();
 
         $this->assertResponseIsSuccessful();

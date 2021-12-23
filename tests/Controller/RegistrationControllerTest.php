@@ -24,7 +24,7 @@ class RegistrationControllerTest extends WebTestCase
             'agreeTerms' => true,
         ];
         $employer = new User();
-        $form = $this->factory->create(RegistrationFormType::class, $employer);
+        //$form = $this->factory->create(RegistrationFormType::class, $employer);
         $expected = new User();
         $expected->setFirstName('mourad1');
         $expected->setLastName('bf');

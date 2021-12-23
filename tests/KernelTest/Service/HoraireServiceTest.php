@@ -11,45 +11,52 @@ class HoraireServiceTest extends KernelTestCase
     public function testGetHoraireForDateNORMAL(): void
     {
         $date = new DateTime('2018-04-02');
-        $datefin = new DateTime('2022-04-01');
+        $datefin = new DateTime('2021-12-01');
         $container = static::getContainer();
         $ramadan= [
-            ['2018-05-16','2018-06-14'],
-            ['2019-05-05','2019-06-03'],
-            ['2020-04-23','2020-05-23'],
-            ['2021-04-13','2021-05-14']
+            ['2018-05-16 00:00:00','2018-06-14 00:00:00'],
+            ['2019-05-05 00:00:00','2019-06-03 00:00:00'],
+            ['2020-04-23 00:00:00','2020-05-23 00:00:00'],
+            ['2021-04-13 00:00:00','2021-05-14 00:00:00']
         ];
         $su= [
-            ['2019-07-01','2019-08-31'],
-            ['2020-07-01','2020-08-31'],
-            ['2021-07-01','2021-08-31']
+            ['2019-07-01 00:00:00','2019-08-31 00:00:00'],
+            ['2020-07-01 00:00:00','2020-08-31 00:00:00'],
+            ['2021-07-01 00:00:00','2021-08-31 00:00:00']
         ];
         /**
          * @var HoraireService
          */
         $horaireService = $container->get(HoraireService::class);
         do {
+            $test = true;
             for ($i = 0; $i < count($ramadan);$i++) {
-                $debut = DateTime::createFromFormat('Y-m-d', $ramadan[$i][0]);
-                $fin =  DateTime::createFromFormat('Y-m-d', $ramadan[$i][1]);
-                if ((!(($date>= $debut) && ($date<=$fin)))) {
-                    $horaire = $horaireService->getHoraireForDate($date);
-                    $this->isInstanceOf('Horaire', $horaire);
-                    $this->assertEquals(
-                        'NORMAL',
-                        $horaire->getHoraire(),
-                        'for date '.$date->format('Y-m-d H:i:s').
-                        ' horaire '.$horaire->getHoraire().
-                        ' debut '. $debut->format('Y-m-d  H:i:s').
-                        ' fin '. $fin->format('Y-m-d  H:i:s').
-                        ' res '. (!(($date>= $debut) && ($date<=$fin)))
-                    );
+                $debut = DateTime::createFromFormat('Y-m-d H:i:s', $ramadan[$i][0]);
+                $fin =  DateTime::createFromFormat('Y-m-d H:i:s', $ramadan[$i][1]);
+                if ((($date>= $debut)&& ($date<=$fin))) {
+                    $test = false;
                 }
             }
-        
+         
+            for ($i = 0; $i < count($su);$i++) {
+                $debut = DateTime::createFromFormat('Y-m-d H:i:s', $su[$i][0]);
+                $fin =  DateTime::createFromFormat('Y-m-d H:i:s', $su[$i][1]);
+                if (($date>= $debut) && ($date<=$fin)) {
+                    $test = false;
+                }
+            }
+            if ($test) {
+                $horaire = $horaireService->getHoraireForDate($date);
+                $this->assertNotNull($horaire, 'for date '.$date->format('Y-m-d H:i:s'));
+                $this->assertEquals(
+                    'NORMAL',
+                    $horaire->getHoraire(),
+                    'for date '.$date->format('Y-m-d H:i:s').
+                ' horaire '.$horaire->getHoraire()
+                );
+            }
             $date->modify('+1 day');
         } while ($date <= $datefin) ;
-        $this->assertNull($horaire);
     }
 
     public function testGetHoraireForDateRAMADAN(): void
@@ -58,10 +65,10 @@ class HoraireServiceTest extends KernelTestCase
         $datefin = new DateTime('2022-04-01');
         $container = static::getContainer();
         $ramadan= [
-            ['2018-05-16','2018-06-14'],
-            ['2019-05-05','2019-06-03'],
-            ['2020-04-23','2020-05-23'],
-            ['2021-04-13','2021-05-14']
+            ['2018-05-16 00:00:00','2018-06-14 00:00:00'],
+            ['2019-05-05 00:00:00','2019-06-03 00:00:00'],
+            ['2020-04-23 00:00:00','2020-05-23 00:00:00'],
+            ['2021-04-13 00:00:00','2021-05-14 00:00:00']
         ];
         /**
          * @var HoraireService
@@ -69,12 +76,20 @@ class HoraireServiceTest extends KernelTestCase
         $horaireService = $container->get(HoraireService::class);
         do {
             for ($i = 0; $i < count($ramadan);$i++) {
-                $debut = DateTime::createFromFormat('Y-m-d', $ramadan[$i][0]);
-                $fin =  DateTime::createFromFormat('Y-m-d', $ramadan[$i][1]);
-                if ($date>= $debut && ($date<=$fin)) {
+                $debut = DateTime::createFromFormat('Y-m-d H:i:s', $ramadan[$i][0]);
+                $fin =  DateTime::createFromFormat('Y-m-d H:i:s', $ramadan[$i][1]);
+                if (($date>= $debut)&& ($date<=$fin)) {
                     $horaire = $horaireService->getHoraireForDate($date);
-                    $this->isInstanceOf('Horaire', $horaire);
-                    $this->assertEquals('RAMADAN', $horaire->getHoraire());
+                    $this->assertNotNull($horaire, 'for date '.$date->format('Y-m-d H:i:s'));
+                    $this->assertEquals(
+                        'RAMADAN',
+                        $horaire->getHoraire(),
+                        'for date '.$date->format('Y-m-d H:i:s').
+                    ' horaire '.$horaire->getHoraire().
+                    ' debut '. $debut->format('Y-m-d  H:i:s').
+                    ' fin '. $fin->format('Y-m-d  H:i:s').
+                    ' res '. (!(($date>= $debut) && ($date<=$fin)))
+                    );
                 }
             }
             $date->modify('+1 day');
@@ -86,9 +101,9 @@ class HoraireServiceTest extends KernelTestCase
         $datefin = new DateTime('2022-04-01');
         $container = static::getContainer();
         $su= [
-            ['2019-07-01','2019-08-31'],
-            ['2020-07-01','2020-08-31'],
-            ['2021-07-01','2021-08-31']
+            ['2019-07-01 00:00:00','2019-08-31 00:00:00'],
+            ['2020-07-01 00:00:00','2020-08-31 00:00:00'],
+            ['2021-07-01 00:00:00','2021-08-31 00:00:00']
         ];
         /**
          * @var HoraireService
@@ -96,11 +111,11 @@ class HoraireServiceTest extends KernelTestCase
         $horaireService = $container->get(HoraireService::class);
         do {
             for ($i = 0; $i < count($su);$i++) {
-                $debut = DateTime::createFromFormat('Y-m-d', $su[$i][0]);
-                $fin =  DateTime::createFromFormat('Y-m-d', $su[$i][1]);
-                if ($date>= $debut && ($date<=$fin)) {
+                $debut = DateTime::createFromFormat('Y-m-d H:i:s', $su[$i][0]);
+                $fin =  DateTime::createFromFormat('Y-m-d H:i:s', $su[$i][1]);
+                if (($date>= $debut) && ($date<=$fin)) {
                     $horaire = $horaireService->getHoraireForDate($date);
-                    $this->isInstanceOf('Horaire', $horaire);
+                    $this->assertNotNull($horaire, 'for date '.$date->format('Y-m-d H:i:s'));
                     $this->assertEquals('SU', $horaire->getHoraire());
                 }
             }
