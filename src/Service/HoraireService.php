@@ -66,25 +66,18 @@ class HoraireService extends DateTimeService
      * @param DateTime $date
      * @return Horaire|null
      */
-    protected function getHoraireForDate(DateTime $date): ?Horaire
+    public function getHoraireForDate(DateTime $date): ?Horaire
     {
-        $this->dateTime = $date;
-        $this->horaire = current(
-            array_filter(
-                array_map(
-                    function (Horaire $horaire): ?Horaire {
-                        if ($horaire->getDateFin()) {
-                            return ($horaire->getDateDebut() <= $this->dateTime && $this->dateTime  <= $horaire->getDateFin()) ? $horaire : null;
-                        } else {
-                            $nowDateTime = new DateTime();
-                            return ($horaire->getDateDebut() <= $this->dateTime && $this->dateTime <= $nowDateTime) ? $horaire : null;
-                        }
-                        //  ($horaire->getDateDebut() <= $dateTime && $dateTime  <= $horaire->getDateFin()) ? $horaire : null : ($horaire->getDateDebut() <= $dateTime and $dateTime  <= $nowDateTime) ? $horaire : null,
-                    },
-                    $this->listhoraires
-                )
-            )
-        );
+        $this->horaire =null;
+        foreach ($this->listhoraires as $horaire) {
+            if ($horaire->getDateFin()) {
+                $this->horaire= $horaire->getDateDebut() <=$date && $date  <= $horaire->getDateFin() ? $horaire : $this->horaire;
+            } else {
+                $nowDateTime = new DateTime();
+                $this->horaire= $horaire->getDateDebut() <=$date && $date <= $nowDateTime ? $horaire : $this->horaire;
+            }
+        }
+
         if ($this->horaire) {
             return $this->horaire;
         }

@@ -58,7 +58,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             return;
         }
         $heurAutoriser = strtotime($as->getHeurAutoriser()->format('H:i:s'));
-        var_dump($heurAutoriser);
+        dump($heurAutoriser);
    
         /**
          * @var Pointage|null
@@ -67,62 +67,55 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             fn ($pointage): ?Pointage => ($as->getDateAutorisation() <= $pointage->getDate() && $pointage->getDate() <= $as->getDateAutorisation()) ? $pointage : null,
             $as->getEmployer()->getPointages()->toArray()
         )));
-        $time = new DateTime();
+        $retardEnMinute = $pointage->getRetardEnMinute()? strtotime($pointage->getRetardEnMinute()->format('H:i:s')):0;
+        $retardMidi =  $pointage->getRetardMidi() ? strtotime($pointage->getRetardMidi()->format('H:i:s')) : 0;
+        $departAnticiper =  $pointage->getDepartAnticiper() ? strtotime($pointage->getDepartAnticiper()->format('H:i:s')):0;
+       
         for ($i = 0 ; $i<3;$i++) {
-            $retardEnMinute = $pointage->getRetardEnMinute()? strtotime($pointage->getRetardEnMinute()->format('H:i:s')):0;
-            $retardMidi =  $pointage->getRetardMidi() ? strtotime($pointage->getRetardMidi()->format('H:i:s')) : 0;
-            $departAnticiper =  $pointage->getDepartAnticiper() ? strtotime($pointage->getDepartAnticiper()->format('H:i:s')):0;
-            if (($retardEnMinute >= $retardMidi) &&($retardMidi>=$departAnticiper)) {
-                var_dump($retardEnMinute);
-                var_dump($retardMidi);
-                var_dump($departAnticiper);
-            } elseif (($retardEnMinute >=$departAnticiper) && ($departAnticiper >= $retardMidi)) {
-                var_dump($retardEnMinute);
-                var_dump($retardMidi);
-                var_dump($departAnticiper);
-            } elseif (($retardMidi >=$departAnticiper) && ($departAnticiper>=$retardEnMinute)) {
-                var_dump($retardEnMinute);
-                var_dump($retardMidi);
-                var_dump($departAnticiper);
-            } elseif (($retardMidi  >= $retardEnMinute) && ($retardEnMinute >= $departAnticiper)) {
-                var_dump($retardEnMinute);
-                var_dump($retardMidi);
-                var_dump($departAnticiper);
-            } elseif (($departAnticiper >= $retardMidi) && ($retardMidi >= $retardEnMinute)) {
-                var_dump($retardEnMinute);
-                var_dump($retardMidi);
-                var_dump($departAnticiper);
-            } elseif (($departAnticiper >= $retardEnMinute) && ($retardEnMinute >= $retardMidi)) {
-                var_dump($as->getHeurAutoriser());
-                var_dump($heurAutoriser);
-                var_dump($pointage->getDepartAnticiper());
-                var_dump($departAnticiper);
+            $time = new DateTime();
+            if (($retardEnMinute >= $retardMidi) &&($retardEnMinute>=$departAnticiper)) {
+                if ($heurAutoriser >=$retardEnMinute) {
+                    $time->setTimestamp($heurAutoriser -$retardEnMinute);
+                    $heurAutoriser -= $retardEnMinute;
+                    $retardEnMinute=0;
+                } else {
+                    $time->setTimestamp($retardEnMinute -  $heurAutoriser);
+                    $retardEnMinute=$retardEnMinute-$heurAutoriser ;
+                    $heurAutoriser = 0;
+                }
+                $pointage->setRetardEnMinute($time);
+            } elseif (($retardMidi >=$departAnticiper) && ($retardMidi>=$retardEnMinute)) {
+                if ($heurAutoriser >=$retardMidi) {
+                    $time->setTimestamp($heurAutoriser -$retardMidi);
+                    $heurAutoriser -= $retardMidi;
+                    $retardMidi=0;
+                } else {
+                    $time->setTimestamp($retardMidi -  $heurAutoriser);
+                    $retardMidi=$retardMidi-$heurAutoriser ;
+                    $heurAutoriser = 0;
+                }
+                $pointage->setRetardMidi($time);
+            } elseif (($departAnticiper >= $retardMidi) && ($departAnticiper >= $retardEnMinute)) {
                 if ($heurAutoriser >=$departAnticiper) {
                     $time->setTimestamp($heurAutoriser -$departAnticiper);
-                   
                     $heurAutoriser -= $departAnticiper;
-                    var_dump($heurAutoriser);
-                    var_dump($departAnticiper);
+                    $departAnticiper=0;
                 } else {
                     $time->setTimestamp($departAnticiper -  $heurAutoriser);
+                    $departAnticiper=$departAnticiper-$heurAutoriser ;
                     $heurAutoriser = 0;
-                    var_dump($heurAutoriser);
-                    var_dump($departAnticiper);
                 }
                 $pointage->setDepartAnticiper($time);
-                var_dump($pointage->getDepartAnticiper());
-                var_dump($retardEnMinute);
-                var_dump($retardMidi);
             } else {
-                var_dump($retardEnMinute);
-                var_dump($retardMidi);
+                dump($retardEnMinute);
+                dump($retardMidi);
                 dd($departAnticiper);
             }
         }
+        $pointage->setTotaleRetard(new DateTime(date('H:i:s', $retardEnMinute+$retardMidi+$departAnticiper)));
         dd($pointage);
         //$pointage->setAbsence(null);
         // $this->congerService->constructFromAbsence($absence);
-        die('tttt');
         $this->manager->flush();
     }
     public function absenceDeleter(BeforeEntityDeletedEvent $event)
