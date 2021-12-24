@@ -2,18 +2,23 @@
 
 namespace App\Tests\KernelTest\Service;
 
+use App\Repository\UserRepository;
+use App\Service\DbfService;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class DbfServiceTest extends KernelTestCase
 {
-    public function testSomething(): void
+    public function testGetDbfDateInDB(): void
     {
-        $kernel = self::bootKernel();
-
-        $this->assertSame('test', $kernel->getEnvironment());
-        
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $container = static::getContainer();
+        $userRepository = $container->get(UserRepository::class);
+        $testUser = $userRepository->findOneBy(['email'=>'mourad.ben.fradj@gmail.com']);
+        /**
+         * @var DbfService
+         */
+        $dbfService = $container->get(DbfService::class);
+        $dbfService->setEmployer($testUser);
+        $this->assertIsArray($dbfService->getDbfDateInDB());
+        $this->assertEmpty($dbfService->getDbfDateInDB());
     }
 }
