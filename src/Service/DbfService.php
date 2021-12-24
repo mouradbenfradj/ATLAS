@@ -16,7 +16,7 @@ class DbfService extends PointageService
     use TableReaderTrait;
     use DbfEntityTrait;
     /**
-     * dbf
+     * Dbf
      *
      * @var Dbf
      */
@@ -37,7 +37,7 @@ class DbfService extends PointageService
     }
 
     /**
-     * createEntity
+     * CreateEntity
      *
      * @return Dbf
      */
@@ -75,6 +75,15 @@ class DbfService extends PointageService
         return $this->dbf;
     }
 
+    /**
+     * DbfConvertToPointage
+     *
+     * @param Dbf $dbf
+     * @param Absence|null $absence
+     * @param Conger|null $conger
+     * @param AutorisationSortie|null $autorisationSortie
+     * @return Pointage
+     */
     public function dbfConvertToPointage(Dbf $dbf, ?Absence $absence, ?Conger $conger, ?AutorisationSortie $autorisationSortie): Pointage
     {
         $this->pointage = new Pointage();
@@ -96,6 +105,11 @@ class DbfService extends PointageService
         return $this->pointage;
     }
       
+    /**
+     * NbrHeurTravailler
+     *
+     * @return DateTime
+     */
     public function nbrHeurTravailler():DateTime
     {
         $date = new DateTime();
@@ -106,6 +120,13 @@ class DbfService extends PointageService
         $atttime += $this->dateIntervalToSeconds(date_diff($this->pointage->getEntrer(), $this->pointage->getSortie()));
         return $date->setTimestamp($atttime-$this->sumPauseInSecond());
     }
+
+    /**
+     * HeurNormalementTravailler
+     *
+     * @param Dbf $dbf
+     * @return DateTime
+     */
     public function heurNormalementTravailler(Dbf $dbf):DateTime
     {
         $seconds =date_diff($dbf->getClockoutti(), $dbf->getClockintim());
@@ -116,6 +137,12 @@ class DbfService extends PointageService
         $date = new DateTime();
         return $date->setTimestamp($seconds);
     }
+    /**
+     * RetardEnMinute
+     *
+     * @param integer $late
+     * @return DateTime|null
+     */
     public function retardEnMinute(int $late):?DateTime
     {
         $date = new DateTime();
@@ -129,6 +156,12 @@ class DbfService extends PointageService
             return null;
         }
     }
+    /**
+     * RetardMidi
+     *
+     * @param array $attchktime
+     * @return DateTime|null
+     */
     public function retardMidi(array $attchktime):?DateTime
     {
         $entrer = $dpd = $fpd  = $sortie = null;
@@ -173,6 +206,11 @@ class DbfService extends PointageService
             return null;
         }
     }
+    /**
+     * TotaleRetard
+     *
+     * @return DateTime
+     */
     public function totaleRetard():DateTime
     {
         $date = new DateTime();
@@ -188,6 +226,11 @@ class DbfService extends PointageService
         }
         return $date->setTimestamp($totaleRetard);
     }
+    /**
+     * Diff
+     *
+     * @return DateTime
+     */
     public function diff():DateTime
     {
         $date = new DateTime();
@@ -199,7 +242,13 @@ class DbfService extends PointageService
         }
         return $date->setTimestamp($diff);
     }
-    public function departAnticiper(Dbf $dbf)
+    /**
+     * DepartAnticiper
+     *
+     * @param Dbf $dbf
+     * @return DateTime|null
+     */
+    public function departAnticiper(Dbf $dbf):?DateTime
     {
         $date = new DateTime();
         $departAnticiper = 0;
