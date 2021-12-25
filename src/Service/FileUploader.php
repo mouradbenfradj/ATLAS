@@ -1,32 +1,29 @@
 <?php
 namespace App\Service;
 
+use App\Interfaces\FileUploaderInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 class FileUploader
 {
-    private $targetDirectory;
-    private $slugger;
+    private FileUploaderInterface $fileUploaderInterface ;
 
-    public function __construct($targetDirectory, SluggerInterface $slugger)
+    public function __construct(FileUploaderInterface $fileUploaderInterface)
     {
-        $this->targetDirectory = $targetDirectory;
-        $this->slugger = $slugger;
+     
+        /**
+         * @var FileUploaderInterface
+         */
+        $this->fileUploaderInterface = $fileUploaderInterface;
     }
 
     public function upload(UploadedFile $file)
     {
-        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename = $this->slugger->slug($originalFilename);
-        $fileName = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
-
-        try {
-            $file->move($this->getTargetDirectory(), $fileName);
-        } catch (FileException $e) {
-            // ... handle exception if something happens during file upload
-        }
+        var_dump($this->fileUploaderInterface->upload($file));
+        die();
+        uasort($elements, [$this->fileUploaderInterface, 'Impl']);
 
         return $fileName;
     }
