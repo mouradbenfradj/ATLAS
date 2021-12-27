@@ -5,7 +5,7 @@ parameters:
         - var/cache/dev/Symfony/Config
     doctrine:
         objectManagerLoader: tests/object-manager.php
-    level: 5
+    level: 4
     paths:
         - src
         - tests
