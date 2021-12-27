@@ -45,6 +45,10 @@
         "twig/twig": "^2.12|^3.0"
     },
     "require-dev": {
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan": "^1.2",
+        "phpstan/phpstan-doctrine": "^1.0",
+        "phpstan/phpstan-symfony": "^1.0",
         "phpunit/phpunit": "^9.5",
         "symfony/browser-kit": "5.4.*",
         "symfony/css-selector": "5.4.*",
@@ -82,6 +86,12 @@
         "symfony/polyfill-php72": "*"
     },
     "scripts": {
+        "phpunit":"./vendor/bin/phpunit",
+        "phpstan": "phpstan analyse",
+        "ci": [
+            "@phpstan",
+            "@phpunit"
+        ],
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
