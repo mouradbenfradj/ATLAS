@@ -5,7 +5,9 @@ namespace App\Controller;
 use App\Controller\Admin\DbfCrudController;
 use App\Entity\User;
 use App\Form\UploadType;
+use App\Implement\DbfImpl;
 use App\Service\DbfService;
+use App\Service\FileUploader;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -57,15 +59,16 @@ class DbfController extends AbstractController
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $dbf = $form->get('upload')->getData();
-            if ($dbf) {
-                $dbfService->setEmployer($employer);
-                $employer = $dbfService->installDbfFile($dbf);
-                $manager = $this->getDoctrine()->getManager();
-                $manager->persist($employer);
-                $manager->flush();
-                $this->addFlash('success', 'upload DBF Successfully');
-            }
+            $file = $form->get('upload')->getData();
+            $fileUploader = new  FileUploader(new DbfImpl);
+            $fileUploader->upload($file);
+            dd($fileUploader);
+            //$dbfService->setEmployer($employer);
+            $manager = $this->getDoctrine()->getManager();
+            $manager->persist($employer);
+            $manager->flush();
+            $this->addFlash('success', 'upload DBF Successfully');
+            
             $url = $this->adminUrlGenerator
                 ->setController(DbfCrudController::class)
                 ->setAction('index')

@@ -3,14 +3,21 @@
 
 namespace App\Implement;
 
+use App\Abstracts\AbstractFile;
 use App\Entity\Dbf;
 use App\Interfaces\FileUploaderInterface;
 use DateTime;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use XBase\TableReader;
 
-class DbfImpl implements FileUploaderInterface
+class DbfImpl extends AbstractFile implements FileUploaderInterface
 {
+
+    const FORMATTIMEHI = 'H:i';
+    const FORMATTIMEHIS = self::FORMATTIMEHI . ':s';
+    const FORMATDATEDMY = 'd/m/Y';
+
+
     public function upload(UploadedFile $file)
     {
         $dbfs = new TableReader($file);
@@ -69,5 +76,32 @@ class DbfImpl implements FileUploaderInterface
             }
         }
         return $this->getEmployer();
+    }
+
+     /**
+     * GetDbfDateInDB
+     *
+     * @return string[]
+     */
+    public function getDbfDateInDB():array
+    {
+        return array_map(
+            fn ($date): string => $date->getAttdate()->format('Y-m-d'),
+            $this->getEmployer()->getDbfs()->toArray()
+        );
+    }
+    
+    /**
+     * DateString_d_m_Y_ToDateTime
+     *
+     * @param string $dateString
+     * @return DateTime|null
+     */
+    public function dateString_d_m_Y_ToDateTime(string $dateString): ?DateTime
+    {
+        if (DateTime::createFromFormat(self::FORMATDATEDMY, $dateString) !== false) {
+            return DateTime::createFromFormat(self::FORMATDATEDMY, $dateString);
+        }
+        return null;
     }
 }

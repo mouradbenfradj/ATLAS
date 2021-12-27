@@ -18,19 +18,6 @@ class DateTimeService extends ConfigService implements DateInterface, TimeInterf
     public function __construct(EntityManagerInterface $manager)
     {
         parent::__construct($manager)        ;
-    }
-    /**
-     * DateString_d_m_Y_ToDateTime
-     *
-     * @param string $dateString
-     * @return DateTime|null
-     */
-    public function dateString_d_m_Y_ToDateTime(string $dateString): ?DateTime
-    {
-        if (DateTime::createFromFormat(self::FORMATDATEDMY, $dateString) !== false) {
-            return DateTime::createFromFormat(self::FORMATDATEDMY, $dateString);
-        }
-        return null;
     }/**
      * DateString_m_d_Y_ToDateTime
      *
