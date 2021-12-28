@@ -41,7 +41,7 @@ class UserCrudController extends AbstractCrudController
                         'SuperAdmin' => 'ROLE_SUPER_ADMIN'
                     ]
                 ),
-            IntegerField::new('userID'),
+            //IntegerField::new('userID'),
             IntegerField::new('badgenumbe'),
             TextField::new('firstName'),
             TextField::new('lastName'),
@@ -59,7 +59,7 @@ class UserCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         $dbfGenerator = Action::new('dbfGenerator', 'generate depui DbF File')
-        ->linkToRoute('file_uploader', function (User $user): array {
+        ->linkToRoute('dbf_uploader', function (User $user): array {
             return [
                 'employer' => $user->getId()
             ];

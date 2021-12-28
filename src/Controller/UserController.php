@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\UploadType;
 use App\Service\UserService;
+use App\Util\FileInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,13 +28,12 @@ class UserController extends AbstractController
     /**
       * @Route("/file/uploader/{employer}", name="file_uploader")
       */
-    public function upload(Request $request, User $employer, AdminUrlGenerator $adminUrlGenerator, UserService $userService): Response
+    public function upload(Request $request, User $employer, AdminUrlGenerator $adminUrlGenerator, FileInterface $fileInterface): Response
     {
         $form = $this->createForm(UploadType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $file = $form->get('upload')->getData();
-            $userService->upload($employer, $file);
+            $fileUploader= $fileInterface->upload($form->get('upload')->getData());
             dd($fileUploader);
             //$dbfService->setEmployer($employer);
             $manager = $this->getDoctrine()->getManager();

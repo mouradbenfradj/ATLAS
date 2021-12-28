@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -16,8 +18,20 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
+     * __toString function
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getBadgenumbe() . " " . $this->getLastName() . " " . $this->getFirstName();
+    }
+    /**
+     * Id
+     *
+     * @var int
      * @ORM\Id
-     * @ORM\GeneratedValue
+     * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -77,6 +91,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="boolean")
      */
     private $isVerified = false;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Dbf::class, mappedBy="employer", orphanRemoval=true, cascade={"persist", "remove"})
+     */
+    private $dbfs;
+
+    public function __construct()
+    {
+        $this->dbfs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -259,6 +283,50 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): self
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Dbf[]
+     */
+    public function getDbfs(): Collection
+    {
+        return $this->dbfs;
+    }
+
+    public function addDbf(Dbf $dbf): self
+    {
+        if (!$this->dbfs->contains($dbf)) {
+            $this->dbfs[] = $dbf;
+            $dbf->setEmployer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDbf(Dbf $dbf): self
+    {
+        if ($this->dbfs->removeElement($dbf)) {
+            // set the owning side to null (unless already changed)
+            if ($dbf->getEmployer() === $this) {
+                $dbf->setEmployer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set id
+     *
+     * @param  int  $id  Id
+     *
+     * @return  self
+     */
+    public function setId(int $id)
+    {
+        $this->id = $id;
 
         return $this;
     }

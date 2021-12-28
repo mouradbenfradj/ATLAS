@@ -97,6 +97,9 @@
     "friendsofphp/proxy-manager-lts": {
         "version": "v1.0.5"
     },
+    "hisamu/php-xbase": {
+        "version": "2.1.0"
+    },
     "laminas/laminas-code": {
         "version": "4.5.1"
     },
