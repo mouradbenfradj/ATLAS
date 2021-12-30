@@ -13,13 +13,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/dbf")
-*/
 class DbfController extends AbstractController
 {
     /**
-     * @Route("/file/uploader/{employer}", name="dbf_uploader")
+     * @Route("/dbf/file/uploader/{employer}", name="dbf_uploader")
     */
     public function upload(DbfService $dbfService, ManagerRegistry $doctrine, User $employer, AdminUrlGenerator $adminUrlGenerator, Request $request): Response
     {
