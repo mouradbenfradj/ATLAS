@@ -44,7 +44,6 @@ class RegistrationControllerTest extends WebTestCase
         ]);
         $client->submit($form);
         $this->assertResponseIsSuccessful();
-        $crawler = $client->followRedirect();
         $response = $client->getResponse();
         //$this->assertResponseRedirects('/');
     }
