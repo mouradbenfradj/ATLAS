@@ -10,7 +10,6 @@ class DefaulltControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $response = $client->request('GET', '/');
-
         $this->assertResponseIsSuccessful();
     }
 }

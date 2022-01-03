@@ -29,7 +29,7 @@ class PointageCrudController extends AbstractCrudController
             ->createAsGlobalAction();
         $updateFromXlsx = Action::new('updateFromXlsx', 'Update from Xlsx')
             ->setIcon('fa fa-download')
-            ->linkToRoute('default')
+            ->linkToRoute('index')
             ->setCssClass('btn')
             ->createAsGlobalAction();
 
