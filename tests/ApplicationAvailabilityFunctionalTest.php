@@ -13,7 +13,7 @@ class ApplicationAvailabilityFunctionalTest extends WebTestCase
         $client = self::createClient();
         $client->request('GET', $url);
 
-        $this->assertResponseIsSuccessful();
+        $this->assertResponseIsSuccessful($url);
     }
 
     public function urlProvider()
@@ -21,8 +21,6 @@ class ApplicationAvailabilityFunctionalTest extends WebTestCase
         yield ['/admin'];
         yield ['/'];
         yield ['/register'];
-        yield ['/verify/email'];
         yield ['/login'];
-        yield ['/logout'];
     }
 }
