@@ -15,6 +15,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    public function __toString()
+    {
+        return $this->id.' '.$this->lastName.' '.$this->firstName;
+    }
     /**
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="NONE")
@@ -83,6 +87,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
     public function getEmail(): ?string
     {
         return $this->email;
