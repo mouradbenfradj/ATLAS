@@ -6,17 +6,26 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ApplicationAvailabilityFunctionalTest extends WebTestCase
 {
-    /**
-     * @dataProvider urlProvider
-     */
-    public function testPageIsSuccessful($url)
+   
+    public function testNotLogiedIsSuccessful($url)
     {
         $client = self::createClient();
-        $client->request('GET', $url);
+        $client->request('GET', '/login');
 
-        $this->assertResponseIsSuccessful();
+        $this->assertResponseIsSuccessful('/login');
     }
 
+    public function urlProviderWithRedirectionToLogin()
+    {
+        yield ['/'];
+        yield ['/admin'];
+        yield ['/dbf/file/uploader/1'];
+        yield ['/verify/email'];
+        // ...
+    }
+
+
+    
     public function urlProvider()
     {
         yield ['/'];
