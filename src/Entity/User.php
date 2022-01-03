@@ -17,7 +17,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue
+     * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\Column(type="integer")
      */
     private $id;
@@ -42,6 +42,41 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="boolean")
      */
     private $isVerified = false;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $badgenumbe;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $firstName;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $lastName;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $qualification;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $matricule;
+
+    /**
+     * @ORM\Column(type="date")
+     */
+    private $debutTravaille;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $demission;
 
     public function getId(): ?int
     {
@@ -140,6 +175,90 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): self
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function getBadgenumbe(): ?int
+    {
+        return $this->badgenumbe;
+    }
+
+    public function setBadgenumbe(int $badgenumbe): self
+    {
+        $this->badgenumbe = $badgenumbe;
+
+        return $this;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): self
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): self
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getQualification(): ?string
+    {
+        return $this->qualification;
+    }
+
+    public function setQualification(?string $qualification): self
+    {
+        $this->qualification = $qualification;
+
+        return $this;
+    }
+
+    public function getMatricule(): ?int
+    {
+        return $this->matricule;
+    }
+
+    public function setMatricule(?int $matricule): self
+    {
+        $this->matricule = $matricule;
+
+        return $this;
+    }
+
+    public function getDebutTravaille(): ?\DateTimeInterface
+    {
+        return $this->debutTravaille;
+    }
+
+    public function setDebutTravaille(\DateTimeInterface $debutTravaille): self
+    {
+        $this->debutTravaille = $debutTravaille;
+
+        return $this;
+    }
+
+    public function getDemission(): ?\DateTimeInterface
+    {
+        return $this->demission;
+    }
+
+    public function setDemission(?\DateTimeInterface $demission): self
+    {
+        $this->demission = $demission;
 
         return $this;
     }
