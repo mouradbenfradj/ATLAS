@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Dbf;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -39,7 +40,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Autorisation Sortie', 'fa fa-hourglass-half', AutorisationSortie::class),
             MenuItem::linkToCrud('Conger', 'fa fa-calendar-minus-o', Conger::class),
             MenuItem::linkToCrud('Pointage', 'fa fa-hand-pointer-o', Pointage::class),
-            MenuItem::linkToCrud('Dbf', 'fa fa-file', Dbf::class),
+            */MenuItem::linkToCrud('Dbf', 'fa fa-file', Dbf::class),/*
             MenuItem::linkToCrud('Xlsx', 'fa fa-file-excel-o', Xlsx::class), */
             MenuItem::linkToCrud('Employer', 'fa fa-user', User::class),
         ]);/*
